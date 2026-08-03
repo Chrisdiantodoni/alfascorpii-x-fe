@@ -1,0 +1,480 @@
+{
+  "nodes": [
+    {
+      "id": "agents_tanstack_start",
+      "label": "TanStack Start Framework",
+      "file_type": "document",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/AGENTS.md",
+      "source_location": "line 3",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "agents_drizzle_orm",
+      "label": "Drizzle ORM",
+      "file_type": "document",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/AGENTS.md",
+      "source_location": "line 3",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "agents_postgresql",
+      "label": "PostgreSQL Database",
+      "file_type": "document",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/AGENTS.md",
+      "source_location": "line 3",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "agents_better_auth",
+      "label": "Better Auth",
+      "file_type": "document",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/AGENTS.md",
+      "source_location": "line 3",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "agents_tailwind_css_v4",
+      "label": "Tailwind CSS v4",
+      "file_type": "document",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/AGENTS.md",
+      "source_location": "line 3",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "agents_biome",
+      "label": "Biome Linter and Formatter",
+      "file_type": "document",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/AGENTS.md",
+      "source_location": "line 36",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "agents_file_based_routing",
+      "label": "File-Based Routing",
+      "file_type": "document",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/AGENTS.md",
+      "source_location": "line 22",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "agents_path_aliases",
+      "label": "Path Aliases (#/* and @/*)",
+      "file_type": "document",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/AGENTS.md",
+      "source_location": "line 23",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "agents_db_schema",
+      "label": "App Database Schema (src/db/schema.ts)",
+      "file_type": "document",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/AGENTS.md",
+      "source_location": "line 25",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "agents_auth_schema",
+      "label": "Auth Schema (src/db/auth-schema.ts)",
+      "file_type": "document",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/AGENTS.md",
+      "source_location": "line 26",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "agents_drizzle_schema_reflection",
+      "label": "Drizzle Schema Reflection (src/drizzle/schema.ts)",
+      "file_type": "document",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/AGENTS.md",
+      "source_location": "line 27",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "agents_db_instance",
+      "label": "Drizzle DB Instance (no relational query builder)",
+      "file_type": "document",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/AGENTS.md",
+      "source_location": "line 28",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "agents_typescript_strict",
+      "label": "TypeScript Strict Mode with verbatimModuleSyntax",
+      "file_type": "document",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/AGENTS.md",
+      "source_location": "line 35",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "agents_generated_files",
+      "label": "Generated Files (do not edit)",
+      "file_type": "document",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/AGENTS.md",
+      "source_location": "line 37",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "readme_tanstack_start",
+      "label": "TanStack Start App",
+      "file_type": "document",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/README.md",
+      "source_location": "line 1",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "readme_vitest",
+      "label": "Vitest Testing Framework",
+      "file_type": "document",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/README.md",
+      "source_location": "line 22",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "readme_tanstack_router",
+      "label": "TanStack Router",
+      "file_type": "document",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/README.md",
+      "source_location": "line 56",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "readme_server_functions",
+      "label": "TanStack Server Functions",
+      "file_type": "document",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/README.md",
+      "source_location": "line 125",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "readme_demo_files",
+      "label": "Demo Files Convention",
+      "file_type": "document",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/README.md",
+      "source_location": "line 198",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "firecrawl_inertia_scroller",
+      "label": "Inertia Scroller (CSS Drag Scroll Pattern)",
+      "file_type": "document",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/.firecrawl/inertia-scroller.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "firecrawl_kinetic_scrolling",
+      "label": "JavaScript Kinetic Scrolling with Physics",
+      "file_type": "document",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/.firecrawl/kinetic-scrolling.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "firecrawl_pointer_events_drag",
+      "label": "Pointer Events Drag Interactions",
+      "file_type": "document",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/.firecrawl/pointer-events-drag.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "firecrawl_tw_carousel",
+      "label": "Tailwind Elements Carousel Component",
+      "file_type": "document",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/.firecrawl/tw-carousel.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "public_drizzle_svg_drizzle_logo",
+      "label": "Drizzle ORM Logo",
+      "file_type": "image",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/public/drizzle.svg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "public_logo192_png_app_logo_192",
+      "label": "Alfascorpii X App Logo (192px)",
+      "file_type": "image",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/public/logo192.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "public_logo512_png_app_logo_512",
+      "label": "Alfascorpii X App Logo (512px)",
+      "file_type": "image",
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/public/logo512.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "readme_tanstack_start",
+      "target": "agents_tanstack_start",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/README.md",
+      "source_location": "line 1",
+      "weight": 1.0
+    },
+    {
+      "source": "agents_tanstack_start",
+      "target": "agents_tailwind_css_v4",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/AGENTS.md",
+      "source_location": "line 3",
+      "weight": 1.0
+    },
+    {
+      "source": "agents_tanstack_start",
+      "target": "agents_drizzle_orm",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/AGENTS.md",
+      "source_location": "line 3",
+      "weight": 1.0
+    },
+    {
+      "source": "agents_drizzle_orm",
+      "target": "agents_postgresql",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/AGENTS.md",
+      "source_location": "line 3",
+      "weight": 1.0
+    },
+    {
+      "source": "agents_drizzle_orm",
+      "target": "agents_better_auth",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/AGENTS.md",
+      "source_location": "line 29",
+      "weight": 1.0
+    },
+    {
+      "source": "agents_db_schema",
+      "target": "agents_auth_schema",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/AGENTS.md",
+      "source_location": "line 31",
+      "weight": 1.0
+    },
+    {
+      "source": "agents_db_schema",
+      "target": "agents_drizzle_schema_reflection",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/AGENTS.md",
+      "source_location": "line 27",
+      "weight": 1.0
+    },
+    {
+      "source": "agents_tanstack_start",
+      "target": "agents_file_based_routing",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/AGENTS.md",
+      "source_location": "line 22",
+      "weight": 1.0
+    },
+    {
+      "source": "agents_file_based_routing",
+      "target": "readme_tanstack_router",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/README.md",
+      "source_location": "line 56",
+      "weight": 1.0
+    },
+    {
+      "source": "agents_typescript_strict",
+      "target": "agents_biome",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/AGENTS.md",
+      "source_location": "line 36",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_tanstack_start",
+      "target": "readme_server_functions",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/README.md",
+      "source_location": "line 125",
+      "weight": 1.0
+    },
+    {
+      "source": "firecrawl_kinetic_scrolling",
+      "target": "firecrawl_pointer_events_drag",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/.firecrawl/kinetic-scrolling.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "firecrawl_inertia_scroller",
+      "target": "firecrawl_kinetic_scrolling",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/.firecrawl/inertia-scroller.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "firecrawl_tw_carousel",
+      "target": "agents_tailwind_css_v4",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/.firecrawl/tw-carousel.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "public_drizzle_svg_drizzle_logo",
+      "target": "agents_drizzle_orm",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/public/drizzle.svg",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "public_logo192_png_app_logo_192",
+      "target": "public_logo512_png_app_logo_512",
+      "relation": "semantically_similar_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/public/logo192.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "readme_vitest",
+      "target": "agents_typescript_strict",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/README.md",
+      "source_location": "line 22",
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "drag_scroll_research",
+      "label": "Drag and Scroll Research References",
+      "nodes": [
+        "firecrawl_inertia_scroller",
+        "firecrawl_kinetic_scrolling",
+        "firecrawl_pointer_events_drag",
+        "firecrawl_tw_carousel"
+      ],
+      "relation": "form",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "/Users/italfa/Desktop/web-project/alfascorpii-x/.firecrawl/inertia-scroller.md"
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

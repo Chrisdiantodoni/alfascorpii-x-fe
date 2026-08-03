@@ -1,0 +1,233 @@
+@import "tailwindcss";
+
+@plugin "@tailwindcss/typography";
+
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-ink: #0a0a0c;
+  --color-ink-2: #131417;
+  --color-paper: #ffffff;
+  --color-paper-dim: #f4f5f7;
+  --color-paper-mute: #e7e9ed;
+  --color-blue: #0b3d91;
+  --color-blue-bright: #1f5fe0;
+  --color-ash: #5a5f6b;
+  --color-line: #e2e4e9;
+  --font-head: "Montserrat", sans-serif;
+  --font-body: "Inter", sans-serif;
+}
+@theme inline {
+	--animate-marquee: marquee var(--duration) infinite linear;
+	--animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+	--animate-pop: pop 0.35s ease-out;
+
+	@keyframes marquee {
+		from {
+			transform: translateX(0);
+		}
+		to {
+			transform: translateX(calc(-100% - var(--gap)));
+		}
+	}
+	@keyframes marquee-vertical {
+		from {
+			transform: translateY(0);
+		}
+		to {
+			transform: translateY(calc(-100% - var(--gap)));
+		}
+	}
+	@keyframes pop {
+		0% {
+			transform: scale(1);
+		}
+		50% {
+			transform: scale(1.15);
+		}
+		80% {
+			transform: scale(0.95);
+		}
+		100% {
+			transform: scale(1);
+		}
+	}
+}
+@keyframes overlay-show {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes overlay-hide {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+html.dark body {
+  background: #0a0a0c;
+  color: #f2f3f5;
+}
+
+html.dark .bg-paper {
+  background: #0a0a0c !important;
+}
+
+html.dark .bg-paper-dim {
+  background: #16171b !important;
+}
+
+html.dark .bg-paper-mute {
+  background: #202226 !important;
+}
+
+html.dark .bg-white {
+  background: #141519 !important;
+}
+
+html.dark #topbar.nav-transparent .bg-white {
+  background: #ffffff !important;
+}
+
+html.dark .border-line {
+  border-color: #26282e !important;
+}
+
+html.dark .text-ink {
+  color: #f2f3f5 !important;
+}
+
+html.dark #topbar .bg-ink {
+  background: #f2f3f5 !important;
+}
+
+html.dark .text-ash {
+  color: #9ca3af !important;
+}
+
+html.dark .hover\:bg-ink:hover {
+  background: #f2f3f5 !important;
+}
+
+html.dark .hover\:bg-ink > * {
+  color: #0a0a0c !important;
+}
+
+#topbar {
+  --tw-backdrop-blur: blur(10px);
+  -webkit-backdrop-filter: var(--tw-backdrop-blur);
+  backdrop-filter: var(--tw-backdrop-blur);
+  background: rgba(255, 255, 255, 0.88);
+  border-bottom-color: transparent;
+  transition:
+    background 0.3s,
+    border-color 0.3s,
+    backdrop-filter 0.3s;
+}
+
+#topbar.scrolled {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom-color: rgba(226, 228, 233, 0.5);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+}
+
+html.dark #topbar {
+  background: rgba(10, 10, 12, 0.92);
+}
+
+html.dark #topbar.scrolled {
+  background: rgba(10, 10, 12, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom-color: rgba(38, 40, 46, 0.5);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+}
+
+#topbar.nav-transparent,
+html.dark #topbar.nav-transparent {
+  background: transparent !important;
+  border-bottom-color: transparent !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.dragging {
+  cursor: grabbing;
+  scroll-behavior: auto;
+}
+
+.dragging * {
+  pointer-events: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+a {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--color-blue-bright);
+  outline-offset: 2px;
+}
+
+/* Banner Swiper — pagination dots */
+.banner-pagination {
+  position: absolute !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: auto !important;
+  bottom: 24px !important;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  z-index: 20;
+}
+.banner-pagination .swiper-pagination-bullet {
+  width: 12px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 1;
+  transition: all 0.3s;
+  margin: 0 !important;
+}
+.banner-pagination .swiper-pagination-bullet-active {
+  background: white;
+  transform: scale(1.1);
+}

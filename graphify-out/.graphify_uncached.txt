@@ -1,0 +1,10 @@
+/Users/italfa/Desktop/web-project/alfascorpii-x/.firecrawl/inertia-scroller.md
+/Users/italfa/Desktop/web-project/alfascorpii-x/.firecrawl/kinetic-scrolling.md
+/Users/italfa/Desktop/web-project/alfascorpii-x/.firecrawl/pointer-events-drag.md
+/Users/italfa/Desktop/web-project/alfascorpii-x/.firecrawl/tw-carousel.md
+/Users/italfa/Desktop/web-project/alfascorpii-x/AGENTS.md
+/Users/italfa/Desktop/web-project/alfascorpii-x/README.md
+/Users/italfa/Desktop/web-project/alfascorpii-x/public/robots.txt
+/Users/italfa/Desktop/web-project/alfascorpii-x/public/drizzle.svg
+/Users/italfa/Desktop/web-project/alfascorpii-x/public/logo192.png
+/Users/italfa/Desktop/web-project/alfascorpii-x/public/logo512.png

@@ -1,0 +1,173 @@
+import { Button } from "./Button";
+
+export interface BannerFieldSettings {
+	title: { position: "left" | "center" | "right"; width: number };
+	subtitle: { position: "left" | "center" | "right"; width: number };
+	cta_text: { position: "left" | "center" | "right"; width: number };
+	gap: number;
+	padding_x: number;
+	padding_y: number;
+}
+
+export interface Banner {
+	id: string;
+	title: string | null;
+	subtitle: string | null;
+	imageUrl: string | null;
+	clickUrl: string | null;
+	ctaText: string | null;
+	textColor: string;
+	overlay: boolean;
+	placement: string;
+	orderPosition: number;
+	isActive: boolean;
+	startDate: string | null;
+	endDate: string | null;
+	fieldSettings: BannerFieldSettings | null;
+}
+
+const DEFAULT_FIELDS: BannerFieldSettings = {
+	title: { position: "center", width: 100 },
+	subtitle: { position: "center", width: 100 },
+	cta_text: { position: "center", width: 56 },
+	gap: 8,
+	padding_x: 32,
+	padding_y: 32,
+};
+
+function posClass(pos: "left" | "center" | "right") {
+	if (pos === "left") return "text-left mr-auto";
+	if (pos === "right") return "text-right ml-auto";
+	return "text-center mx-auto";
+}
+
+export function BannerSlide({
+	banner,
+	height = "92vh",
+	className = "",
+}: {
+	banner: Banner;
+	height?: string;
+	className?: string;
+}) {
+	const fs: BannerFieldSettings = {
+		title: { ...DEFAULT_FIELDS.title, ...banner.fieldSettings?.title },
+		subtitle: { ...DEFAULT_FIELDS.subtitle, ...banner.fieldSettings?.subtitle },
+		cta_text: { ...DEFAULT_FIELDS.cta_text, ...banner.fieldSettings?.cta_text },
+		gap: banner.fieldSettings?.gap ?? DEFAULT_FIELDS.gap,
+		padding_x: banner.fieldSettings?.padding_x ?? DEFAULT_FIELDS.padding_x,
+		padding_y: banner.fieldSettings?.padding_y ?? DEFAULT_FIELDS.padding_y,
+	};
+	const { title, subtitle, cta_text: cta } = fs;
+	const isLight = banner.textColor === "light";
+
+	const isExternal =
+		banner.clickUrl?.startsWith("http://") ||
+		banner.clickUrl?.startsWith("https://");
+
+	return (
+		<section
+			className={`relative overflow-hidden flex flex-col justify-center ${className}`}
+			style={{ height }}
+		>
+			{banner.imageUrl ? (
+				<>
+					<div
+						className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+						style={{
+							backgroundImage: `url(${banner.imageUrl})`,
+						}}
+					/>
+					{banner.overlay && (
+						<div className="absolute inset-0 bg-[rgba(10,10,12,.6)]" />
+					)}
+				</>
+			) : (
+				<div className="absolute inset-0 flex items-center justify-end opacity-[0.06] pr-0 lg:pr-10 pointer-events-none">
+					<svg
+						viewBox="0 0 400 240"
+						className="w-[85%] max-w-[900px]"
+						fill="none"
+						stroke={isLight ? "#ffffff" : "#0B3D91"}
+						strokeWidth="3"
+					>
+						<circle cx="90" cy="180" r="46" />
+						<circle cx="310" cy="180" r="46" />
+						<path d="M90 180 L168 88 H244 L310 180" strokeLinejoin="round" />
+						<path d="M168 88 L140 180" />
+						<path d="M244 88 L226 44 H272" strokeLinecap="round" />
+					</svg>
+				</div>
+			)}
+
+			<div
+				className="relative z-10 flex flex-col w-full"
+				style={{
+					padding: `${fs.padding_y}px ${fs.padding_x}px`,
+				}}
+			>
+				{banner.title && (
+					<div
+						className={posClass(title?.position)}
+						style={{
+							width: `${title.width}%`,
+							marginBottom: fs.gap,
+						}}
+					>
+						<div
+							className={`font-head font-black tracking-tight ${
+								isLight ? "text-white" : "text-ink"
+							} [&>*]:text-[clamp(1.5rem,4.5vw,4rem)] [&>*]:leading-[1.1]`}
+							dangerouslySetInnerHTML={{
+								__html: banner.title,
+							}}
+						/>
+					</div>
+				)}
+
+				{banner.subtitle && (
+					<div
+						className={posClass(subtitle?.position)}
+						style={{
+							width: `${subtitle.width}%`,
+							marginBottom: fs.gap,
+						}}
+					>
+						<div
+							className={`text-[17px] md:text-[20px] ${
+								isLight ? "text-white/80" : "text-ash"
+							} [&>*]:mb-0`}
+							dangerouslySetInnerHTML={{
+								__html: banner.subtitle,
+							}}
+						/>
+					</div>
+				)}
+
+				{banner.ctaText && banner.clickUrl && (
+					<div
+						className={posClass(cta?.position)}
+						style={{ width: `${cta.width}%` }}
+					>
+						{isExternal ? (
+							<Button
+								variant={isLight ? "light" : "primary"}
+								href={banner.clickUrl}
+								external
+							>
+								{banner.ctaText}
+							</Button>
+						) : (
+							<Button
+								variant={isLight ? "light" : "primary"}
+								to={banner.clickUrl}
+							>
+								{banner.ctaText}
+							</Button>
+						)}
+					</div>
+				)}
+			</div>
+		</section>
+	);
+}
