@@ -54,6 +54,7 @@ export default function SparepartsTeaser() {
 						badge={p.code || "SPAREPART"}
 						icon="settings"
 						name={p.name}
+						slug={p.slug}
 						detail={rupiah(p.price)}
 						href={`/product/${p.slug}`}
 					/>

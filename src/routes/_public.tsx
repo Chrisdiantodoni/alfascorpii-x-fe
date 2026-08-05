@@ -11,6 +11,8 @@ import Topbar from "#/components/layout/Topbar";
 import WhatsAppFloat from "#/components/layout/WhatsAppFloat";
 import { getBanners } from "#/server/cms";
 import { getLayoutData } from "#/server/master";
+import { useCartStore } from "#/stores/cart";
+import { useWishlistStore } from "#/stores/wishlist";
 
 export const Route = createFileRoute("/_public")({
 	loader: async ({ location }) => {
@@ -24,12 +26,18 @@ export const Route = createFileRoute("/_public")({
 });
 
 function PublicLayout() {
-	const { menu, contact } = Route.useLoaderData();
-	const pathname = useRouterState({ select: (s) => s.location.pathname });
-	const isHome = pathname === "/";
+	const { menu, contact, banners } = Route.useLoaderData();
+	const pathname = useRouterState({
+		select: (s) => s.location.pathname,
+	});
+	const hasHeroBanner = pathname === "/";
+
 	const [menuOpen, setMenuOpen] = useState(false);
-	const [cartOpen, setCartOpen] = useState(false);
-	const [heroTransparent, setHeroTransparent] = useState(isHome);
+	const [heroTransparent, setHeroTransparent] = useState(hasHeroBanner);
+
+	useEffect(() => {
+		useWishlistStore.getState().load();
+	}, []);
 
 	useEffect(() => {
 		const topbar = document.getElementById("topbar");
@@ -37,13 +45,13 @@ function PublicLayout() {
 		const handler = () => {
 			const scrolled = window.scrollY > 24;
 			if (topbar) topbar.classList.toggle("scrolled", scrolled);
-			setHeroTransparent(isHome && window.scrollY < 80);
+			setHeroTransparent(hasHeroBanner && window.scrollY < 80);
 		};
 
 		handler();
 		window.addEventListener("scroll", handler, { passive: true });
 		return () => window.removeEventListener("scroll", handler);
-	}, [isHome]);
+	}, [hasHeroBanner]);
 
 	useEffect(() => {
 		if (menuOpen) {
@@ -61,7 +69,7 @@ function PublicLayout() {
 				menuOpen={menuOpen}
 				transparent={heroTransparent || menuOpen}
 				onMenuToggle={() => setMenuOpen((prev) => !prev)}
-				onCartToggle={() => setCartOpen(true)}
+				onCartToggle={useCartStore((s) => s.toggleCart)}
 			/>
 			<OverlayNav
 				open={menuOpen}
@@ -73,7 +81,7 @@ function PublicLayout() {
 				<Outlet />
 			</main>
 			<Footer contact={contact} menu={menu} />
-			<CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+			<CartDrawer />
 			<WhatsAppFloat contact={contact} />
 		</>
 	);

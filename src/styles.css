@@ -228,6 +228,35 @@ a:focus-visible {
   margin: 0 !important;
 }
 .banner-pagination .swiper-pagination-bullet-active {
-  background: white;
-  transform: scale(1.1);
+	background: white;
+	transform: scale(1.1);
+}
+
+/* Product Gallery — pagination dots */
+.gallery-pagination {
+	position: absolute !important;
+	left: 50% !important;
+	transform: translateX(-50%) !important;
+	width: auto !important;
+	bottom: 12px !important;
+	display: flex;
+	justify-content: center;
+	gap: 8px;
+	z-index: 10;
+}
+
+.gallery-pagination .swiper-pagination-bullet {
+	width: 8px;
+	height: 8px;
+	background: rgba(0, 0, 0, 0.35);
+	opacity: 1;
+	border-radius: 9999px;
+	transition: all 0.3s;
+	margin: 0 !important;
+}
+
+.gallery-pagination .swiper-pagination-bullet-active {
+	background: var(--color-blue);
+	width: 24px;
+	border-radius: 4px;
 }

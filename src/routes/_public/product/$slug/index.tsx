@@ -1,26 +1,56 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useLocation } from "@tanstack/react-router";
+import { Check } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "#/components/ui/Button";
 import { MaterialIcon } from "#/components/ui/MaterialIcon";
-import { cms } from "#/data/cms";
-
-function rupiah(n: number | null) {
-	if (n == null) return null;
-	return new Intl.NumberFormat("id-ID", {
-		style: "currency",
-		currency: "IDR",
-		maximumFractionDigits: 0,
-	}).format(n);
-}
+import { ProductGallery } from "#/components/ui/ProductGallery";
+import { WishlistButton } from "#/components/ui/WishlistButton";
+import { getProductDetail } from "#/server/master";
+import { useCartStore } from "#/stores/cart";
+import { formatRupiah } from "#/utils/fn";
 
 export const Route = createFileRoute("/_public/product/$slug/")({
 	component: ProductDetail,
+	loader: async ({ params }) => {
+		const data = await getProductDetail({
+			data: { slug: params.slug },
+		});
+		return data;
+	},
 });
 
 function ProductDetail() {
-	const { slug } = Route.useParams();
-	const product = cms.featuredProducts.find((p) => p.slug === slug);
+	const data = Route.useLoaderData();
+	const addItem = useCartStore((s) => s.addItem);
+	const items = useCartStore((s) => s.items);
+	const location = useLocation();
 
-	if (!product) {
+	const qty =
+		"id" in data ? (items.find((i) => i.id === String(data.id))?.qty ?? 0) : 0;
+
+	const [justAdded, setJustAdded] = useState(false);
+	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	useEffect(() => {
+		return () => {
+			if (timeoutRef.current) clearTimeout(timeoutRef.current);
+		};
+	}, []);
+
+	const handleAddToCart = () => {
+		if (justAdded || !("id" in data)) return;
+		addItem({
+			id: String(data.id),
+			name: data.name,
+			price: data.price != null ? Number(data.price) : null,
+			code: data.code,
+		});
+		setJustAdded(true);
+		timeoutRef.current = setTimeout(() => setJustAdded(false), 1200);
+	};
+
+	if (!("id" in data)) {
 		return (
 			<div className="pt-32 text-center">
 				<p className="text-ash">Produk tidak ditemukan.</p>
@@ -34,58 +64,71 @@ function ProductDetail() {
 		);
 	}
 
-	const sub = cms.featuredCategories
-		.flatMap((c) => c.subCategories)
-		.find((s) => s.id === product.subCategoryId);
+	const sub = data.subCategory;
+	const files = (data.files ?? []) as Array<{
+		url: string | null;
+		role: string;
+	}>;
+	const colors = (data.productColors ?? []) as Array<{
+		id: string;
+		hex: string;
+		name: string;
+	}>;
+	const price =
+		data.price != null ? formatRupiah(Number(data.price)) : "Hubungi admin";
 
-	const related = product.relatedProducts
-		.map((rp) => cms.featuredProducts.find((p) => p.id === rp.id))
-		.filter(Boolean);
+	const backTo = (location.state as { from?: string })?.from || "/store";
 
 	return (
 		<>
 			<section className="pt-32 pb-8">
 				<Link
-					to="/store"
+					to={backTo}
 					className="inline-flex items-center gap-2 text-[11px] tracking-widest text-ash hover:text-blue transition-colors"
 				>
 					<MaterialIcon name="arrow_back" className="!text-[16px]" />
-					KEMBALI KE TOKO
+					KEMBALI
 				</Link>
 			</section>
 
 			<section className="pb-20 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-				<div>
-					<div className="aspect-square bg-paper-dim flex items-center justify-center mb-4">
-						<MaterialIcon name="settings" className="text-blue !text-[80px]" />
-					</div>
-				</div>
+				<motion.div
+					layoutId={`product-card-${data.slug}`}
+					className="aspect-square bg-paper-dim overflow-hidden mb-5"
+					transition={{ duration: 0.45, ease: [0.32, 0.72, 0, 1] }}
+				>
+					<ProductGallery files={files} productName={data.name} />
+				</motion.div>
 				<div>
 					{sub && (
 						<span className="text-[12px] tracking-widest text-blue-bright font-semibold">
 							{sub.name.toUpperCase()}
 						</span>
 					)}
-					<h1 className="font-head font-black text-3xl md:text-4xl tracking-tight mt-3 mb-2">
-						{product.name}
-					</h1>
-					{product.code && (
-						<p className="text-[12px] text-ash mb-6">{product.code}</p>
+					<div className="flex items-start justify-between gap-4">
+						<h1 className="font-head font-black text-3xl md:text-4xl tracking-tight mt-3 mb-2">
+							{data.name}
+						</h1>
+						<WishlistButton
+							productId={String(data.id)}
+							className="shrink-0 mt-3"
+						/>
+					</div>
+					{data.code && (
+						<p className="text-[12px] text-ash mb-6">{data.code}</p>
 					)}
-					<p className="font-head font-bold text-2xl mb-6">
-						{product.price != null ? rupiah(product.price) : "Hubungi admin"}
-					</p>
+					<p className="font-head font-bold text-2xl mb-6">{price}</p>
 					<p className="text-ash leading-relaxed mb-8 max-w-lg">
-						{product.description}
+						{data.description}
 					</p>
 
-					{product.colors.length > 0 && (
+					{colors.length > 0 && (
 						<div className="mb-8">
 							<span className="block text-[11px] tracking-widest text-ash mb-3">
 								PILIHAN WARNA
 							</span>
 							<div className="flex gap-3">
-								{product.colors.map((c) => (
+								{colors.map((c) => (
 									<div
 										key={c.id}
 										className="w-8 h-8 rounded-full border border-line cursor-pointer hover:scale-110 transition-transform"
@@ -98,63 +141,111 @@ function ProductDetail() {
 					)}
 
 					<p className="text-[13px] mb-8">
-						{product.stock > 0
-							? `${product.stock} unit tersedia`
+						{data.stock > 0
+							? `${data.stock} unit tersedia`
 							: "Cek ketersediaan"}
 					</p>
 
-					<Button className="w-full sm:w-auto">
-						{product.price != null ? "TAMBAH KE KERANJANG" : "HUBUNGI ADMIN"}
-					</Button>
-
-					{product.specValues.length > 0 && (
-						<div className="mt-12">
-							<span className="block text-[11px] tracking-widest text-ash mb-3">
-								SPESIFIKASI
-							</span>
-							<div className="space-y-2">
-								{product.specValues.map((spec) => (
-									<div
-										key={spec.key}
-										className="flex justify-between py-2 border-b border-line text-sm"
-									>
-										<span className="text-ash">{spec.label}</span>
-										<span className="font-semibold">{spec.value}</span>
-									</div>
-								))}
-							</div>
-						</div>
+					{data.price != null ? (
+						<motion.div
+							transition={{ duration: 0.15 }}
+							className="w-full sm:w-auto"
+						>
+							<Button
+								className="w-full sm:w-auto min-w-[200px] relative overflow-hidden"
+								onClick={handleAddToCart}
+								disabled={justAdded}
+							>
+								<AnimatePresence mode="wait" initial={false}>
+									{justAdded ? (
+										<motion.span
+											key="added"
+											initial={{ y: 20, opacity: 0 }}
+											animate={{ y: 0, opacity: 1 }}
+											exit={{ y: -20, opacity: 0 }}
+											transition={{ duration: 0.2 }}
+											className="inline-flex items-center gap-2"
+										>
+											<Check size={15} />
+											DITAMBAHKAN
+										</motion.span>
+									) : qty > 0 ? (
+										<motion.span
+											key={`in-cart-${qty}`}
+											initial={{ scale: 0.8, opacity: 0 }}
+											animate={{ scale: 1, opacity: 1 }}
+											exit={{ scale: 0.8, opacity: 0 }}
+											transition={{ duration: 0.15 }}
+										>
+											DI KERANJANG ({qty})
+										</motion.span>
+									) : (
+										<motion.span
+											key="add"
+											initial={{ y: 20, opacity: 0 }}
+											animate={{ y: 0, opacity: 1 }}
+											exit={{ y: -20, opacity: 0 }}
+											transition={{ duration: 0.2 }}
+										>
+											TAMBAH KE KERANJANG
+										</motion.span>
+									)}
+								</AnimatePresence>
+							</Button>
+						</motion.div>
+					) : (
+						<Button className="w-full sm:w-auto" disabled>
+							HUBUNGI ADMIN
+						</Button>
 					)}
+					{data.specValues &&
+						(Array.isArray(data.specValues)
+							? (
+									data.specValues as Array<{
+										key: string;
+										label: string;
+										value: string;
+									}>
+								).length > 0
+							: typeof data.specValues === "object" &&
+								Object.keys(data.specValues).length > 0) && (
+							<div className="mt-12">
+								<span className="block text-[11px] tracking-widest text-ash mb-3">
+									SPESIFIKASI
+								</span>
+								<div className="space-y-2">
+									{Array.isArray(data.specValues)
+										? (
+												data.specValues as Array<{
+													key: string;
+													label: string;
+													value: string;
+												}>
+											).map((spec) => (
+												<div
+													key={spec.key}
+													className="flex justify-between py-2 border-b border-line text-sm"
+												>
+													<span className="text-ash">{spec.label}</span>
+													<span className="font-semibold">{spec.value}</span>
+												</div>
+											))
+										: Object.entries(
+												data.specValues as Record<string, unknown>,
+											).map(([key, value]) => (
+												<div
+													key={key}
+													className="flex justify-between py-2 border-b border-line text-sm"
+												>
+													<span className="text-ash">{key}</span>
+													<span className="font-semibold">{String(value)}</span>
+												</div>
+											))}
+								</div>
+							</div>
+						)}
 				</div>
 			</section>
-
-			{related.length > 0 && (
-				<section className="pb-24 border-t border-line pt-16">
-					<h3 className="font-head font-bold text-xl mb-8">Produk Terkait</h3>
-					<div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-						{related.map((p) =>
-							p ? (
-								<Link
-									key={p.id}
-									to="/product/$slug"
-									params={{ slug: p.slug }}
-									className="block bg-white border border-line p-6 group hover:border-blue transition-colors"
-								>
-									<div className="flex items-center justify-center py-4">
-										<MaterialIcon
-											name="settings"
-											className="text-blue !text-[36px]"
-										/>
-									</div>
-									<h4 className="font-head font-bold text-sm group-hover:text-blue transition-colors">
-										{p.name}
-									</h4>
-								</Link>
-							) : null,
-						)}
-					</div>
-				</section>
-			)}
 		</>
 	);
 }

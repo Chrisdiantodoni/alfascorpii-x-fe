@@ -77,7 +77,7 @@ export const PLACEMENTS = ["hero", "top", "middle", "bottom"] as const;
 export type BannerPlacement = (typeof PLACEMENTS)[number];
 
 export interface BannerScope {
-	type: "page" | "category" | "sub_category" | "product" | "blog" | "menu_item";
+	type: "page" | "category" | "sub_category" | "product" | "blog" | "menu_item" | "home";
 	id: string;
 }
 

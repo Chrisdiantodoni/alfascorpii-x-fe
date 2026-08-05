@@ -1,141 +1,150 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { motion } from "motion/react";
+import Hero from "#/components/sections/Hero";
+import { BannerCarousel } from "#/components/ui/BannerCarousel";
+import CategorySidebar from "#/components/ui/CategorySidebar";
+import { EmptyState } from "#/components/ui/EmptyState";
+import { MaterialIcon } from "#/components/ui/MaterialIcon";
 import { MiniProductCard } from "#/components/ui/MiniProductCard";
 import { Section } from "#/components/ui/Section";
 import { SectionHeading } from "#/components/ui/SectionHeading";
 import { cms } from "#/data/cms";
+import { getBanners } from "#/server/cms";
+import { getProductByCategory } from "#/server/master";
+import type { Category, FeaturedProduct } from "#/types";
+import { formatRupiah } from "#/utils/fn";
+import { TextInput } from "#/components/ui/TextInput";
 
-const allSubs = cms.featuredCategories.flatMap((c) => c.subCategories);
+function mapToMiniCard(product: FeaturedProduct) {
+  const type = product.subCategory?.name?.toLowerCase() || "";
+  const year = product?.specValues?.find((s) => s.key === "year");
 
-const categoryDescriptions: Record<string, string> = {
-	"sepeda-motor":
-		"Jelajahi seluruh line-up resmi Yamaha — dari matic premium harian hingga motor sport performa tinggi. Garansi resmi dan layanan purna jual terbaik.",
-	spareparts:
-		"Genuine Parts, Yamalube, Dunlop, dan Philips — semua sparepart original untuk performa maksimal motor Yamaha Anda.",
-	"premium-zone":
-		"Maxi matic premium — DP ringan mulai 1,5 juta, cicilan sampai 35 bulan.",
-	"fashionable-zone":
-		"Desain retro-modern favorit harian, tersedia banyak pilihan warna.",
-	"exciting-zone":
-		"Untuk yang suka performa — konsultasi test ride gratis lewat admin.",
-	"active-zone": "Matic harian irit dan lincah, cocok untuk mobilitas tinggi.",
-	"genuine-parts":
-		"Diskon 10% untuk semua Genuine Parts & Yamalube selama periode promo.",
-	"sparepart-klasik":
-		"Suku cadang untuk Yamaha generasi lama — diskon sampai 40% + gratis ongkir.",
-};
+  // Fix: Gunakan product.subCategory?.name secara langsung
+  const badge =
+    type === "motor"
+      ? product.subCategory?.name?.toUpperCase() || "MOTOR"
+      : type === "legacy"
+        ? "KLASIK"
+        : product.code || "SPAREPART";
 
-const zoneIcon: Record<string, string> = {
-	"sub-premium": "two_wheeler",
-	"sub-fashionable": "moped",
-	"sub-exciting": "sports_motorsports",
-	"sub-active": "electric_moped",
-};
+  const icon = "two-wheel";
+  const imageUrl = product?.images.find(
+    (find) => find.role === "thumbnail",
+  )?.url;
 
-function rupiah(n: number | null) {
-	if (n == null || n === 0) return "Cek ketersediaan";
-	return new Intl.NumberFormat("id-ID", {
-		style: "currency",
-		currency: "IDR",
-		maximumFractionDigits: 0,
-	}).format(n);
-}
+  const detail =
+    type === "motor"
+      ? `${product.stock > 0 ? `${product.stock} unit tersedia` : "Cek ketersediaan"}${year ? ` · ${year.value}` : ""}`
+      : "";
 
-function getProductType(product: (typeof cms.featuredProducts)[number]) {
-	const sub = cms.featuredCategories
-		.flatMap((c) => c.subCategories)
-		.find((s) => s.id === product.subCategoryId);
-	if (!sub) return "genuine";
-	const parentCat = cms.featuredCategories.find((c) =>
-		c.subCategories.some((s) => s.id === sub.id),
-	);
-	if (parentCat && parentCat.slug === "sepeda-motor") return "motor";
-	return sub.slug === "sparepart-klasik" ? "legacy" : "genuine";
-}
+  const price = formatRupiah(Number(product.price));
 
-function mapToMiniCard(product: (typeof cms.featuredProducts)[number]) {
-	const type = getProductType(product);
-	const sub = allSubs.find((s) => s.id === product.subCategoryId);
-	const year = product.specValues?.find((s) => s.key === "year");
-
-	const badge =
-		type === "motor"
-			? sub?.name.toUpperCase() || "MOTOR"
-			: type === "legacy"
-				? "KLASIK"
-				: product.code || "SPAREPART";
-
-	const icon =
-		type === "motor"
-			? zoneIcon[product.subCategoryId] || "two_wheeler"
-			: "settings";
-
-	const detail =
-		type === "motor"
-			? `${product.stock > 0 ? `${product.stock} unit tersedia` : "Cek ketersediaan"}${year ? ` · ${year.value}` : ""}`
-			: "";
-
-	const price = rupiah(product.price);
-
-	return {
-		badge,
-		icon,
-		name: product.name,
-		detail,
-		price,
-		href: `/product/${product.slug}`,
-	};
+  return {
+    badge,
+    icon,
+    imageUrl,
+    name: product.name,
+    slug: product.slug,
+    detail,
+    price,
+    href: `/product/${product.slug}`,
+    productId: product.id,
+  };
 }
 
 export const Route = createFileRoute("/_public/category/$slug")({
-	component: CategoryPage,
+  component: CategoryPage,
+  loader: async ({ params }) => {
+    const res = await getProductByCategory({
+      data: { slug: params.slug },
+    });
+    return { res: res || [] };
+  },
 });
 
 function CategoryPage() {
-	const { slug } = Route.useParams();
+  const { slug } = Route.useParams();
+  const {
+    res,
+  }: {
+    res: {
+      categories: Category;
+      products: FeaturedProduct[];
+    };
+  } = Route.useLoaderData();
 
-	const parentCat = cms.featuredCategories.find((c) => c.slug === slug);
-	const sub = allSubs.find((s) => s.slug === slug);
+  const { data: banners } = useSuspenseQuery({
+    queryKey: ["banners", slug],
+    queryFn: () => getBanners({ data: { pathname: slug } }),
+    staleTime: Infinity,
+  });
 
-	const title = parentCat?.name || sub?.name || "Kategori";
-	const description =
-		categoryDescriptions[slug] ||
-		"Temukan produk terbaik untuk kebutuhan Anda.";
+  const title = slug
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+  const products = res.products;
 
-	const products = parentCat
-		? cms.featuredProducts.filter((p) =>
-				parentCat.subCategories.some((s) => s.id === p.subCategoryId),
-			)
-		: cms.featuredProducts.filter((p) => p.subCategoryId === sub?.id);
+  return (
+    <>
+      <Hero banners={banners.hero} />
+      <BannerCarousel banners={banners.top} className="-mx-6 md:-mx-16" />
+      <section
+        className={`${banners.hero.length > 0 || banners.top.length > 0 ? "pt-18" : "pt-24"} pb-8`}
+      >
+        <Link
+          to="/store"
+          className="hover:text-blue inline-flex items-center gap-2 text-[11px] tracking-widest text-ash transition-colors"
+        >
+          <MaterialIcon name="arrow_back" className="!text-[16px]" />
+          KEMBALI
+        </Link>
+      </section>
 
-	return (
-		<>
-			<section className="pt-32 pb-8">
-				<Link
-					to="/store"
-					className="inline-flex items-center gap-2 text-[11px] tracking-widest text-ash hover:text-blue transition-colors"
-				>
-					<span className="text-[16px]">←</span>
-					KEMBALI KE TOKO
-				</Link>
-			</section>
+      <Section className="pt-8">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-6">
+          {Array.isArray(res?.categories?.specTemplate) &&
+            res.categories.specTemplate.length > 0 && (
+              <CategorySidebar specTemplate={res.categories.specTemplate} />
+            )}
 
-			<Section className="!pt-0">
-				<SectionHeading className="mb-4">{title}</SectionHeading>
-				<p className="text-ash max-w-2xl mb-10">{description}</p>
+          <div className="lg:col-span-5">
+            <SectionHeading className="mb-4">{title}</SectionHeading>
+            <p className="mb-10 max-w-2xl text-ash">
+              {res.categories?.description}
+            </p>
+            <div className="w-full pb-8 ">
+              <TextInput
+                fontSize={14}
+                placeholder={`Nmax, Gear Ultima, Filano`}
+                label={`Cari ${title}`}
+              />
+            </div>
 
-				{products.length > 0 ? (
-					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-						{products.map((p) => {
-							const props = mapToMiniCard(p);
-							return <MiniProductCard key={p.id} {...props} />;
-						})}
-					</div>
-				) : (
-					<p className="text-ash text-center py-16">
-						Belum ada produk di kategori ini.
-					</p>
-				)}
-			</Section>
-		</>
-	);
+            {products.length > 0 ? (
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
+                {products.map((p) => {
+                  const props = mapToMiniCard(p as unknown as FeaturedProduct);
+                  return (
+                    <motion.div
+                      key={p.id}
+                      layoutId={`category-card-${p.slug}`}
+                      transition={{ duration: 0.45, ease: [0.32, 0.72, 0, 1] }}
+                    >
+                      <MiniProductCard {...props} />
+                    </motion.div>
+                  );
+                })}
+              </div>
+            ) : (
+              <EmptyState
+                title={`Tidak ada produk di ${title}`}
+                description="Belum ada produk yang tersedia di kategori ini."
+              />
+            )}
+          </div>
+        </div>
+      </Section>
+    </>
+  );
 }

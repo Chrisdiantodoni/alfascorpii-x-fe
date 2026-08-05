@@ -1,14 +1,19 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Button } from "#/components/ui/Button";
 import { TextInput } from "#/components/ui/TextInput";
+import { signIn } from "#/lib/auth-client";
 
 export const Route = createFileRoute("/_public/login/")({
 	component: Login,
 });
 
 function Login() {
-	const [status, setStatus] = useState("");
+	const navigate = useNavigate();
+	const [status, setStatus] = useState<{ ok: boolean; text: string } | null>(
+		null,
+	);
+	const [loading, setLoading] = useState(false);
 
 	const handleGoogle = () => {
 		alert(
@@ -16,9 +21,29 @@ function Login() {
 		);
 	};
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		setStatus("Belum ada backend live — form ini contoh tampilan saja.");
+		const formData = new FormData(e.currentTarget as HTMLFormElement);
+		const email = String(formData.get("email") ?? "");
+		const password = String(formData.get("password") ?? "");
+
+		setStatus(null);
+		setLoading(true);
+		const { error } = await signIn.email({ email, password });
+		setLoading(false);
+
+		if (error) {
+			setStatus({
+				ok: false,
+				text:
+					error.message === "Invalid email or password"
+						? "Email atau kata sandi salah."
+						: error.message,
+			});
+			return;
+		}
+
+		await navigate({ to: "/user" });
 	};
 
 	return (
@@ -35,7 +60,13 @@ function Login() {
 				onClick={handleGoogle}
 				className="flex items-center justify-center gap-3 w-full p-[13px] border border-line text-[14px] font-semibold text-ink bg-white hover:border-ink hover:bg-paper-dim transition-colors"
 			>
-				<svg width="18" height="18" viewBox="0 0 48 48">
+				<svg
+					width="18"
+					height="18"
+					viewBox="0 0 48 48"
+					role="img"
+					aria-label="Google"
+				>
 					<path
 						fill="#FFC107"
 						d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"
@@ -81,12 +112,29 @@ function Login() {
 					<label className="flex items-center gap-2 text-ash">
 						<input type="checkbox" className="accent-blue" /> Ingat saya
 					</label>
-					<a href="#" className="text-blue hover:underline">
+					<button
+						type="button"
+						onClick={() =>
+							setStatus({
+								ok: false,
+								text: "Fitur lupa kata sandi segera hadir.",
+							})
+						}
+						className="text-blue hover:underline"
+					>
 						Lupa kata sandi?
-					</a>
+					</button>
 				</div>
-				<Button type="submit">MASUK</Button>
-				<p className="text-[13px] text-ash">{status}</p>
+				<Button type="submit" disabled={loading}>
+					{loading ? "MEMPROSES..." : "MASUK"}
+				</Button>
+				{status && (
+					<p
+						className={`text-[13px] ${status.ok ? "text-green-600" : "text-red-600"}`}
+					>
+						{status.text}
+					</p>
+				)}
 			</form>
 
 			<p className="text-[13px] text-ash mt-10">

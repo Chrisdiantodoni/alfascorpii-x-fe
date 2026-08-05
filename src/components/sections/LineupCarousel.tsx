@@ -40,6 +40,7 @@ export default function LineupCarousel() {
 							// badge={(subNames[p.subCategoryId] || "").toUpperCase()}
 							// icon={zoneIcon[p.subCategoryId] || "two_wheeler"}
 							name={p.name}
+							slug={p.slug}
 							detail={
 								year
 									? `${p.stock > 0 ? `${p.stock} unit tersedia` : "Cek ketersediaan"} · ${year.value}`
@@ -48,6 +49,7 @@ export default function LineupCarousel() {
 										: "Cek ketersediaan"
 							}
 							href={`/product/${p.slug}`}
+							productId={p.id}
 						/>
 					);
 				})}

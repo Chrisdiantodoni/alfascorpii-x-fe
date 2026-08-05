@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { DragScrollContainer } from "#/components/ui/DragScrollContainer";
 import { MiniProductCard } from "#/components/ui/MiniProductCard";
 import type { Category, FeaturedProduct } from "#/types/master";
+import { formatRupiah } from "#/utils/fn";
 
 interface FeaturedCarouselProps {
 	label?: string;
@@ -14,16 +15,6 @@ interface FeaturedCarouselProps {
 	categorySlug: string;
 	categories: Category[];
 	cardMode: "motor" | "sparepart";
-}
-
-function rupiah(n: string | null) {
-	const num = n ? Number(n) : null;
-	if (num == null) return "Cek ketersediaan";
-	return new Intl.NumberFormat("id-ID", {
-		style: "currency",
-		currency: "IDR",
-		maximumFractionDigits: 0,
-	}).format(num);
 }
 
 interface ProductWithSub {
@@ -106,16 +97,21 @@ export default function FeaturedCarousel({
 }
 
 function getYear(product: FeaturedProduct): string | undefined {
-	if (!product.specValues || typeof product.specValues !== "object")
+	const specs = product.specValues;
+
+	if (!specs || typeof specs !== "object") {
 		return undefined;
-	const spec = product.specValues as Record<string, unknown>;
-	if (Array.isArray(spec)) {
-		const found = (spec as Array<{ key: string; value: string }>).find(
-			(s) => s.key === "year",
-		);
-		return found?.value;
 	}
-	return typeof spec.year === "string" ? spec.year : undefined;
+
+	// Handle Array structure: [{ key: "year", value: "2024" }]
+	if (Array.isArray(specs)) {
+		const found = specs.find((s) => s?.key === "year");
+		return typeof found?.value === "string" ? found.value : undefined;
+	}
+
+	// Handle Object structure: { year: "2024" }
+	const yearVal = specs.year;
+	return typeof yearVal === "string" ? yearVal : undefined;
 }
 
 function renderSparepartCard(product: FeaturedProduct) {
@@ -126,10 +122,12 @@ function renderSparepartCard(product: FeaturedProduct) {
 			badge={product.code || "SPAREPART"}
 			icon="settings"
 			name={product.name}
-			detail=""
-			imageUrl={imageUrl && imageUrl.url}
-			price={rupiah(product.price)}
+			slug={product.slug}
+			detail={product.description || "Genuine Part Original"}
+			imageUrl={imageUrl ? imageUrl.url : undefined}
+			price={formatRupiah(Number(product.price))}
 			href={`/product/${product.slug}`}
+			productId={product.id}
 		/>
 	);
 }
@@ -147,10 +145,12 @@ function renderMotorCard(product: FeaturedProduct, subCategoryName: string) {
 			badge={subCategoryName.toUpperCase()}
 			icon="two_wheeler"
 			name={product.name}
-			imageUrl={imageUrl && imageUrl.url}
+			slug={product.slug}
+			imageUrl={imageUrl ? imageUrl.url : undefined}
 			detail={detail}
-			price={rupiah(product.price)}
+			price={formatRupiah(Number(product.price))}
 			href={`/product/${product.slug}`}
+			productId={product.id}
 		/>
 	);
 }

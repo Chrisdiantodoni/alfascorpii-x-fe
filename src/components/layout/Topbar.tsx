@@ -1,6 +1,8 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { MaterialIcon } from "#/components/ui/MaterialIcon";
+import { useSession } from "#/lib/auth-client";
 import { useCartStore } from "#/stores/cart";
 
 interface TopbarProps {
@@ -17,6 +19,7 @@ export default function Topbar({
 	transparent,
 }: TopbarProps) {
 	const totalItems = useCartStore((s) => s.totalItems());
+	const { data: session } = useSession();
 	const [hydrated, setHydrated] = useState(false);
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
 	useEffect(() => setHydrated(true), []);
@@ -51,31 +54,59 @@ export default function Topbar({
 					>
 						TOKO
 					</Link>
-					<Link
-						to="/login"
-						className={`flex items-center gap-1.5 hover:text-blue-bright transition-colors ${linkColor(pathname.startsWith("/login"))}`}
-					>
-						<MaterialIcon name="person" className="!text-[22px]" />
-						<span className="hidden md:inline text-[11px] font-semibold tracking-widest">
-							MASUK
-						</span>
-					</Link>
-					<button
+					{session ? (
+						<Link
+							to="/user"
+							className={`flex items-center gap-1.5 hover:text-blue-bright transition-colors ${linkColor(pathname.startsWith("/user"))}`}
+						>
+							<MaterialIcon name="person" className="!text-[22px]" />
+							<span className="hidden md:inline text-[11px] font-semibold tracking-widest">
+								AKUN
+							</span>
+						</Link>
+					) : (
+						<Link
+							to="/login"
+							className={`flex items-center gap-1.5 hover:text-blue-bright transition-colors ${linkColor(pathname.startsWith("/login"))}`}
+						>
+							<MaterialIcon name="person" className="!text-[22px]" />
+							<span className="hidden md:inline text-[11px] font-semibold tracking-widest">
+								MASUK
+							</span>
+						</Link>
+					)}
+					<motion.button
 						id="cartTrig"
 						type="button"
 						aria-label="Keranjang"
 						onClick={onCartToggle}
+						whileTap={{ scale: 0.9 }}
+						whileHover={{ scale: 1.05 }}
 						className={`relative hover:text-blue-bright transition-colors ${
 							transparent ? "text-white/80" : "text-ink"
 						}`}
 					>
 						<MaterialIcon name="shopping_cart" className="!text-[22px]" />
-						{hydrated && totalItems > 0 && (
-							<span className="absolute -top-[6px] -right-[8px] min-w-[16px] h-[16px] px-[4px] rounded-full bg-blue-bright text-white text-[10px] font-bold flex items-center justify-center leading-none">
-								{totalItems}
-							</span>
-						)}
-					</button>
+
+						<AnimatePresence mode="popLayout">
+							{hydrated && totalItems > 0 && (
+								<motion.span
+									key={totalItems} // Key dinamis berdasarkan totalItems memicu re-trigger animasi saat angka berubah
+									initial={{ scale: 0, opacity: 0 }}
+									animate={{
+										scale: [1, 1.4, 0.95, 1.1, 1], // Bounce effect
+										rotate: [0, -12, 12, -6, 0], // Shake effect
+										opacity: 1,
+									}}
+									exit={{ scale: 0, opacity: 0 }}
+									transition={{ duration: 0.35, ease: "easeOut" }}
+									className="absolute -top-[6px] -right-[8px] min-w-[16px] h-[16px] px-[4px] rounded-full bg-blue-bright text-white text-[10px] font-bold flex items-center justify-center leading-none shadow-sm"
+								>
+									{totalItems}
+								</motion.span>
+							)}
+						</AnimatePresence>
+					</motion.button>
 					<button
 						id="menuToggle"
 						type="button"

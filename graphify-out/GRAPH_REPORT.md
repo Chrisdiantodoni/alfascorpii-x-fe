@@ -1,13 +1,18 @@
-# Graph Report - .  (2026-07-29)
+# Graph Report - alfascorpii-x  (2026-08-05)
 
 ## Corpus Check
-- 107 files · ~166,845 words
+- 172 files · ~206,804 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 496 nodes · 706 edges · 37 communities (25 shown, 12 thin omitted)
-- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 13 edges (avg confidence: 0.6)
+- 1133 nodes · 1676 edges · 109 communities (67 shown, 42 thin omitted)
+- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 27 edges (avg confidence: 0.62)
 - Token cost: 0 input · 0 output
+
+## Graph Freshness
+- Built from commit: `f41bdf59`
+- Run `git rev-parse HEAD` and compare to check if the graph is stale.
+- Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - Layout Components
@@ -43,31 +48,105 @@
 - Generated Files
 - Path Aliases
 - Demo Files
+- DB BigInt Serializer
+- App DB Schema
 - Auth Client Functions
+- Logo AI Prompt Engineering
+- CIP Deliverable Guide
+- BM25
+- Workflow
+- drizzle/relations.ts
+- InquiryForm.tsx
+- Routing by Task Type
+- Primary Color Meanings
+- Core Logo Types
+- text-input-field.tsx
+- CIP Mockup Prompt Engineering
+- category/$slug.tsx
+- MaterialIcon.tsx
+- socials.ts
+- Design Principles
+- icon/generate.py
+- FeaturedCarousel.tsx
+- CIP Design Reference
+- Icon Design Reference
+- Copywriting Formulas
+- product/$slug/index.tsx
+- Layout Patterns
+- Faq.tsx
+- _public/index.tsx
+- Logo Design Reference
+- CIP Design Style Guide
+- Skeleton.tsx
+- FileRoutesByPath
+- Slide Strategies
+- logo/generate.py
+- files.server.ts
+- router.tsx
+- Slides Reference
+- HTML Slide Template
+- types/cms.ts
+- ProductCard.tsx
+- ProductGallery.tsx
+- files.tsx
+- CartDrawer.tsx
+- __root.tsx
+- slides-create.md
+- cheerio
+- drizzle-orm
+- @faker-js/faker
+- lucide-react
+- marked
+- motion
+- pg
+- @radix-ui/react-dialog
+- react
+- react-dom
+- sonner
+- swiper
+- @tailwindcss/vite
+- @tanstack/match-sorter-utils
+- @tanstack/react-devtools
+- @tanstack/react-form
+- @tanstack/react-form-start
+- @tanstack/react-router
+- @tanstack/react-router-devtools
+- @tanstack/react-router-ssr-query
+- @tanstack/react-start
+- @tanstack/react-table
+- @tanstack/router-plugin
+- @tanstack/zod-adapter
+- @tanstack/zod-form-adapter
+- ulid
+- @unpic/react
+- zod
+- zustand
+- PageTransition.tsx
+- better-auth
 
 ## God Nodes (most connected - your core abstractions)
-1. `cms` - 21 edges
+1. `FileRoutesByPath` - 19 edges
 2. `compilerOptions` - 17 edges
-3. `scripts` - 14 edges
-4. `MaterialIcon()` - 13 edges
-5. `FileRoutesByPath` - 12 edges
-6. `useCartStore` - 11 edges
-7. `Section()` - 9 edges
-8. `Button()` - 8 edges
-9. `includes` - 7 edges
-10. `DragScrollContainer()` - 6 edges
+3. `MaterialIcon()` - 15 edges
+4. `Design` - 15 edges
+5. `scripts` - 14 edges
+6. `cms` - 13 edges
+7. `formatRupiah()` - 12 edges
+8. `Section()` - 11 edges
+9. `useCartStore` - 11 edges
+10. `Banner` - 10 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Drizzle ORM Logo` --conceptually_related_to--> `Drizzle ORM`  [EXTRACTED]
   public/drizzle.svg → AGENTS.md
 - `Tailwind Elements Carousel Component` --conceptually_related_to--> `Tailwind CSS v4`  [INFERRED]
   .firecrawl/tw-carousel.md → AGENTS.md
-- `TanStack Start App` --conceptually_related_to--> `TanStack Start Framework`  [EXTRACTED]
-  README.md → AGENTS.md
-- `File-Based Routing` --conceptually_related_to--> `TanStack Router`  [EXTRACTED]
-  AGENTS.md → README.md
-- `Vitest Testing Framework` --conceptually_related_to--> `TypeScript Strict Mode with verbatimModuleSyntax`  [EXTRACTED]
-  README.md → AGENTS.md
+- `ProductCardProps` --references--> `cms`  [EXTRACTED]
+  src/components/ui/ProductCard.tsx → src/data/cms.ts
+- `PublicLayout()` --calls--> `useCartStore`  [EXTRACTED]
+  src/routes/_public.tsx → src/stores/cart.ts
+- `SubCategoryPage()` --calls--> `formatRupiah()`  [EXTRACTED]
+  src/routes/_public/sub-category/$slug.tsx → src/utils/fn.tsx
 
 ## Import Cycles
 - None detected.
@@ -75,27 +154,27 @@
 ## Hyperedges (group relationships)
 - **Drag and Scroll Research References** — firecrawl_inertia_scroller, firecrawl_kinetic_scrolling, firecrawl_pointer_events_drag, firecrawl_tw_carousel [INFERRED 0.85]
 
-## Communities (37 total, 12 thin omitted)
+## Communities (109 total, 42 thin omitted)
 
 ### Community 0 - "Layout Components"
-Cohesion: 0.06
-Nodes (46): Topbar(), TopbarProps, LineupCarousel(), subNames, zoneIcon, MessageGallery(), PARTNERS, SocialsGrid() (+38 more)
+Cohesion: 0.22
+Nodes (6): DragScrollContainer(), DragScrollContainerProps, listVariants, MiniProductCard(), cms, useDragScroll()
 
 ### Community 1 - "Database Relations"
-Cohesion: 0.05
-Nodes (53): authAccountRelations, authSessionRelations, authUserRelations, blogCategoriesRelations, blogsRelations, categoriesRelations, menuItemsRelations, menusRelations (+45 more)
+Cohesion: 0.09
+Nodes (27): areas, banners, blogCategories, blogs, cache, cacheLocks, categories, failedJobs (+19 more)
 
 ### Community 2 - "External Dependencies"
-Cohesion: 0.04
-Nodes (49): better-auth, drizzle-orm, @faker-js/faker, lucide-react, dependencies, better-auth, drizzle-orm, @faker-js/faker (+41 more)
+Cohesion: 0.22
+Nodes (9): cheerio, dependencies, cheerio, tailwindcss, @tanstack/react-query, @tanstack/react-query-devtools, tailwindcss, @tanstack/react-query (+1 more)
 
 ### Community 3 - "TanStack Integration"
-Cohesion: 0.06
-Nodes (40): getContext(), getRouter(), Register, @tanstack/react-router, Route, Route, Route, Route (+32 more)
+Cohesion: 0.07
+Nodes (27): ApiAuthSplatRoute, FileRoutesByFullPath, FileRoutesByTo, FileRouteTypes, PublicBlogIndexRoute, PublicBlogSlugIndexRoute, PublicCategorySlugRoute, PublicIndexRoute (+19 more)
 
 ### Community 4 - "Dev Dependencies"
 Cohesion: 0.05
-Nodes (37): @biomejs/biome, dotenv, drizzle-kit, jsdom, devDependencies, @biomejs/biome, dotenv, drizzle-kit (+29 more)
+Nodes (39): @biomejs/biome, dotenv, drizzle-dbml-generator, drizzle-kit, jsdom, devDependencies, @biomejs/biome, dotenv (+31 more)
 
 ### Community 5 - "Biome Configuration"
 Cohesion: 0.07
@@ -106,44 +185,44 @@ Cohesion: 0.08
 Nodes (24): DOM, DOM.Iterable, ES2022, **/*.ts, **/*.tsx, vite/client, compilerOptions, allowImportingTsExtensions (+16 more)
 
 ### Community 7 - "Package Configuration"
-Cohesion: 0.09
-Nodes (22): imports, name, pnpm, onlyBuiltDependencies, private, scripts, build, check (+14 more)
+Cohesion: 0.08
+Nodes (23): author, imports, name, pnpm, onlyBuiltDependencies, private, scripts, build (+15 more)
 
 ### Community 8 - "Form Components"
-Cohesion: 0.13
-Nodes (13): Button(), ButtonAsAnchor, ButtonAsButton, ButtonAsLink, ButtonBaseProps, ButtonProps, variants, SelectInput() (+5 more)
+Cohesion: 0.18
+Nodes (9): Button(), ButtonAsAnchor, ButtonAsButton, ButtonAsLink, ButtonBaseProps, ButtonProps, motionFx, variants (+1 more)
 
 ### Community 9 - "Cart Components"
-Cohesion: 0.17
-Nodes (10): CartDrawer(), CartDrawerProps, itemIcon(), ProductThumb(), ProductThumbProps, TODO: sesuaikan nama field (thumbnailUrl/image/thumbnail_url) dengan, rupiah(), OverlayNav() (+2 more)
+Cohesion: 0.10
+Nodes (24): Footer(), footerRoute(), getLabel(), OverlayNav(), OverlayNavProps, staggerItem, staggerList, WhatsAppFloat() (+16 more)
 
 ### Community 10 - "App Data Relations"
 Cohesion: 0.13
 Nodes (14): blogCategoriesRelations, blogsRelations, categoriesRelations, menuItemsRelations, menusRelations, modelHasPermissionsRelations, modelHasRolesRelations, permissionsRelations (+6 more)
 
 ### Community 11 - "Auth Database Schema"
-Cohesion: 0.28
-Nodes (9): account, accountRelations, session, sessionRelations, user, userRelations, verification, db (+1 more)
+Cohesion: 0.31
+Nodes (8): schema, account, accountRelations, session, sessionRelations, user, userRelations, verification
 
 ### Community 12 - "Architecture Documentation"
 Cohesion: 0.18
 Nodes (11): Better Auth, Drizzle ORM, File-Based Routing, PostgreSQL Database, Tailwind CSS v4, TanStack Start Framework, Tailwind Elements Carousel Component, Drizzle ORM Logo (+3 more)
 
 ### Community 13 - "Hero and Banner"
-Cohesion: 0.27
-Nodes (8): Hero(), BannerCarousel(), BannerCarouselProps, Banner, BannerFieldSettings, BannerSlide(), DEFAULT_FIELDS, posClass()
+Cohesion: 0.19
+Nodes (16): Hero(), BannerCarousel(), BannerCarouselProps, Banner, BannerFieldSettings, BannerSlide(), containerVariants, DEFAULT_FIELDS (+8 more)
 
 ### Community 14 - "Web App Manifest"
 Cohesion: 0.25
 Nodes (7): background_color, display, icons, name, short_name, start_url, theme_color
 
 ### Community 15 - "Marquee Component"
-Cohesion: 0.47
-Nodes (4): Marquee(), MarqueeProps, ClassValue, cn()
+Cohesion: 0.24
+Nodes (8): Marquee(), MarqueeProps, db, inquiries, ClassValue, cn(), now(), fetchBanners()
 
 ### Community 16 - "Theme Toggle"
-Cohesion: 0.60
-Nodes (4): applyThemeMode(), getInitialMode(), ThemeMode, ThemeToggle()
+Cohesion: 0.06
+Nodes (42): BM25, detect_domain(), get_cip_brief(), _load_csv(), Load CSV and return list of dicts, Core search function using BM25, Auto-detect the most relevant domain from query, Main search function with auto-domain detection (+34 more)
 
 ### Community 17 - "Demo Table Data"
 Cohesion: 0.50
@@ -165,25 +244,201 @@ Nodes (3): Biome Linter and Formatter, TypeScript Strict Mode with verbatimModul
 Cohesion: 0.67
 Nodes (3): Inertia Scroller (CSS Drag Scroll Pattern), JavaScript Kinetic Scrolling with Physics, Pointer Events Drag Interactions
 
+### Community 26 - "Auth Client Lib"
+Cohesion: 0.20
+Nodes (9): Route, UserOverview(), navItems, Route, UserProfile(), Route, UserSessionContext, useUserSession() (+1 more)
+
+### Community 34 - "DB BigInt Serializer"
+Cohesion: 0.06
+Nodes (35): Banner Design (Built-in), Banner: Design Rules, Banner: Quick Size Reference, Banner: Top Art Styles, Banner: Workflow, CIP Design (Built-in), CIP: Generate Brief, CIP: Generate Mockups (+27 more)
+
+### Community 35 - "App DB Schema"
+Cohesion: 0.16
+Nodes (14): WishlistButton(), WishlistButtonProps, wishlists, wishlistsRelations, products, Route, UserWishlist(), addWishlist (+6 more)
+
+### Community 37 - "Logo AI Prompt Engineering"
+Cohesion: 0.08
+Nodes (25): Common Pitfalls, Core Prompt Structure, Detailed Brief, Eco/Sustainable, Effective Keywords by Style, Fashion Brand, Healthcare, Industry-Specific Prompts (+17 more)
+
+### Community 38 - "CIP Deliverable Guide"
+Cohesion: 0.08
+Nodes (24): Apparel, Business Card, Car/Sedan, CIP Deliverable Guide, Core Identity, Digital Assets, Email Signature, Envelope (+16 more)
+
+### Community 39 - "BM25"
+Cohesion: 0.11
+Nodes (19): BM25, detect_domain(), _load_csv(), Load CSV and return list of dicts, Core search function using BM25, Auto-detect the most relevant domain from query, Main search function with auto-domain detection, Search across all domains and combine results (+11 more)
+
+### Community 40 - "Workflow"
+Cohesion: 0.08
+Nodes (23): Art Direction Styles (Reuse from Banner), Color & Contrast, Design Best Practices, HTML Design Rules, HTML Template Structure, Option A: Chrome Headless CLI (Recommended — zero dependencies), Option B: chrome-devtools skill, Option C: Playwright script (+15 more)
+
+### Community 41 - "drizzle/relations.ts"
+Cohesion: 0.09
+Nodes (21): blogCategoriesRelations, blogsRelations, categoriesRelations, menuItemsRelations, menusRelations, modelHasPermissionsRelations, modelHasRolesRelations, permissionsRelations (+13 more)
+
+### Community 42 - "InquiryForm.tsx"
+Cohesion: 0.23
+Nodes (7): MessageGallery(), SocialItem, SocialsGridProps, Section(), SectionProps, SectionLabel(), SectionLabelProps
+
+### Community 43 - "Routing by Task Type"
+Cohesion: 0.10
+Nodes (19): Banner Design Tasks, Brand Identity Tasks, Component Creation, Corporate Identity Program Tasks, Design Routing Guide, Design System Migration, Icon Design Tasks, Implementation Tasks (+11 more)
+
+### Community 44 - "Primary Color Meanings"
+Cohesion: 0.11
+Nodes (18): Accessibility Considerations, Analogous, Black, Blue, Color Combinations by Industry, Color Harmony Types, Complementary, Green (+10 more)
+
+### Community 45 - "Core Logo Types"
+Cohesion: 0.11
+Nodes (18): 1. Wordmark (Logotype), 2. Lettermark (Monogram), 3. Pictorial Mark (Brand Mark), 4. Abstract Mark, 5. Mascot, 6. Emblem, 7. Combination Mark, Aesthetic Styles (+10 more)
+
+### Community 46 - "text-input-field.tsx"
+Cohesion: 0.15
+Nodes (13): SelectInput, SelectInputProps, SelectOption, SelectField(), SelectFieldProps, FieldBase, MultiLineProps, Props (+5 more)
+
+### Community 47 - "CIP Mockup Prompt Engineering"
+Cohesion: 0.11
+Nodes (17): Apparel (Polo/T-Shirt), Base Prompt Structure, Business Card, CIP Mockup Prompt Engineering, Context Modifiers, Corporate Minimal, Deliverable-Specific Modifiers, Letterhead (+9 more)
+
+### Community 48 - "category/$slug.tsx"
+Cohesion: 0.17
+Nodes (12): PARTNERS, EmptyState(), EmptyStateProps, SectionHeading(), SectionHeadingProps, CategoryPage(), mapToMiniCard(), Route (+4 more)
+
+### Community 49 - "MaterialIcon.tsx"
+Cohesion: 0.48
+Nodes (4): BlogCard(), BlogDetail(), getBlogDetail, formatDate()
+
+### Community 50 - "socials.ts"
+Cohesion: 0.24
+Nodes (14): cache, createErrorResponse(), extractTikTokDetail(), fetchHtml(), fetchWithTimeout(), formatCompactNumber(), getSocialPostData, parseNumber() (+6 more)
+
+### Community 51 - "Design Principles"
+Cohesion: 0.12
+Nodes (15): 22 Art Direction Styles, Banner Sizes & Art Direction Styles Reference, Complete Banner Sizes, CTA Rules, Design Principles, Pinterest Research Queries, Print, Print Specs (+7 more)
+
+### Community 52 - "icon/generate.py"
+Cohesion: 0.20
+Nodes (15): apply_color(), apply_viewbox_size(), extract_svgs(), generate_batch(), generate_icon(), generate_sizes(), load_env(), main() (+7 more)
+
+### Community 53 - "FeaturedCarousel.tsx"
+Cohesion: 0.22
+Nodes (12): FeaturedCarousel(), FeaturedCarouselProps, getYear(), ProductWithSub, renderMotorCard(), renderSparepartCard(), CategorySidebarProps, SpecTemplateItem (+4 more)
+
+### Community 54 - "CIP Design Reference"
+Cohesion: 0.13
+Nodes (14): CIP Brief (Start Here), CIP Design Reference, Commands, Deliverable Categories, Design Styles, Detailed References, Generate Mockups, HTML Presentation Features (+6 more)
+
+### Community 55 - "Icon Design Reference"
+Cohesion: 0.13
+Nodes (14): Available Styles, CLI Options, Commands, Generate Batch Variations, Generate Multiple Sizes, Generate Single Icon, Icon Categories, Icon Design Reference (+6 more)
+
+### Community 56 - "Copywriting Formulas"
+Cohesion: 0.13
+Nodes (14): AIDA (Attention-Interest-Desire-Action), Before-After-Bridge, Contrast Patterns, Copywriting Formulas, Core Formulas, Cost of Inaction, FAB (Features-Advantages-Benefits), Formula-to-Slide Mapping (+6 more)
+
+### Community 57 - "product/$slug/index.tsx"
+Cohesion: 0.16
+Nodes (16): CartDrawer(), itemIcon(), ProductThumb(), ProductThumbProps, rupiah(), Topbar(), TopbarProps, iconMap (+8 more)
+
+### Community 58 - "Layout Patterns"
+Cohesion: 0.14
+Nodes (13): Card Styles, Component Variants, CSS Structures, Feature Grid (3 columns), Layout Decision Flow, Layout Patterns, Layout Selection by Use Case, Metric Styles (+5 more)
+
+### Community 59 - "Faq.tsx"
+Cohesion: 0.18
+Nodes (9): FaqProps, MarkdownPreview(), MarkdownPreviewProps, itemVariants, StaggerItem(), StaggerItemProps, listVariants, StaggerList() (+1 more)
+
+### Community 60 - "_public/index.tsx"
+Cohesion: 0.20
+Nodes (11): SplitSection(), Home(), SocialsSection(), getCategories, getSiteSettings, getSubCategories, productDetailSchema, productSchema (+3 more)
+
+### Community 61 - "Logo Design Reference"
+Cohesion: 0.15
+Nodes (12): Available Styles, Color Psychology, Commands, Design Brief (Start Here), Detailed References, Generate Logo, Industry Defaults, Logo Design Reference (+4 more)
+
+### Community 62 - "CIP Design Style Guide"
+Cohesion: 0.18
+Nodes (10): Bold Dynamic, CIP Design Style Guide, Classic Traditional, Color Psychology, Corporate Minimal, Fresh Modern, Luxury Premium, Modern Tech (+2 more)
+
+### Community 63 - "Skeleton.tsx"
+Cohesion: 0.29
+Nodes (9): cn(), shimmerStyle, SkeletonBanner(), SkeletonBox(), SkeletonBoxProps, SkeletonCard(), SkeletonGrid(), SkeletonText() (+1 more)
+
+### Community 64 - "FileRoutesByPath"
+Cohesion: 0.29
+Nodes (7): Route, Route, Route, Route, Route, Route, FileRoutesByPath
+
+### Community 65 - "Slide Strategies"
+Cohesion: 0.20
+Nodes (9): Common Structures, Duarte Sparkline Pattern, Matching Strategy to Context, Product Demo (6 slides), Sales Pitch (9 slides), Search Commands, Slide Strategies, Strategy Selection (+1 more)
+
+### Community 66 - "logo/generate.py"
+Cohesion: 0.29
+Nodes (9): enhance_prompt(), generate_batch(), generate_logo(), load_env(), main(), Enhance the logo prompt with style and industry modifiers, Generate a logo using Gemini models with image generation      Args:         asp, Generate multiple logo variants with different styles (+1 more)
+
+### Community 67 - "files.server.ts"
+Cohesion: 0.14
+Nodes (14): batchFiles(), batchFilesWithUrls(), FileableType, FileItem, FileItemWithUrl, files, storageUrl(), mapBanner() (+6 more)
+
+### Community 68 - "router.tsx"
+Cohesion: 0.28
+Nodes (6): getContext(), getRouter(), Register, @tanstack/react-router, Register, routeTree
+
+### Community 69 - "Slides Reference"
+Cohesion: 0.29
+Nodes (6): Key Features, Knowledge Base, Slides Reference, Usage, When to Use, Workflow
+
+### Community 70 - "HTML Slide Template"
+Cohesion: 0.29
+Nodes (6): Animation Classes, Background Images, Base Structure, Chart.js Integration, CSS Variables Reference, HTML Slide Template
+
+### Community 71 - "types/cms.ts"
+Cohesion: 0.33
+Nodes (5): BlogCardProps, Blog, BlogCategory, IPage, FileData
+
+### Community 72 - "ProductCard.tsx"
+Cohesion: 0.24
+Nodes (7): Image(), MiniProductCardProps, getProductType(), Product, ProductCard(), ProductCardProps, zoneIcon
+
+### Community 73 - "ProductGallery.tsx"
+Cohesion: 0.33
+Nodes (5): GalleryImage, ImageLightboxProps, prepareImages(), ProductGallery(), ProductGalleryProps
+
+### Community 74 - "files.tsx"
+Cohesion: 0.20
+Nodes (8): SearchBar(), SearchBarProps, BaseProps, Props, TextAreaProps, TextInput, TextInputProps, Route
+
+### Community 75 - "CartDrawer.tsx"
+Cohesion: 0.27
+Nodes (5): auth, authClient, Route, Route, SessionInfo
+
+### Community 76 - "__root.tsx"
+Cohesion: 0.33
+Nodes (3): MyRouterContext, Route, FileRoutesById
+
+### Community 78 - "cheerio"
+Cohesion: 0.28
+Nodes (7): defaultValues, InquiryForm(), Inquiry, inquiryFormSchema, InquiryFormValues, inquirySchema, createInquiry
+
 ## Knowledge Gaps
-- **241 isolated node(s):** `$schema`, `.opencode/plugins/graphify.js`, `$schema`, `enabled`, `clientKind` (+236 more)
+- **547 isolated node(s):** `$schema`, `.opencode/plugins/graphify.js`, `$schema`, `enabled`, `clientKind` (+542 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **12 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **42 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `dependencies` connect `External Dependencies` to `Package Configuration`?**
-  _High betweenness centrality (0.033) - this node is a cross-community bridge._
+- **Why does `dependencies` connect `External Dependencies` to `Package Configuration`, `drizzle-orm`, `@faker-js/faker`, `lucide-react`, `marked`, `motion`, `pg`, `@radix-ui/react-dialog`, `react`, `react-dom`, `sonner`, `swiper`, `@tailwindcss/vite`, `@tanstack/match-sorter-utils`, `@tanstack/react-devtools`, `@tanstack/react-form`, `@tanstack/react-form-start`, `@tanstack/react-router`, `@tanstack/react-router-devtools`, `@tanstack/react-router-ssr-query`, `@tanstack/react-start`, `@tanstack/react-table`, `@tanstack/router-plugin`, `@tanstack/zod-adapter`, `@tanstack/zod-form-adapter`, `ulid`, `@unpic/react`, `zod`, `zustand`, `better-auth`?**
+  _High betweenness centrality (0.014) - this node is a cross-community bridge._
+- **Why does `cms` connect `Layout Components` to `ProductCard.tsx`, `Cart Components`, `InquiryForm.tsx`, `cheerio`, `category/$slug.tsx`, `product/$slug/index.tsx`, `Faq.tsx`?**
+  _High betweenness centrality (0.009) - this node is a cross-community bridge._
 - **Why does `devDependencies` connect `Dev Dependencies` to `Package Configuration`?**
-  _High betweenness centrality (0.026) - this node is a cross-community bridge._
-- **Why does `cms` connect `Layout Components` to `Form Components`, `Cart Components`, `TanStack Integration`, `Hero and Banner`?**
-  _High betweenness centrality (0.017) - this node is a cross-community bridge._
+  _High betweenness centrality (0.006) - this node is a cross-community bridge._
 - **What connects `$schema`, `.opencode/plugins/graphify.js`, `$schema` to the rest of the system?**
-  _241 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `Layout Components` be split into smaller, more focused modules?**
-  _Cohesion score 0.056962025316455694 - nodes in this community are weakly interconnected._
+  _547 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Database Relations` be split into smaller, more focused modules?**
-  _Cohesion score 0.05064935064935065 - nodes in this community are weakly interconnected._
-- **Should `External Dependencies` be split into smaller, more focused modules?**
-  _Cohesion score 0.04081632653061224 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08505747126436781 - nodes in this community are weakly interconnected._
+- **Should `TanStack Integration` be split into smaller, more focused modules?**
+  _Cohesion score 0.07142857142857142 - nodes in this community are weakly interconnected._
+- **Should `Dev Dependencies` be split into smaller, more focused modules?**
+  _Cohesion score 0.05128205128205128 - nodes in this community are weakly interconnected._

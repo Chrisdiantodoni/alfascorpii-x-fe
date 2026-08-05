@@ -17,6 +17,22 @@ export const auth = betterAuth({
 
 	emailAndPassword: {
 		enabled: true,
+		changePassword: {
+			enabled: true,
+		},
+	},
+	user: {
+		additionalFields: {
+			whatsapp: {
+				type: "string",
+				required: false,
+				input: true,
+			},
+		},
+		deleteUser: {
+			enabled: true,
+			deleteUserCallbackURL: `${process.env.BETTER_AUTH_URL || "http://localhost:3000"}/login`,
+		},
 	},
 	plugins: [tanstackStartCookies()],
 });

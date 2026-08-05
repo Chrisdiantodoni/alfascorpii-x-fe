@@ -110,42 +110,6 @@ export const jobBatches = pgTable("job_batches", {
 	finishedAt: integer("finished_at"),
 });
 
-export const authAccount = pgTable(
-	"auth_account",
-	{
-		id: text().primaryKey().notNull(),
-		accountId: text("account_id").notNull(),
-		providerId: text("provider_id").notNull(),
-		userId: text("user_id").notNull(),
-		accessToken: text("access_token"),
-		refreshToken: text("refresh_token"),
-		idToken: text("id_token"),
-		accessTokenExpiresAt: timestamp("access_token_expires_at", {
-			mode: "string",
-		}),
-		refreshTokenExpiresAt: timestamp("refresh_token_expires_at", {
-			mode: "string",
-		}),
-		scope: text(),
-		password: text(),
-		createdAt: timestamp("created_at", { mode: "string" })
-			.defaultNow()
-			.notNull(),
-		updatedAt: timestamp("updated_at", { mode: "string" }).notNull(),
-	},
-	(table) => [
-		index("account_userId_idx").using(
-			"btree",
-			table.userId.asc().nullsLast().op("text_ops"),
-		),
-		foreignKey({
-			columns: [table.userId],
-			foreignColumns: [authUser.id],
-			name: "auth_account_user_id_auth_user_id_fk",
-		}).onDelete("cascade"),
-	],
-);
-
 export const failedJobs = pgTable(
 	"failed_jobs",
 	{
@@ -220,28 +184,6 @@ export const blogCategories = pgTable(
 	(table) => [unique("blog_categories_slug_unique").on(table.slug)],
 );
 
-export const authVerification = pgTable(
-	"auth_verification",
-	{
-		id: text().primaryKey().notNull(),
-		identifier: text().notNull(),
-		value: text().notNull(),
-		expiresAt: timestamp("expires_at", { mode: "string" }).notNull(),
-		createdAt: timestamp("created_at", { mode: "string" })
-			.defaultNow()
-			.notNull(),
-		updatedAt: timestamp("updated_at", { mode: "string" })
-			.defaultNow()
-			.notNull(),
-	},
-	(table) => [
-		index("verification_identifier_idx").using(
-			"btree",
-			table.identifier.asc().nullsLast().op("text_ops"),
-		),
-	],
-);
-
 export const files = pgTable(
 	"files",
 	{
@@ -279,57 +221,12 @@ export const areas = pgTable(
 	(table) => [unique("areas_name_unique").on(table.name)],
 );
 
-export const authUser = pgTable(
-	"auth_user",
-	{
-		id: text().primaryKey().notNull(),
-		name: text().notNull(),
-		email: text().notNull(),
-		emailVerified: boolean("email_verified").default(false).notNull(),
-		image: text(),
-		createdAt: timestamp("created_at", { mode: "string" })
-			.defaultNow()
-			.notNull(),
-		updatedAt: timestamp("updated_at", { mode: "string" })
-			.defaultNow()
-			.notNull(),
-	},
-	(table) => [unique("auth_user_email_unique").on(table.email)],
-);
-
-export const authSession = pgTable(
-	"auth_session",
-	{
-		id: text().primaryKey().notNull(),
-		expiresAt: timestamp("expires_at", { mode: "string" }).notNull(),
-		token: text().notNull(),
-		createdAt: timestamp("created_at", { mode: "string" })
-			.defaultNow()
-			.notNull(),
-		updatedAt: timestamp("updated_at", { mode: "string" }).notNull(),
-		ipAddress: text("ip_address"),
-		userAgent: text("user_agent"),
-		userId: text("user_id").notNull(),
-	},
-	(table) => [
-		index("session_userId_idx").using(
-			"btree",
-			table.userId.asc().nullsLast().op("text_ops"),
-		),
-		foreignKey({
-			columns: [table.userId],
-			foreignColumns: [authUser.id],
-			name: "auth_session_user_id_auth_user_id_fk",
-		}).onDelete("cascade"),
-		unique("auth_session_token_unique").on(table.token),
-	],
-);
-
 export const pages = pgTable(
 	"pages",
 	{
 		id: char({ length: 26 }).primaryKey().notNull(),
 		title: varchar({ length: 255 }).notNull(),
+		description: varchar({ length: 255 }),
 		slug: varchar({ length: 255 }).notNull(),
 		content: text().notNull(),
 		deletedAt: timestamp("deleted_at", { mode: "string" }),
@@ -424,6 +321,7 @@ export const subCategories = pgTable(
 	{
 		id: char({ length: 26 }).primaryKey().notNull(),
 		name: varchar({ length: 255 }).notNull(),
+		description: varchar({ length: 255 }),
 		slug: varchar({ length: 255 }).notNull(),
 		categoryId: char("category_id", { length: 26 }),
 		orderIndex: integer("order_index").default(0).notNull(),
@@ -516,6 +414,7 @@ export const categories = pgTable(
 	{
 		id: char({ length: 26 }).primaryKey().notNull(),
 		name: varchar({ length: 255 }).notNull(),
+		description: varchar({ length: 255 }),
 		slug: varchar({ length: 255 }).notNull(),
 		orderIndex: integer("order_index").default(0).notNull(),
 		isActive: boolean("is_active").default(true).notNull(),
