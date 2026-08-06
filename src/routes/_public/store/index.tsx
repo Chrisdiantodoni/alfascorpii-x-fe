@@ -17,7 +17,7 @@ import { SharedElement } from "#/components/SharedElements";
 import { AnimatedRoute } from "#/components/AnimatedRoute";
 import type { Category, SubCategory } from "#/types";
 import { Image } from "#/components/ui/Image";
-import { ArrowRight } from "lucide-react";
+import { Button } from "#/components/ui/Button";
 
 export const Route = createFileRoute("/_public/store/")({
   component: Store,
@@ -37,34 +37,52 @@ function SubCategoryBanner({ subCategory }: { subCategory: SubCategory }) {
   const thumbnail = subCategory.files?.find((f) => f.role === "thumbnail");
 
   return (
-    <div className="relative w-full aspect-[21/9] md:aspect-[3/1] min-h-[220px] md:min-h-[340px] rounded-2xl overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900 border border-line/40 group">
+    <div className="relative w-full overflow-hidden rounded-2xl border border-line/40 bg-ink-2 group">
       {/* Background Image - conditional render */}
       {thumbnail?.url && (
         <Image
           src={thumbnail.url}
           alt={subCategory.name}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
           priority={false}
         />
       )}
 
-      {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+      {/* Fallback watermark (motif BannerSlide) saat tidak ada thumbnail */}
+      {!thumbnail?.url && (
+        <div className="absolute inset-y-0 right-0 w-[60%] flex items-center justify-end opacity-[0.05] pr-0 lg:pr-10 pointer-events-none">
+          <svg
+            viewBox="0 0 400 240"
+            className="w-full max-w-[900px]"
+            fill="none"
+            stroke="#ffffff"
+            strokeWidth="3"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <circle cx="90" cy="180" r="46" />
+            <circle cx="310" cy="180" r="46" />
+            <path d="M90 180 L168 88 H244 L310 180" strokeLinejoin="round" />
+            <path d="M168 88 L140 180" />
+            <path d="M244 88 L226 44 H272" strokeLinecap="round" />
+          </svg>
+        </div>
+      )}
 
-      {/* Decorative Line */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-orange-500 to-transparent" />
+      {/* Gradient Overlay - brand ink, konsisten dengan BannerSlide */}
+      <div className="absolute inset-0 bg-gradient-to-r from-ink/95 via-ink/70 to-ink/10" />
+
+      {/* Accent Line - brand biru */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-bright via-blue to-transparent" />
 
       {/* Content */}
-      <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-12 lg:px-16">
+      <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-12 lg:px-16 min-h-[240px] md:min-h-[360px]">
         <div className="max-w-2xl">
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1 mb-3">
-            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-[10px] tracking-[0.2em] text-white/80 font-semibold uppercase">
-              {subCategory.category?.name || "KATEGORI"}
-            </span>
-          </div>
+          <span className="text-[10px] tracking-[0.25em] text-blue-bright font-semibold uppercase">
+            {subCategory.category?.name || "KATEGORI"}
+          </span>
 
-          <h2 className="font-head font-black text-2xl md:text-4xl lg:text-5xl text-white leading-[1.1] drop-shadow-[0_4px_20px_rgba(0,0,0,0.3)]">
+          <h2 className="font-head font-black text-2xl md:text-4xl lg:text-5xl text-white leading-[1.05] tracking-tighter mt-3">
             {subCategory.name}
           </h2>
 
@@ -74,21 +92,17 @@ function SubCategoryBanner({ subCategory }: { subCategory: SubCategory }) {
             </p>
           )}
 
-          <Link
-            to="/sub-category/$slug"
-            params={{ slug: subCategory.slug }}
-            className="inline-flex items-center gap-3 mt-5 bg-white text-ink px-8 py-3.5 rounded-full text-[13px] font-bold tracking-wide hover:bg-white/90 hover:scale-105 transition-all duration-300 shadow-2xl shadow-black/20 group/cta"
-          >
-            <span>JELAJAHI {subCategory.name.toUpperCase()}</span>
-            <ArrowRight
-              size={18}
-              className="group-hover/cta:translate-x-1 transition-transform"
-            />
-          </Link>
+          <div className="mt-6 md:mt-8">
+            <Button
+              variant="light"
+              to="/sub-category/$slug"
+              params={{ slug: subCategory.slug }}
+            >
+              JELAJAHI {subCategory.name.toUpperCase()}
+            </Button>
+          </div>
         </div>
       </div>
-
-      <div className="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-tl from-white/5 to-transparent rounded-tl-full" />
     </div>
   );
 }

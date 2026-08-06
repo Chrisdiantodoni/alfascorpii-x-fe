@@ -20,6 +20,7 @@ type ButtonAsButton = ButtonBaseProps &
 
 type ButtonAsLink = ButtonBaseProps & {
 	to: string;
+	params?: Record<string, string>;
 	href?: never;
 	external?: never;
 };
@@ -68,7 +69,7 @@ export function Button(props: ButtonProps) {
 	if ("to" in props && props.to) {
 		return (
 			<motion.div className="inline-flex" {...activeFx}>
-				<Link to={props.to} className={combinedClasses}>
+				<Link to={props.to} params={props.params} className={combinedClasses}>
 					{children}
 				</Link>
 			</motion.div>
