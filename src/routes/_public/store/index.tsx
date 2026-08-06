@@ -37,7 +37,7 @@ function SubCategoryBanner({ subCategory }: { subCategory: SubCategory }) {
   const thumbnail = subCategory.files?.find((f) => f.role === "thumbnail");
 
   return (
-    <div className="relative w-full overflow-hidden rounded-2xl border border-line/40 bg-ink-2 group">
+    <div className="relative w-full overflow-hidden rounded-2xl border border-line/40 bg-ink-2 min-h-[240px] md:min-h-[360px] group">
       {/* Background Image - conditional render */}
       {thumbnail?.url && (
         <Image
@@ -70,13 +70,13 @@ function SubCategoryBanner({ subCategory }: { subCategory: SubCategory }) {
       )}
 
       {/* Gradient Overlay - brand ink, konsisten dengan BannerSlide */}
-      <div className="absolute inset-0 bg-gradient-to-r from-ink/95 via-ink/70 to-ink/10" />
+      <div className="absolute inset-0 bg-gradient-to-r from-ink/90 via-ink/55 to-ink/5" />
 
       {/* Accent Line - brand biru */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-bright via-blue to-transparent" />
+      {/*<div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-bright via-blue to-transparent" />*/}
 
       {/* Content */}
-      <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-12 lg:px-16 min-h-[240px] md:min-h-[360px]">
+      <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-12 lg:px-16">
         <div className="max-w-2xl">
           <span className="text-[10px] tracking-[0.25em] text-blue-bright font-semibold uppercase">
             {subCategory.category?.name || "KATEGORI"}
@@ -227,7 +227,7 @@ function Store() {
                   {sc.products && sc.products.length > 0 ? (
                     <DragScrollContainer
                       stagger
-                      className="flex gap-4 md:gap-6 pb-6 overflow-x-auto snap-x snap-mandatory hide-scrollbar"
+                      className="flex gap-4 md:gap-6 pb-6 overflow-x-auto snap-x snap-mandatory hide-scrollbar mt-4"
                     >
                       {sc.products.map((p) => {
                         const isMotor = sc.category?.slug === "sepeda-motor";

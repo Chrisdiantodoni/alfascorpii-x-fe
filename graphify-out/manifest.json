@@ -375,8 +375,8 @@
     "semantic_hash": ""
   },
   "src/lib/auth-client.ts": {
-    "mtime": 1785927280.377645,
-    "ast_hash": "236f3d4268c216286db6adf4a0a4c520",
+    "mtime": 1786014952.7153413,
+    "ast_hash": "30ab430d0bda1d8185bac90093df3671",
     "semantic_hash": ""
   },
   "src/lib/auth.ts": {
@@ -445,8 +445,8 @@
     "semantic_hash": "4dc291441d5d099fab16c9a82306f4d1"
   },
   "vite.config.ts": {
-    "mtime": 1785772292.2472172,
-    "ast_hash": "f4dfc7b257dbf132d8c9f6997dad36c9",
+    "mtime": 1786014648.7177851,
+    "ast_hash": "dccd30fe3b018df37bc5abd670079349",
     "semantic_hash": ""
   },
   ".firecrawl/inertia-scroller.md": {
@@ -680,8 +680,8 @@
     "semantic_hash": ""
   },
   "src/routes/_public/store/index.tsx": {
-    "mtime": 1786014542.3707278,
-    "ast_hash": "4084f90afafe3d0b1967e8e09e6f32dd",
+    "mtime": 1786015250.931843,
+    "ast_hash": "6a572fe51869ce97ab235a5039bee74a",
     "semantic_hash": ""
   },
   "src/routes/_public/sub-category/$slug.tsx": {
