@@ -10,12 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PublicRouteImport } from './routes/_public'
-import { Route as UserRouteImport } from './routes/user'
+import { Route as UserRouteRouteImport } from './routes/user/route'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
-import { Route as UserIndexRouteImport } from './routes/user.index'
-import { Route as UserProfileRouteImport } from './routes/user.profile'
-import { Route as UserSecurityRouteImport } from './routes/user.security'
-import { Route as UserWishlistRouteImport } from './routes/user.wishlist'
+import { Route as UserIndexRouteImport } from './routes/user/index'
+import { Route as UserProfileRouteImport } from './routes/user/profile'
+import { Route as UserSecurityRouteImport } from './routes/user/security'
+import { Route as UserWishlistRouteImport } from './routes/user/wishlist'
 import { Route as PublicSlugIndexRouteImport } from './routes/_public/$slug/index'
 import { Route as PublicBlogIndexRouteImport } from './routes/_public/blog/index'
 import { Route as PublicCategorySlugRouteImport } from './routes/_public/category/$slug'
@@ -31,7 +31,7 @@ const PublicRoute = PublicRouteImport.update({
   id: '/_public',
   getParentRoute: () => rootRouteImport,
 } as any)
-const UserRoute = UserRouteImport.update({
+const UserRouteRoute = UserRouteRouteImport.update({
   id: '/user',
   path: '/user',
   getParentRoute: () => rootRouteImport,
@@ -44,22 +44,22 @@ const PublicIndexRoute = PublicIndexRouteImport.update({
 const UserIndexRoute = UserIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => UserRoute,
+  getParentRoute: () => UserRouteRoute,
 } as any)
 const UserProfileRoute = UserProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
-  getParentRoute: () => UserRoute,
+  getParentRoute: () => UserRouteRoute,
 } as any)
 const UserSecurityRoute = UserSecurityRouteImport.update({
   id: '/security',
   path: '/security',
-  getParentRoute: () => UserRoute,
+  getParentRoute: () => UserRouteRoute,
 } as any)
 const UserWishlistRoute = UserWishlistRouteImport.update({
   id: '/wishlist',
   path: '/wishlist',
-  getParentRoute: () => UserRoute,
+  getParentRoute: () => UserRouteRoute,
 } as any)
 const PublicSlugIndexRoute = PublicSlugIndexRouteImport.update({
   id: '/$slug/',
@@ -113,8 +113,8 @@ const PublicProductSlugIndexRoute = PublicProductSlugIndexRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/user': typeof UserRouteRouteWithChildren
   '/': typeof PublicIndexRoute
-  '/user': typeof UserRouteWithChildren
   '/user/profile': typeof UserProfileRoute
   '/user/security': typeof UserSecurityRoute
   '/user/wishlist': typeof UserWishlistRoute
@@ -149,8 +149,8 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/user': typeof UserRouteRouteWithChildren
   '/_public': typeof PublicRouteWithChildren
-  '/user': typeof UserRouteWithChildren
   '/user/profile': typeof UserProfileRoute
   '/user/security': typeof UserSecurityRoute
   '/user/wishlist': typeof UserWishlistRoute
@@ -170,8 +170,8 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
     | '/user'
+    | '/'
     | '/user/profile'
     | '/user/security'
     | '/user/wishlist'
@@ -205,8 +205,8 @@ export interface FileRouteTypes {
     | '/product/$slug'
   id:
     | '__root__'
-    | '/_public'
     | '/user'
+    | '/_public'
     | '/user/profile'
     | '/user/security'
     | '/user/wishlist'
@@ -225,8 +225,8 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  UserRouteRoute: typeof UserRouteRouteWithChildren
   PublicRoute: typeof PublicRouteWithChildren
-  UserRoute: typeof UserRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -243,7 +243,7 @@ declare module '@tanstack/react-router' {
       id: '/user'
       path: '/user'
       fullPath: '/user'
-      preLoaderRoute: typeof UserRouteImport
+      preLoaderRoute: typeof UserRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_public/': {
@@ -258,28 +258,28 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/user/'
       preLoaderRoute: typeof UserIndexRouteImport
-      parentRoute: typeof UserRoute
+      parentRoute: typeof UserRouteRoute
     }
     '/user/profile': {
       id: '/user/profile'
       path: '/profile'
       fullPath: '/user/profile'
       preLoaderRoute: typeof UserProfileRouteImport
-      parentRoute: typeof UserRoute
+      parentRoute: typeof UserRouteRoute
     }
     '/user/security': {
       id: '/user/security'
       path: '/security'
       fullPath: '/user/security'
       preLoaderRoute: typeof UserSecurityRouteImport
-      parentRoute: typeof UserRoute
+      parentRoute: typeof UserRouteRoute
     }
     '/user/wishlist': {
       id: '/user/wishlist'
       path: '/wishlist'
       fullPath: '/user/wishlist'
       preLoaderRoute: typeof UserWishlistRouteImport
-      parentRoute: typeof UserRoute
+      parentRoute: typeof UserRouteRoute
     }
     '/_public/$slug/': {
       id: '/_public/$slug/'
@@ -354,6 +354,24 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface UserRouteRouteChildren {
+  UserProfileRoute: typeof UserProfileRoute
+  UserSecurityRoute: typeof UserSecurityRoute
+  UserWishlistRoute: typeof UserWishlistRoute
+  UserIndexRoute: typeof UserIndexRoute
+}
+
+const UserRouteRouteChildren: UserRouteRouteChildren = {
+  UserProfileRoute: UserProfileRoute,
+  UserSecurityRoute: UserSecurityRoute,
+  UserWishlistRoute: UserWishlistRoute,
+  UserIndexRoute: UserIndexRoute,
+}
+
+const UserRouteRouteWithChildren = UserRouteRoute._addFileChildren(
+  UserRouteRouteChildren,
+)
+
 interface PublicRouteChildren {
   PublicIndexRoute: typeof PublicIndexRoute
   PublicCategorySlugRoute: typeof PublicCategorySlugRoute
@@ -383,25 +401,9 @@ const PublicRouteChildren: PublicRouteChildren = {
 const PublicRouteWithChildren =
   PublicRoute._addFileChildren(PublicRouteChildren)
 
-interface UserRouteChildren {
-  UserProfileRoute: typeof UserProfileRoute
-  UserSecurityRoute: typeof UserSecurityRoute
-  UserWishlistRoute: typeof UserWishlistRoute
-  UserIndexRoute: typeof UserIndexRoute
-}
-
-const UserRouteChildren: UserRouteChildren = {
-  UserProfileRoute: UserProfileRoute,
-  UserSecurityRoute: UserSecurityRoute,
-  UserWishlistRoute: UserWishlistRoute,
-  UserIndexRoute: UserIndexRoute,
-}
-
-const UserRouteWithChildren = UserRoute._addFileChildren(UserRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
+  UserRouteRoute: UserRouteRouteWithChildren,
   PublicRoute: PublicRouteWithChildren,
-  UserRoute: UserRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
