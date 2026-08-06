@@ -41,29 +41,31 @@ async function resolveScopes(pathname: string): Promise<BannerScope[]> {
 
   const slug = pathname.replace(/^\//, "").split("/").pop()!;
 
-  const [page, category, product, blog, menuItem] = await Promise.all([
+  const [page, category, subCategory, menuItem] = await Promise.all([
     db.query.pages.findFirst({ where: eq(pages.slug, slug) }),
     db.query.categories.findFirst({ where: eq(categories.slug, slug) }),
-    db.query.products.findFirst({ where: eq(products.slug, slug) }),
-    db.query.blogs.findFirst({ where: eq(blogs.slug, slug) }),
+    db.query.subCategories.findFirst({ where: eq(subCategories.slug, slug) }),
+    // db.query.products.findFirst({ where: eq(products.slug, slug) }),
+    // db.query.blogs.findFirst({ where: eq(blogs.slug, slug) }),
     db.query.menuItems.findFirst({ where: eq(menuItems.url, pathname) }),
   ]);
 
   if (page) return [{ type: "page", id: page.id }];
+  if (category) return [{ type: "category", id: category.id }];
 
-  if (category) {
-    const subs = await db.query.subCategories.findMany({
-      where: eq(subCategories.categoryId, category.id),
-      columns: { id: true },
-    });
-    return [
-      { type: "category", id: category.id },
-      ...subs.map((s) => ({ type: "sub_category" as const, id: s.id })),
-    ];
-  }
+  // if (category) {
+  //   const subs = await db.query.subCategories.findMany({
+  //     where: eq(subCategories.categoryId, category.id),
+  //     columns: { id: true },
+  //   });
+  //   return [
+  //     { type: "category", id: category.id },
+  //     ...subs.map((s) => ({ type: "sub_category" as const, id: s.id })),
+  //   ];
+  // }
 
-  if (product) return [{ type: "product", id: product.id }];
-  if (blog) return [{ type: "blog", id: blog.id }];
+  // if (product) return [{ type: "product", id: product.id }];
+  if (subCategory) return [{ type: "sub-category", id: subCategory.id }];
   if (menuItem) return [{ type: "menu_item", id: menuItem.id }];
 
   return [];
@@ -93,6 +95,7 @@ async function fetchBanners(scopes: BannerScope[]) {
     ),
     orderBy: (b, { asc }) => [asc(b.placement), asc(b.orderPosition)],
   });
+  console.log({ rows });
 
   return rows;
 }
@@ -104,9 +107,8 @@ const schema = z.object({
 export const getBanners = createServerFn({ method: "GET" })
   .validator(schema)
   .handler(async ({ data }) => {
-    console.log({ data }, "data");
     const scopes = await resolveScopes(data.pathname);
-
+    console.log({ scopes });
     const rows = await fetchBanners(scopes);
 
     const grouped: Record<string, ReturnType<typeof mapBanner>[]> = {
@@ -129,7 +131,7 @@ const blogListSchema = z
   .default({});
 
 export const getBlogs = createServerFn({ method: "GET" })
-  .validator((data: unknown) => blogListSchema.parse(data ?? {}))
+  .validator(blogListSchema)
   .handler(async ({ data }) => {
     // 2. Ambil kategori terlebih dahulu agar bisa filter blog berdasarkan categoryId
     const allCategories = await db.query.blogCategories.findMany({

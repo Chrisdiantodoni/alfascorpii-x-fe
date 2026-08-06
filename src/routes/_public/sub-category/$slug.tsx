@@ -14,6 +14,7 @@ import { TextInput } from "#/components/ui/TextInput";
 import type { Category, FeaturedProduct, SubCategory } from "#/types";
 import { motion } from "motion/react";
 import { SharedElement } from "#/components/SharedElements";
+import { BannerCarousel } from "#/components/ui/BannerCarousel";
 
 function mapToMiniCard(product: FeaturedProduct) {
   const type = product.subCategory?.name?.toLowerCase() || "";
@@ -55,6 +56,7 @@ function mapToMiniCard(product: FeaturedProduct) {
 export const Route = createFileRoute("/_public/sub-category/$slug")({
   component: SubCategoryPage,
   loader: async ({ params }) => {
+    console.log(params.slug, "slug");
     const [res, banners] = await Promise.all([
       getSubCategoryBySlug({
         data: { slug: params.slug },
@@ -79,7 +81,7 @@ function SubCategoryPage() {
     };
   } = Route.useLoaderData();
 
-  console.log(res);
+  console.log(banners);
 
   if (!res.subCategory) {
     return (
@@ -112,6 +114,7 @@ function SubCategoryPage() {
           KEMBALI
         </Link>
       </section>
+      <BannerCarousel banners={banners.middle} className="-mx-6 md:-mx-16" />
 
       <Section className="pt-8">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-6">
@@ -160,6 +163,7 @@ function SubCategoryPage() {
           </div>
         </div>
       </Section>
+      <BannerCarousel banners={banners.bottom} className="-mx-6 md:-mx-16" />
     </>
   );
 }

@@ -11,21 +11,27 @@ import { type CartColor, lineId, useCartStore } from "#/stores/cart";
 import { formatRupiah } from "#/utils/fn";
 import { ProductDetailSkeleton } from "#/components/skeleton/ProductDetailSkeleton";
 import { SharedElement } from "#/components/SharedElements";
+import { PageBanner } from "#/components/PageBanner";
+import { getBanners } from "#/server/cms";
+import { BannerCarousel } from "#/components/ui/BannerCarousel";
 
 export const Route = createFileRoute("/_public/product/$slug/")({
   component: ProductDetail,
-  // pendingMs: 0,
-  // pendingComponent: ProductDetailSkeleton,
+  pendingMs: 0,
+  pendingComponent: ProductDetailSkeleton,
   loader: async ({ params }) => {
-    const data = await getProductDetail({
-      data: { slug: params.slug },
-    });
-    return data;
+    const [data, banners] = await Promise.all([
+      getProductDetail({
+        data: { slug: params.slug },
+      }),
+      getBanners({ data: { pathname: params.slug } }),
+    ]);
+    return { data, banners };
   },
 });
 
 function ProductDetail() {
-  const data = Route.useLoaderData();
+  const { data, banners } = Route.useLoaderData();
   const addItem = useCartStore((s) => s.addItem);
   const items = useCartStore((s) => s.items);
   const location = useLocation();
@@ -101,6 +107,8 @@ function ProductDetail() {
 
   return (
     <>
+      <PageBanner hero={banners.hero} top={banners.top} />
+
       <section className="pt-32 pb-8">
         <Link
           to={backTo}
@@ -110,6 +118,7 @@ function ProductDetail() {
           KEMBALI
         </Link>
       </section>
+      <BannerCarousel banners={banners.middle} className="-mx-6 md:-mx-16" />
 
       <section className="pb-20 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
         <SharedElement
@@ -300,6 +309,7 @@ function ProductDetail() {
             )}
         </div>
       </section>
+      <BannerCarousel banners={banners.bottom} className="-mx-6 md:-mx-16" />
     </>
   );
 }

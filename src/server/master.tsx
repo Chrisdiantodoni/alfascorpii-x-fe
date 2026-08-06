@@ -209,6 +209,11 @@ export const getSubCategories = createServerFn({ method: "GET" }).handler(
     const productIds = response.flatMap((subC) =>
       subC.products ? subC.products.map((p) => p.id) : [],
     );
+    const subCategoryIds = response.map((item) => item.id);
+
+    const subCategoryMap = await batchFilesWithUrls({
+      data: { type: "sub-category", ids: subCategoryIds },
+    });
 
     const filesMap =
       productIds.length > 0
@@ -219,6 +224,7 @@ export const getSubCategories = createServerFn({ method: "GET" }).handler(
 
     const result = response.map((subC) => ({
       ...subC,
+      files: subCategoryMap[subC.id],
       category: subC.category
         ? {
             ...subC.category,

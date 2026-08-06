@@ -1,5 +1,6 @@
 // components/CategorySidebar.tsx
 import { useNavigate, useSearch, useRouterState } from "@tanstack/react-router";
+import { useState, useEffect } from "react"; // <-- 1. Import ini
 
 export interface SpecTemplateItem {
   id?: string;
@@ -24,9 +25,21 @@ export default function CategorySidebar({
     string | undefined
   >;
 
-  const isLoading = useRouterState({
+  const isPending = useRouterState({
     select: (s) => s.status === "pending",
   });
+
+  // --- SOLUSI HYDRATION MISMATCH ---
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Sebelum mounted (termasuk SSR), kita asumsikan 'true' agar SAMA dengan server.
+  // Setelah mounted di browser, baru kita ikuti status isPending dari router.
+  const isLoading = isMounted ? isPending : true;
+  // ---------------------------------
 
   const getSelected = (key: string): string[] => {
     const val = search[key];
