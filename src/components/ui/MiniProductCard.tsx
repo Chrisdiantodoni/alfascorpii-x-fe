@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { Image } from "./Image";
 import { MaterialIcon } from "./MaterialIcon";
 import { WishlistButton } from "./WishlistButton";
+import { SharedElement } from "../SharedElements";
 
 interface MiniProductCardProps {
   badge?: string;
@@ -44,10 +45,11 @@ export function MiniProductCard({
 
       {/* Full-card overlay link ke detail produk */}
       <Link
+        resetScroll={false}
         to={href}
         state={(prev) => ({
           ...prev,
-          from: window.location.pathname + window.location.search,
+          from: location.pathname + location.searchStr,
         })}
         className="absolute inset-0 z-10 focus:outline-none"
         aria-label={`Lihat detail ${name}`}
@@ -66,26 +68,26 @@ export function MiniProductCard({
               <WishlistButton productId={productId} className="!w-9 !h-9" />
             </div>
           )}
-          <motion.div
+          <SharedElement
             layoutId={shouldAnimate ? `product-card-${slug}` : undefined}
-            transition={{ duration: 0.45, ease: [0.32, 0.72, 0, 1] }}
-            className="aspect-square bg-paper-dim overflow-hidden mb-5"
           >
-            {imageUrl ? (
-              <Image
-                src={imageUrl}
-                alt={name}
-                width={400}
-                height={300}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
-              />
-            ) : icon ? (
-              <MaterialIcon
-                name={icon}
-                className="!text-[60px] text-blue/30 group-hover:text-blue/70 group-hover:scale-110 transition-all duration-500 select-none"
-              />
-            ) : null}
-          </motion.div>
+            <div className="aspect-square bg-paper-dim overflow-hidden mb-5">
+              {imageUrl ? (
+                <Image
+                  src={imageUrl}
+                  alt={name}
+                  width={400}
+                  height={300}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
+                />
+              ) : icon ? (
+                <MaterialIcon
+                  name={icon}
+                  className="!text-[60px] text-blue/30 group-hover:text-blue/70 group-hover:scale-110 transition-all duration-500 select-none"
+                />
+              ) : null}
+            </div>
+          </SharedElement>
         </div>
 
         {/* Detail Teks */}

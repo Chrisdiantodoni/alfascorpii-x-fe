@@ -1,10 +1,11 @@
-import Hero from "#/components/sections/Hero";
+import { AnimatedRoute } from "#/components/AnimatedRoute";
+import { PageBanner } from "#/components/PageBanner";
 import { BannerCarousel } from "#/components/ui/BannerCarousel";
-import type { Banner } from "#/components/ui/BannerSlide";
 import { MarkdownPreview } from "#/components/ui/MarkdownPreview";
 import { getBanners, getPages } from "#/server/cms";
 import type { BannerProps, IPage } from "#/types";
 import { createFileRoute } from "@tanstack/react-router";
+import { motion } from "motion/react";
 
 export const Route = createFileRoute("/_public/$slug/")({
   component: RouteComponent,
@@ -22,10 +23,8 @@ function RouteComponent() {
     Route.useLoaderData();
 
   return (
-    <>
-      <Hero banners={banners.hero} />
-
-      <BannerCarousel banners={banners.top} className="-mx-6 md:-mx-16" />
+    <AnimatedRoute variant="slide">
+      <PageBanner hero={banners.hero} top={banners.top} />
       <section className="min-h-[20vh] flex flex-col justify-center pt-24 pb-8 max-w-4xl mx-auto w-full px-4">
         <span className="text-[12px] tracking-[0.25em] text-blue-bright font-semibold mb-4">
           HALAMAN
@@ -46,6 +45,6 @@ function RouteComponent() {
         <MarkdownPreview content={pages.content} />
       </section>
       <BannerCarousel banners={banners.bottom} className="-mx-6 md:-mx-16" />
-    </>
+    </AnimatedRoute>
   );
 }

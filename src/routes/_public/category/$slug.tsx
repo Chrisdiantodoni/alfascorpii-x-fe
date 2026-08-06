@@ -1,7 +1,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import Hero from "#/components/sections/Hero";
+import { PageBanner } from "#/components/PageBanner";
 import { BannerCarousel } from "#/components/ui/BannerCarousel";
 import CategorySidebar from "#/components/ui/CategorySidebar";
 import { EmptyState } from "#/components/ui/EmptyState";
@@ -56,10 +56,13 @@ function mapToMiniCard(product: FeaturedProduct) {
 export const Route = createFileRoute("/_public/category/$slug")({
   component: CategoryPage,
   loader: async ({ params }) => {
-    const res = await getProductByCategory({
-      data: { slug: params.slug },
-    });
-    return { res: res || [] };
+    const [res, banners] = await Promise.all([
+      getProductByCategory({
+        data: { slug: params.slug },
+      }),
+      getBanners({ data: { pathname: params.slug } }),
+    ]);
+    return { res: res || [], banners };
   },
 });
 
@@ -67,18 +70,13 @@ function CategoryPage() {
   const { slug } = Route.useParams();
   const {
     res,
+    banners,
   }: {
     res: {
       categories: Category;
       products: FeaturedProduct[];
     };
   } = Route.useLoaderData();
-
-  const { data: banners } = useSuspenseQuery({
-    queryKey: ["banners", slug],
-    queryFn: () => getBanners({ data: { pathname: slug } }),
-    staleTime: Infinity,
-  });
 
   const title = slug
     .replace(/-/g, " ")
@@ -87,10 +85,9 @@ function CategoryPage() {
 
   return (
     <>
-      <Hero banners={banners.hero} />
-      <BannerCarousel banners={banners.top} className="-mx-6 md:-mx-16" />
+      <PageBanner hero={banners.hero} top={banners.top} />
       <section
-        className={`${banners.hero.length > 0 || banners.top.length > 0 ? "pt-18" : "pt-24"} pb-8`}
+        className={`${banners.hero.length > 0 || banners.top.length > 0 ? "pt-18 " : "pt-32 lg:pt-24"} pb-8`}
       >
         <Link
           to="/store"
@@ -100,6 +97,7 @@ function CategoryPage() {
           KEMBALI
         </Link>
       </section>
+      <BannerCarousel banners={banners.middle} className="-mx-6 md:-mx-16" />
 
       <Section className="pt-8">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-6">
@@ -129,7 +127,10 @@ function CategoryPage() {
                     <motion.div
                       key={p.id}
                       layoutId={`category-card-${p.slug}`}
-                      transition={{ duration: 0.45, ease: [0.32, 0.72, 0, 1] }}
+                      transition={{
+                        duration: 0.45,
+                        ease: [0.32, 0.72, 0, 1],
+                      }}
                     >
                       <MiniProductCard {...props} />
                     </motion.div>
@@ -145,6 +146,7 @@ function CategoryPage() {
           </div>
         </div>
       </Section>
+      <BannerCarousel banners={banners.bottom} className="-mx-6 md:-mx-16" />
     </>
   );
 }

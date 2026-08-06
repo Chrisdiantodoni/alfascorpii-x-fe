@@ -1,11 +1,19 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+export interface CartColor {
+	id: string;
+	name: string;
+	hex: string;
+}
+
 export interface CartItem {
 	id: string;
+	productId: string;
 	name: string;
 	price: number | null;
 	code: string | null;
+	color: CartColor | null;
 	qty: number;
 }
 
@@ -17,12 +25,22 @@ interface CartStore {
 	closeCart: () => void;
 	toggleCart: () => void;
 	clearLastAdded: () => void;
-	addItem: (item: Omit<CartItem, "qty">) => void;
+	addItem: (item: {
+		productId: string;
+		name: string;
+		price: number | null;
+		code: string | null;
+		color: CartColor | null;
+	}) => void;
 	removeItem: (id: string) => void;
 	updateQty: (id: string, delta: number) => void;
 	clearCart: () => void;
 	totalItems: () => number;
 	subtotal: () => number;
+}
+
+export function lineId(productId: string, color: CartColor | null) {
+	return `${productId}|${color?.id ?? "default"}`;
 }
 
 export const useCartStore = create<CartStore>()(
@@ -38,21 +56,33 @@ export const useCartStore = create<CartStore>()(
 			clearLastAdded: () => set({ lastAddedId: null }),
 
 			addItem: (item) => {
-				const existing = get().items.find((i) => i.id === item.id);
+				const id = lineId(item.productId, item.color);
+				const existing = get().items.find((i) => i.id === id);
 
 				if (existing) {
 					set({
 						items: get().items.map((i) =>
-							i.id === item.id ? { ...i, qty: i.qty + 1 } : i,
+							i.id === id ? { ...i, qty: i.qty + 1 } : i,
 						),
 						isOpen: true, // Otomatis buka drawer
-						lastAddedId: item.id, // Simpan id untuk efek highlight
+						lastAddedId: id, // Simpan id untuk efek highlight
 					});
 				} else {
 					set({
-						items: [...get().items, { ...item, qty: 1 }],
+						items: [
+							...get().items,
+							{
+								id,
+								productId: item.productId,
+								name: item.name,
+								price: item.price,
+								code: item.code,
+								color: item.color,
+								qty: 1,
+							},
+						],
 						isOpen: true, // Otomatis buka drawer
-						lastAddedId: item.id, // Simpan id untuk efek highlight
+						lastAddedId: id, // Simpan id untuk efek highlight
 					});
 				}
 			},
@@ -80,6 +110,28 @@ export const useCartStore = create<CartStore>()(
 			name: "alfascorpii-cart",
 			// Mencegah status drawer (isOpen) ikut tersimpan ke localStorage
 			partialize: (state) => ({ items: state.items }),
+			// Migrasi item lama (sebelum fitur warna) ke format line id komposit
+			merge: (persisted, current) => {
+				const state = {
+					...(current as CartStore),
+					...(persisted as Partial<CartStore>),
+				};
+				const persistedItems = (persisted as Partial<CartStore>)?.items;
+				if (persistedItems) {
+					state.items = persistedItems.map((item) => {
+						if (item.productId && item.color !== undefined) return item;
+						const productId =
+							item.productId ?? (item.id.split("|")[0] as string);
+						return {
+							...item,
+							id: lineId(productId, item.color ?? null),
+							productId,
+							color: item.color ?? null,
+						};
+					});
+				}
+				return state;
+			},
 		},
 	),
 );

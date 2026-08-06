@@ -106,5 +106,6 @@
   "104": "@unpic/react",
   "105": "zod",
   "106": "zustand",
-  "107": "PageTransition.tsx"
+  "107": "PageTransition.tsx",
+  "108": "better-auth"
 }

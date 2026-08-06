@@ -3,13 +3,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Suspense } from "react";
 import Faq from "#/components/sections/Faq";
 import FeaturedCarousel from "#/components/sections/FeaturedCarousel";
-import Hero from "#/components/sections/Hero";
 import InquiryForm from "#/components/sections/InquiryForm";
 import MessageGallery from "#/components/sections/MessageGallery";
 import Partners from "#/components/sections/Partners";
 import SocialsGrid from "#/components/sections/SocialsGrid";
 import SplitSection from "#/components/sections/SplitSection";
 import UspStrip from "#/components/sections/UspStrip";
+import { PageBanner } from "#/components/PageBanner";
 import VideoSection from "#/components/sections/VideoSection";
 import type { Banner } from "#/components/ui/BannerSlide";
 import { SkeletonGrid } from "#/components/ui/Skeleton";
@@ -39,11 +39,7 @@ function Home() {
 
   return (
     <>
-      <Hero banners={banners.hero as Banner[]} />
-      <BannerCarousel
-        banners={banners.top as Banner[]}
-        className="-mx-6 md:-mx-16"
-      />
+      <PageBanner hero={banners.hero as Banner[]} top={banners.top as Banner[]} />
       <UspStrip />
       <MessageGallery />
       <SplitSection categories={categories} />

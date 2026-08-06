@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { z } from "zod";
-import Hero from "#/components/sections/Hero";
+import { PageBanner } from "#/components/PageBanner";
 import { BannerCarousel } from "#/components/ui/BannerCarousel";
 import type { Banner } from "#/components/ui/BannerSlide";
 import { BlogCard } from "#/components/ui/BlogCard";
@@ -11,6 +11,7 @@ import { SkeletonGrid } from "#/components/ui/Skeleton";
 import { StaggerItem } from "#/components/ui/StaggerItem";
 import { StaggerList } from "#/components/ui/StaggerList";
 import { getBanners, getBlogs } from "#/server/cms";
+import { motion } from "motion/react";
 
 const pageSize = 6;
 
@@ -29,22 +30,74 @@ export const Route = createFileRoute("/_public/blog/")({
     slug: search.slug,
   }),
   loader: async ({ deps }) => {
-    const res = await getBlogs({ data: { slug: deps.slug } });
+    const [banners, res] = await Promise.all([
+      getBanners({ data: { pathname: "/blog" } }),
+      getBlogs({ data: { slug: deps.slug } }),
+    ]);
 
     return {
       res,
+      banners,
     };
   },
 });
 
-function Blog() {
-  const { res } = Route.useLoaderData();
+interface TabItem {
+  value: string | null;
+  label: string;
+}
 
-  const { data: banners } = useSuspenseQuery({
-    queryKey: ["banners", "blog"],
-    queryFn: () => getBanners({ data: { pathname: "/blog" } }),
-    staleTime: Infinity,
-  });
+interface AnimatedTabsLocalProps {
+  items: TabItem[];
+  currentValue: string | null;
+  onChange: (value: string | null) => void;
+  className?: string;
+}
+
+function AnimatedTabsLocal({
+  items,
+  currentValue,
+  onChange,
+  className,
+}: AnimatedTabsLocalProps) {
+  return (
+    <nav className={`flex flex-wrap gap-3 ${className}`}>
+      {items.map((item) => {
+        const isActive = currentValue === item.value;
+
+        return (
+          <button
+            key={item.value ?? "all"}
+            type="button"
+            onClick={() => onChange(item.value)}
+            className={`relative px-5 py-2 text-[12px] font-semibold tracking-widest transition-colors ${
+              isActive
+                ? "text-white"
+                : "border border-line text-ash hover:text-ink hover:border-ink"
+            }`}
+          >
+            {isActive && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 bg-[#0A0A0C]"
+                initial={false}
+                transition={{
+                  type: "spring",
+                  bounce: 0.2,
+                  duration: 0.6,
+                }}
+              />
+            )}
+            <span className="relative z-10">{item.label}</span>
+          </button>
+        );
+      })}
+    </nav>
+  );
+}
+
+function Blog() {
+  const { res, banners } = Route.useLoaderData();
 
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
@@ -86,16 +139,23 @@ function Blog() {
         ...prev,
         slug: slug || undefined, // Hapus query param 'slug' dari URL jika klik "SEMUA"
       }),
+      resetScroll: false,
     });
   };
 
+  const tabItems = [
+    { value: "", label: "SEMUA" }, // Ubah dari null ke ""
+    ...blogCategories.map((cat) => ({
+      value: cat.slug,
+      label: cat.name.toUpperCase(),
+    })),
+  ];
+
   return (
     <Suspense fallback={<SkeletonGrid cols={3} itemHeight={320} />}>
-      <Hero banners={banners.hero as Banner[]} />
-
-      <BannerCarousel
-        banners={banners.top as Banner[]}
-        className="-mx-6 md:-mx-16"
+      <PageBanner
+        hero={banners.hero as Banner[]}
+        top={banners.top as Banner[]}
       />
 
       <section className="min-h-[40vh] flex flex-col justify-center pt-24 pb-8">
@@ -118,7 +178,7 @@ function Blog() {
 
       {/* Filter Buttons Section */}
       <section className="py-8 border-t border-line flex flex-wrap gap-3">
-        <button
+        {/*<button
           type="button"
           onClick={() => handleFilterChange()}
           className={`px-5 py-2 text-[12px] font-semibold tracking-widest transition-colors ${
@@ -143,7 +203,12 @@ function Blog() {
           >
             {cat.name.toUpperCase()}
           </button>
-        ))}
+        ))}*/}
+        <AnimatedTabsLocal
+          items={tabItems}
+          currentValue={currentSlug} // Gunakan currentSlug, bukan currentCategory
+          onChange={handleFilterChange}
+        />
       </section>
 
       {/* Posts Grid */}

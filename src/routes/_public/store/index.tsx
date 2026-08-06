@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import Hero from "#/components/sections/Hero";
+import { PageBanner } from "#/components/PageBanner";
 import { BannerCarousel } from "#/components/ui/BannerCarousel";
 import type { Banner } from "#/components/ui/BannerSlide";
 import { DragScrollContainer } from "#/components/ui/DragScrollContainer";
@@ -13,6 +13,8 @@ import { StaggerItem } from "#/components/ui/StaggerItem";
 import { getBanners } from "#/server/cms";
 import { getSubCategories, searchProducts } from "#/server/master";
 import { formatRupiah } from "#/utils/fn";
+import { SharedElement } from "#/components/SharedElements";
+import { AnimatedRoute } from "#/components/AnimatedRoute";
 
 export const Route = createFileRoute("/_public/store/")({
   component: Store,
@@ -51,13 +53,8 @@ function Store() {
   }
 
   return (
-    <>
-      <Hero banners={banners.hero as Banner[]} />
-
-      <BannerCarousel
-        banners={banners.top as Banner[]}
-        className="-mx-6 md:-mx-16"
-      />
+    <AnimatedRoute variant="slide">
+      <PageBanner hero={banners.hero as Banner[]} top={banners.top as Banner[]} />
       <section className="min-h-[40vh] flex flex-col justify-center pt-32 pb-12">
         <span className="text-[12px] tracking-[0.25em] text-blue-bright font-semibold mb-6">
           TOKO RESMI · SEPEDA MOTOR &amp; SPAREPARTS
@@ -129,6 +126,7 @@ function Store() {
               <div className="flex justify-between items-end mb-6 gap-6 flex-wrap">
                 <SectionHeading as="h2">{category.name}</SectionHeading>
                 <Link
+                  resetScroll={false}
                   to="/category/$slug"
                   params={{ slug: category.slug }}
                   state={(prev) => ({
@@ -155,6 +153,7 @@ function Store() {
                   </div>
                   <Link
                     to="/sub-category/$slug"
+                    resetScroll={false}
                     params={{ slug: sc.slug }}
                     className="text-[11px] font-bold tracking-widest text-ink hover:text-blue transition-colors duration-300"
                   >
@@ -173,14 +172,7 @@ function Store() {
                       const thumb = p.files.find((f) => f.role === "thumbnail");
                       return (
                         <StaggerItem key={p.id}>
-                          <motion.div
-                            key={p.id}
-                            layoutId={`category-card-${p.slug}`}
-                            transition={{
-                              duration: 0.45,
-                              ease: [0.32, 0.72, 0, 1],
-                            }}
-                          >
+                          <SharedElement layoutId={`category-card-${p.slug}`}>
                             <MiniProductCard
                               key={p.id}
                               slug={p.slug}
@@ -199,7 +191,7 @@ function Store() {
                               href={`/product/${p.slug}`}
                               productId={p.id}
                             />
-                          </motion.div>
+                          </SharedElement>
                         </StaggerItem>
                       );
                     })}
@@ -217,6 +209,6 @@ function Store() {
       )}
 
       <BannerCarousel banners={banners.bottom as Banner[]} />
-    </>
+    </AnimatedRoute>
   );
 }

@@ -6,14 +6,14 @@ import { SectionHeading } from "#/components/ui/SectionHeading";
 import { getSubCategoryBySlug } from "#/server/master";
 import { formatRupiah } from "#/utils/fn";
 import { MaterialIcon } from "#/components/ui/MaterialIcon";
-import Hero from "#/components/sections/Hero";
+import { PageBanner } from "#/components/PageBanner";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getBanners } from "#/server/cms";
-import { BannerCarousel } from "#/components/ui/BannerCarousel";
 import CategorySidebar from "#/components/ui/CategorySidebar";
 import { TextInput } from "#/components/ui/TextInput";
 import type { Category, FeaturedProduct, SubCategory } from "#/types";
 import { motion } from "motion/react";
+import { SharedElement } from "#/components/SharedElements";
 
 function mapToMiniCard(product: FeaturedProduct) {
   const type = product.subCategory?.name?.toLowerCase() || "";
@@ -55,10 +55,14 @@ function mapToMiniCard(product: FeaturedProduct) {
 export const Route = createFileRoute("/_public/sub-category/$slug")({
   component: SubCategoryPage,
   loader: async ({ params }) => {
-    const res = await getSubCategoryBySlug({
-      data: { slug: params.slug },
-    });
-    return { res };
+    const [res, banners] = await Promise.all([
+      getSubCategoryBySlug({
+        data: { slug: params.slug },
+      }),
+      getBanners({ data: { pathname: params.slug } }),
+    ]);
+
+    return { res, banners };
   },
 });
 
@@ -66,6 +70,7 @@ function SubCategoryPage() {
   const { slug } = Route.useParams();
   const {
     res,
+    banners,
   }: {
     res: {
       subCategory: SubCategory;
@@ -75,11 +80,7 @@ function SubCategoryPage() {
   } = Route.useLoaderData();
 
   console.log(res);
-  const { data: banners } = useSuspenseQuery({
-    queryKey: ["banners", slug],
-    queryFn: () => getBanners({ data: { pathname: slug } }),
-    staleTime: Infinity,
-  });
+
   if (!res.subCategory) {
     return (
       <Section className="pt-32">
@@ -99,10 +100,9 @@ function SubCategoryPage() {
 
   return (
     <>
-      <Hero banners={banners.hero} />
-      <BannerCarousel banners={banners.top} className="-mx-6 md:-mx-16" />
+      <PageBanner hero={banners.hero} top={banners.top} />
       <section
-        className={`${banners.hero.length > 0 || banners.top.length > 0 ? "pt-18" : "pt-24"} pb-8`}
+        className={`${banners.hero.length > 0 || banners.top.length > 0 ? "pt-18 " : "pt-32 lg:pt-24"} pb-8`}
       >
         <Link
           to="/store"
@@ -138,13 +138,16 @@ function SubCategoryPage() {
                 {products.map((p) => {
                   const props = mapToMiniCard(p as unknown as FeaturedProduct);
                   return (
-                    <motion.div
+                    <SharedElement
                       key={p.id}
                       layoutId={`category-card-${p.slug}`}
-                      transition={{ duration: 0.45, ease: [0.32, 0.72, 0, 1] }}
+                      transition={{
+                        duration: 0.45,
+                        ease: [0.32, 0.72, 0, 1],
+                      }}
                     >
                       <MiniProductCard {...props} />
-                    </motion.div>
+                    </SharedElement>
                   );
                 })}
               </div>

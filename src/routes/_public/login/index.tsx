@@ -5,57 +5,57 @@ import { TextInput } from "#/components/ui/TextInput";
 import { signIn } from "#/lib/auth-client";
 
 export const Route = createFileRoute("/_public/login/")({
-	component: Login,
+  component: Login,
 });
 
 function Login() {
-	const navigate = useNavigate();
-	const [status, setStatus] = useState<{ ok: boolean; text: string } | null>(
-		null,
-	);
-	const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const [status, setStatus] = useState<{ ok: boolean; text: string } | null>(
+    null,
+  );
+  const [loading, setLoading] = useState(false);
 
-	const handleGoogle = () => {
-		alert(
-			'"Masuk dengan Google" akan aktif setelah terhubung ke Google OAuth di backend. Ini masih tampilan contoh.',
-		);
-	};
+  const handleGoogle = () => {
+    alert(
+      '"Masuk dengan Google" akan aktif setelah terhubung ke Google OAuth di backend. Ini masih tampilan contoh.',
+    );
+  };
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		const formData = new FormData(e.currentTarget as HTMLFormElement);
-		const email = String(formData.get("email") ?? "");
-		const password = String(formData.get("password") ?? "");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    const email = String(formData.get("email") ?? "");
+    const password = String(formData.get("password") ?? "");
 
-		setStatus(null);
-		setLoading(true);
-		const { error } = await signIn.email({ email, password });
-		setLoading(false);
+    setStatus(null);
+    setLoading(true);
+    const { error } = await signIn.email({ email, password });
+    setLoading(false);
 
-		if (error) {
-			setStatus({
-				ok: false,
-				text:
-					error.message === "Invalid email or password"
-						? "Email atau kata sandi salah."
-						: error.message,
-			});
-			return;
-		}
+    if (error) {
+      setStatus({
+        ok: false,
+        text:
+          error.message === "Invalid email or password"
+            ? "Email atau kata sandi salah."
+            : error.message,
+      });
+      return;
+    }
 
-		await navigate({ to: "/user" });
-	};
+    await navigate({ to: "/user" });
+  };
 
-	return (
-		<section className="min-h-[85vh] flex flex-col justify-center max-w-md mx-auto w-full pt-28 md:pt-32">
-			<span className="text-[12px] tracking-[0.25em] text-blue-bright font-semibold mb-4">
-				SELAMAT DATANG KEMBALI
-			</span>
-			<h1 className="font-head font-black text-4xl md:text-5xl tracking-tight mb-10">
-				Masuk Akun
-			</h1>
+  return (
+    <section className="min-h-[85vh] flex flex-col justify-center max-w-md mx-auto w-full pt-28 md:pt-32">
+      <span className="text-[12px] tracking-[0.25em] text-blue-bright font-semibold mb-4">
+        SELAMAT DATANG KEMBALI
+      </span>
+      <h1 className="font-head font-black text-4xl md:text-5xl tracking-tight mb-10">
+        Masuk Akun
+      </h1>
 
-			<button
+      {/*<button
 				type="button"
 				onClick={handleGoogle}
 				className="flex items-center justify-center gap-3 w-full p-[13px] border border-line text-[14px] font-semibold text-ink bg-white hover:border-ink hover:bg-paper-dim transition-colors"
@@ -91,58 +91,58 @@ function Login() {
 				<span className="flex-1 h-px bg-line" />
 				<span>ATAU</span>
 				<span className="flex-1 h-px bg-line" />
-			</div>
+			</div>*/}
 
-			<form onSubmit={handleSubmit} className="flex flex-col gap-6" noValidate>
-				<TextInput
-					label="EMAIL"
-					name="email"
-					type="email"
-					required
-					placeholder="nama@email.com"
-				/>
-				<TextInput
-					label="KATA SANDI"
-					name="password"
-					type="password"
-					required
-					placeholder="••••••••"
-				/>
-				<div className="flex justify-between items-center text-[12px]">
-					<label className="flex items-center gap-2 text-ash">
-						<input type="checkbox" className="accent-blue" /> Ingat saya
-					</label>
-					<button
-						type="button"
-						onClick={() =>
-							setStatus({
-								ok: false,
-								text: "Fitur lupa kata sandi segera hadir.",
-							})
-						}
-						className="text-blue hover:underline"
-					>
-						Lupa kata sandi?
-					</button>
-				</div>
-				<Button type="submit" disabled={loading}>
-					{loading ? "MEMPROSES..." : "MASUK"}
-				</Button>
-				{status && (
-					<p
-						className={`text-[13px] ${status.ok ? "text-green-600" : "text-red-600"}`}
-					>
-						{status.text}
-					</p>
-				)}
-			</form>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-6" noValidate>
+        <TextInput
+          label="EMAIL"
+          name="email"
+          type="email"
+          required
+          placeholder="nama@email.com"
+        />
+        <TextInput
+          label="KATA SANDI"
+          name="password"
+          type="password"
+          required
+          placeholder="••••••••"
+        />
+        <div className="flex justify-between items-center text-[12px]">
+          <label className="flex items-center gap-2 text-ash">
+            <input type="checkbox" className="accent-blue" /> Ingat saya
+          </label>
+          <button
+            type="button"
+            onClick={() =>
+              setStatus({
+                ok: false,
+                text: "Fitur lupa kata sandi segera hadir.",
+              })
+            }
+            className="text-blue hover:underline"
+          >
+            Lupa kata sandi?
+          </button>
+        </div>
+        <Button type="submit" disabled={loading}>
+          {loading ? "MEMPROSES..." : "MASUK"}
+        </Button>
+        {status && (
+          <p
+            className={`text-[13px] ${status.ok ? "text-green-600" : "text-red-600"}`}
+          >
+            {status.text}
+          </p>
+        )}
+      </form>
 
-			<p className="text-[13px] text-ash mt-10">
-				Belum punya akun?{" "}
-				<Link to="/signup" className="text-blue hover:underline font-semibold">
-					Daftar di sini
-				</Link>
-			</p>
-		</section>
-	);
+      <p className="text-[13px] text-ash mt-10">
+        Belum punya akun?{" "}
+        <Link to="/signup" className="text-blue hover:underline font-semibold">
+          Daftar di sini
+        </Link>
+      </p>
+    </section>
+  );
 }
