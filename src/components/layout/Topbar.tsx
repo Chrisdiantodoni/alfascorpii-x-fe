@@ -63,7 +63,7 @@ export default function Topbar({
         </Link>
 
         <div className="flex items-center gap-5 md:gap-7">
-          <div className="sm:hidden flex items-center gap-7">
+          <div className="hidden md:flex items-center gap-7">
             <Link
               to="/"
               className={`${navLinkClasses} ${linkColor(pathname === "/")}`}
