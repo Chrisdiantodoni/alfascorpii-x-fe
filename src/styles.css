@@ -2,6 +2,8 @@
 
 @plugin "@tailwindcss/typography";
 
+@source "./components/layout/Topbar.tsx"
+
 @variant dark (&:where(.dark, .dark *));
 
 @theme {
@@ -18,40 +20,40 @@
   --font-body: "Inter", sans-serif;
 }
 @theme inline {
-	--animate-marquee: marquee var(--duration) infinite linear;
-	--animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
-	--animate-pop: pop 0.35s ease-out;
+  --animate-marquee: marquee var(--duration) infinite linear;
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+  --animate-pop: pop 0.35s ease-out;
 
-	@keyframes marquee {
-		from {
-			transform: translateX(0);
-		}
-		to {
-			transform: translateX(calc(-100% - var(--gap)));
-		}
-	}
-	@keyframes marquee-vertical {
-		from {
-			transform: translateY(0);
-		}
-		to {
-			transform: translateY(calc(-100% - var(--gap)));
-		}
-	}
-	@keyframes pop {
-		0% {
-			transform: scale(1);
-		}
-		50% {
-			transform: scale(1.15);
-		}
-		80% {
-			transform: scale(0.95);
-		}
-		100% {
-			transform: scale(1);
-		}
-	}
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(calc(-100% - var(--gap)));
+    }
+  }
+  @keyframes marquee-vertical {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(calc(-100% - var(--gap)));
+    }
+  }
+  @keyframes pop {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.15);
+    }
+    80% {
+      transform: scale(0.95);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
 }
 @keyframes overlay-show {
   from {
@@ -228,35 +230,35 @@ a:focus-visible {
   margin: 0 !important;
 }
 .banner-pagination .swiper-pagination-bullet-active {
-	background: white;
-	transform: scale(1.1);
+  background: white;
+  transform: scale(1.1);
 }
 
 /* Product Gallery — pagination dots */
 .gallery-pagination {
-	position: absolute !important;
-	left: 50% !important;
-	transform: translateX(-50%) !important;
-	width: auto !important;
-	bottom: 12px !important;
-	display: flex;
-	justify-content: center;
-	gap: 8px;
-	z-index: 10;
+  position: absolute !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: auto !important;
+  bottom: 12px !important;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  z-index: 10;
 }
 
 .gallery-pagination .swiper-pagination-bullet {
-	width: 8px;
-	height: 8px;
-	background: rgba(0, 0, 0, 0.35);
-	opacity: 1;
-	border-radius: 9999px;
-	transition: all 0.3s;
-	margin: 0 !important;
+  width: 8px;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 1;
+  border-radius: 9999px;
+  transition: all 0.3s;
+  margin: 0 !important;
 }
 
 .gallery-pagination .swiper-pagination-bullet-active {
-	background: var(--color-blue);
-	width: 24px;
-	border-radius: 4px;
+  background: var(--color-blue);
+  width: 24px;
+  border-radius: 4px;
 }
