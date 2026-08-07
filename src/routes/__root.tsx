@@ -26,6 +26,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Alfa Scorpii X — Main Dealer Resmi Yamaha" },
     ],
+    links: [{ rel: "stylesheet", href: appCss }],
   }),
 
   shellComponent: RootDocument,
@@ -37,7 +38,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
-        <link rel="stylesheet" href={appCss} />
+        {/*<link rel="stylesheet" href={appCss} />*/}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
