@@ -31,6 +31,8 @@ function BlogDetail() {
       <div className="pt-32 text-center">
         <p className="text-ash">Artikel tidak ditemukan.</p>
         <Link
+          resetScroll={false}
+
           to="/blog"
           className="text-blue hover:underline mt-4 inline-block"
         >

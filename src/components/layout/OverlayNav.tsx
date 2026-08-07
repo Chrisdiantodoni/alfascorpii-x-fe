@@ -110,7 +110,12 @@ export default function OverlayNav({
             variants={staggerItem}
             className="border-b border-white/12 group"
           >
-            <Link to="/" onClick={onClose} className={linkClasses}>
+            <Link
+              resetScroll={false}
+              to="/"
+              onClick={onClose}
+              className={linkClasses}
+            >
               <RowLabel num="01" label="BERANDA" />
             </Link>
           </motion.div>
@@ -121,7 +126,12 @@ export default function OverlayNav({
             className="border-b border-white/12 group"
           >
             <div className="flex items-center justify-between py-4 md:py-5 hover:text-blue-bright transition-colors">
-              <Link to="/store" onClick={onClose} className="flex-1">
+              <Link
+                resetScroll={false}
+                to="/store"
+                onClick={onClose}
+                className="flex-1"
+              >
                 <RowLabel num="02" label="TOKO" />
               </Link>
               {categories.length > 0 && (
@@ -152,6 +162,7 @@ export default function OverlayNav({
                   {categories.map((cat) => (
                     <div key={cat.id}>
                       <Link
+                        resetScroll={false}
                         to="/category/$slug"
                         params={{ slug: cat.slug }}
                         onClick={onClose}
@@ -246,6 +257,7 @@ export default function OverlayNav({
               if (item.type === "page" && item.reference) {
                 linkEl = (
                   <Link
+                    resetScroll={false}
                     to="/$slug"
                     params={{ slug: item.reference.slug }}
                     onClick={onClose}
@@ -257,6 +269,8 @@ export default function OverlayNav({
               } else if (item.type === "product" && item.reference) {
                 linkEl = (
                   <Link
+                    resetScroll={false}
+
                     to="/product/$slug"
                     params={{ slug: item.reference.slug }}
                     onClick={onClose}
@@ -268,6 +282,8 @@ export default function OverlayNav({
               } else if (item.url) {
                 linkEl = (
                   <Link
+                    resetScroll={false}
+
                     key={item.id}
                     to={item.url}
                     onClick={onClose}
@@ -297,6 +313,8 @@ export default function OverlayNav({
                         {catRef!.subCategories!.map((sc) => (
                           <Link
                             key={sc.id}
+                            resetScroll={false}
+
                             to="/sub-category/$slug"
                             params={{
                               slug: sc.slug,

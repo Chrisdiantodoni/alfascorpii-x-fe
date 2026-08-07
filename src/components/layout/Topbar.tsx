@@ -34,7 +34,8 @@ export default function Topbar({
 
   useEffect(() => setHydrated(true), []);
 
-  const isTransparent = transparent || !hydrated;
+  // PERBAIKAN: isTransparent murni mengikuti prop transparent
+  const isTransparent = Boolean(transparent);
 
   const linkColor = (active: boolean) =>
     active ? "text-blue-bright" : isTransparent ? "text-white/80" : "text-ink";
@@ -54,6 +55,8 @@ export default function Topbar({
     >
       <div className="max-w-[1920px] mx-auto flex items-center justify-between">
         <Link
+          resetScroll={false}
+
           to="/"
           className={`font-head  font-extrabold text-lg tracking-tight transition-colors uppercase ${linkColor(
             pathname === "/",
@@ -63,8 +66,9 @@ export default function Topbar({
         </Link>
 
         <div className="flex items-center gap-5 md:gap-7">
-          <div className="flex items-center gap-7">
+          <div className="hidden md:flex items-center gap-7">
             <Link
+              resetScroll={false}
               to="/"
               className={`${navLinkClasses} ${linkColor(pathname === "/")}`}
             >
@@ -74,6 +78,8 @@ export default function Topbar({
             <HoverDropdown
               trigger={
                 <Link
+                  resetScroll={false}
+
                   to="/store"
                   className={`${navLinkClasses} hover:text-blue-bright transition-colors  ${linkColor(
                     pathname.startsWith("/store"),
@@ -138,6 +144,8 @@ export default function Topbar({
 
           {session ? (
             <Link
+              resetScroll={false}
+
               to="/user"
               className={`flex items-center gap-1.5 hover:text-blue-bright transition-colors ${linkColor(
                 pathname.startsWith("/user"),
@@ -150,13 +158,15 @@ export default function Topbar({
             </Link>
           ) : (
             <Link
+              resetScroll={false}
+
               to="/login"
               className={`flex items-center gap-1.5 hover:text-blue-bright transition-colors ${linkColor(
                 pathname.startsWith("/login"),
               )}`}
             >
               <MaterialIcon name="person" className="!text-[22px]" />
-              <span className="hidden md:inline text-[11px] font-semibold tracking-widest uppercase">
+              <span className="hidden md:inline text-[12px] font-semibold tracking-widest uppercase">
                 MASUK
               </span>
             </Link>
@@ -233,6 +243,8 @@ function CategoryRow({ category }: { category: CategoryRef }) {
   return (
     <div className="relative group/cat">
       <Link
+        resetScroll={false}
+
         to="/category/$slug"
         params={{ slug: category.slug }}
         className="flex items-center justify-between gap-6 px-5 py-2.5 text-[12px] font-semibold tracking-wide hover:bg-black/[.03] hover:text-blue-bright transition-colors uppercase"
@@ -246,6 +258,8 @@ function CategoryRow({ category }: { category: CategoryRef }) {
           <div className="bg-white text-ink rounded-xl shadow-xl border border-black/5 py-3 min-w-[220px]">
             {category.subCategories?.map((sc) => (
               <Link
+                resetScroll={false}
+
                 key={sc.id}
                 to="/sub-category/$slug"
                 params={{ slug: sc.slug }}
@@ -282,6 +296,8 @@ function DynamicNavItem({
     const page = item.reference as PageRef;
     return (
       <Link
+        resetScroll={false}
+
         to="/$slug"
         params={{ slug: page.slug }}
         className={`${navLinkClasses} hover:text-blue-bright transition-colors  ${linkColor(pathname === `/${page.slug}`)}`}
@@ -295,6 +311,8 @@ function DynamicNavItem({
     const product = item.reference as { slug: string };
     return (
       <Link
+        resetScroll={false}
+
         to="/product/$slug"
         params={{ slug: product.slug }}
         className={`${navLinkClasses} hover:text-blue-bright transition-colors  ${linkColor(
@@ -309,6 +327,8 @@ function DynamicNavItem({
   if (item.url) {
     return (
       <Link
+        resetScroll={false}
+
         to={item.url}
         className={`${navLinkClasses} hover:text-blue-bright transition-colors  ${linkColor(pathname === item.url)}`}
       >

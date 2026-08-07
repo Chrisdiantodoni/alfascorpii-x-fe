@@ -64,6 +64,8 @@ export function PageHeader({
         {/* Back Button */}
         {showBack && backTo && (
           <Link
+            resetScroll={false}
+
             to={backTo}
             className="inline-flex items-center gap-1.5 text-[12px] text-ash/70 hover:text-ink transition-colors mb-2 group"
           >

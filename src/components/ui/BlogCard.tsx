@@ -16,6 +16,8 @@ export function BlogCard({ post }: BlogCardProps) {
 
   return (
     <Link
+      resetScroll={false}
+
       to="/blog/$slug"
       params={{ slug: post.slug }}
       className="blog-item group block"

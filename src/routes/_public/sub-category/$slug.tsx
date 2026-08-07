@@ -107,6 +107,8 @@ function SubCategoryPage() {
         className={`${banners.hero.length > 0 || banners.top.length > 0 ? "pt-18 " : "pt-32 lg:pt-24"} pb-8`}
       >
         <Link
+          resetScroll={false}
+
           to="/store"
           className="hover:text-blue inline-flex items-center gap-2 text-[11px] tracking-widest text-ash transition-colors"
         >

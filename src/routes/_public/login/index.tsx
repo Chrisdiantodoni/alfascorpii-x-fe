@@ -139,7 +139,12 @@ function Login() {
 
       <p className="text-[13px] text-ash mt-10">
         Belum punya akun?{" "}
-        <Link to="/signup" className="text-blue hover:underline font-semibold">
+        <Link
+          resetScroll={false}
+
+          to="/signup"
+          className="text-blue hover:underline font-semibold"
+        >
           Daftar di sini
         </Link>
       </p>

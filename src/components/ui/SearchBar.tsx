@@ -159,6 +159,8 @@ export function SearchBar<T>({
                 {results.map((item, idx) => (
                   <li key={getItemKey(item)}>
                     <Link
+                      resetScroll={false}
+
                       to={getItemHref(item)}
                       className={`flex items-center px-4 py-3 hover:bg-paper-dim transition-colors cursor-pointer ${
                         idx === activeIndex ? "bg-paper-dim" : ""

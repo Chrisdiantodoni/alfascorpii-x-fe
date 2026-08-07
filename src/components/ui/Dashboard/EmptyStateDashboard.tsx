@@ -78,6 +78,8 @@ export function EmptyStateDashboard({
       {/* CTA Button */}
       {ctaTo && ctaText && (
         <Link
+          resetScroll={false}
+
           to={ctaTo}
           className={`group inline-flex items-center gap-2.5 px-8 py-3.5 text-[13px] font-semibold tracking-wider transition-all rounded-full ${ctaVariantStyles[ctaVariant]}`}
         >

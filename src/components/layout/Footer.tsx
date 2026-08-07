@@ -42,7 +42,11 @@ export default function Footer({
           </div>
           <div className="flex flex-col gap-4 text-[12px] tracking-widest">
             <h4 className="text-white/40 mb-1">Halaman</h4>
-            <Link to="/" className="hover:text-blue-bright transition-colors">
+            <Link
+              resetScroll={false}
+              to="/"
+              className="hover:text-blue-bright transition-colors"
+            >
               Beranda
             </Link>
             {activeItems.map((item) => {
@@ -53,6 +57,7 @@ export default function Footer({
               if (to && item.reference?.slug) {
                 return (
                   <Link
+                    resetScroll={false}
                     key={item.id}
                     to={to}
                     params={{ slug: item.reference.slug }}
@@ -66,6 +71,7 @@ export default function Footer({
               if (item.url) {
                 return (
                   <Link
+                    resetScroll={false}
                     key={item.id}
                     to={item.url}
                     className="hover:text-blue-bright transition-colors"
@@ -73,6 +79,7 @@ export default function Footer({
                     {label}
                   </Link>
                 );
+                re;
               }
 
               return null;

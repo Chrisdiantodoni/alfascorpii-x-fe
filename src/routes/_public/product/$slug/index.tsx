@@ -86,6 +86,8 @@ function ProductDetail() {
       <div className="pt-32 text-center">
         <p className="text-ash">Produk tidak ditemukan.</p>
         <Link
+          resetScroll={false}
+
           to="/store"
           className="text-blue hover:underline mt-4 inline-block"
         >
@@ -111,6 +113,8 @@ function ProductDetail() {
 
       <section className="pt-32 pb-8">
         <Link
+          resetScroll={false}
+
           to={backTo}
           className="inline-flex items-center gap-2 text-[11px] tracking-widest text-ash hover:text-blue transition-colors"
         >
