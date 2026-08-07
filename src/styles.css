@@ -2,7 +2,7 @@
 
 @plugin "@tailwindcss/typography";
 
-@source "./components/layout/Topbar.tsx";
+@source "./**/*.{ts,tsx,js,jsx,html}";
 
 @variant dark (&:where(.dark, .dark *));
 
