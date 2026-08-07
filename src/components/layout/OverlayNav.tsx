@@ -30,7 +30,7 @@ function MagneticLink({ platform, url }: { platform: string; url: string }) {
       rel="noopener noreferrer"
       animate={{ x: position.x, y: position.y }}
       transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
-      className="relative px-4 py-2 text-[12px] tracking-widest text-white/60 hover:text-white uppercase transition-colors group"
+      className="relative px-4 py-2 text-[12px] tracking-widest text-white/60 hover:text-white transition-colors group"
     >
       <span className="relative z-10 flex items-center gap-1.5">
         <span className="inline-block w-1.5 h-1.5 rounded-full bg-white/20 group-hover:bg-blue-bright group-hover:scale-125 transition-all duration-300" />
@@ -116,7 +116,7 @@ export default function OverlayNav({
               onClick={onClose}
               className={linkClasses}
             >
-              <RowLabel num="01" label="BERANDA" />
+              <RowLabel num="01" label="Beranda" />
             </Link>
           </motion.div>
 
@@ -132,7 +132,7 @@ export default function OverlayNav({
                 onClick={onClose}
                 className="flex-1"
               >
-                <RowLabel num="02" label="TOKO" />
+                <RowLabel num="02" label="Toko" />
               </Link>
               {categories.length > 0 && (
                 <button
@@ -166,7 +166,7 @@ export default function OverlayNav({
                         to="/category/$slug"
                         params={{ slug: cat.slug }}
                         onClick={onClose}
-                        className="inline-block font-head font-bold text-[14px] tracking-widest uppercase text-white hover:text-blue-bright transition-colors mb-3"
+                        className="inline-block font-head font-bold text-[14px] tracking-widest text-white hover:text-blue-bright transition-colors mb-3"
                       >
                         {cat.name}
                       </Link>

@@ -67,7 +67,7 @@ export default function Topbar({
 
         <div className="flex items-center gap-5 md:gap-7">
           <div
-            className="hidden lg:flex items-center gap-8"
+            className="hidden lg:flex items-center gap-8 "
             suppressHydrationWarning
           >
             <Link
@@ -182,7 +182,7 @@ export default function Topbar({
             aria-expanded={menuOpen}
             onClick={onMenuToggle}
             whileTap={{ scale: 0.9 }}
-            className="flex items-center gap-[10px] md:hidden"
+            className="flex items-center gap-[10px] lg:hidden"
           >
             {/*<span
               className={`hidden sm:inline-block text-right w-[56px] text-[11px] font-semibold tracking-[0.2em] transition-colors uppercase ${
