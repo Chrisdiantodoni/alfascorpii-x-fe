@@ -82,7 +82,7 @@ function PublicLayout() {
         menu={menu}
         contact={contact}
       />
-      <main className="px-6 md:px-16 max-w-[1920px] mx-auto">
+      <main className="px-6 md:px-16  mx-auto">
         <LayoutGroup id="page-layout">
           <RouteAnimationContainer>
             <Outlet />
