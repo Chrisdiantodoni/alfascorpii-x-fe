@@ -6,6 +6,7 @@ import { useSession } from "#/lib/auth-client";
 import { useCartStore } from "#/stores/cart";
 import type { CategoryRef, MenuData, PageRef } from "#/types/menu";
 import type { Category } from "#/types";
+import useIsMobile from "#/hooks/useMobile";
 
 interface TopbarProps {
   onMenuToggle: () => void;
@@ -31,7 +32,7 @@ export default function Topbar({
   const { data: session } = useSession();
   const [hydrated, setHydrated] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-
+  const { isMobile } = useIsMobile();
   useEffect(() => setHydrated(true), []);
 
   // PERBAIKAN: isTransparent murni mengikuti prop transparent
@@ -174,36 +175,37 @@ export default function Topbar({
               </span>
             </Link>
           )}
-
-          <motion.button
-            id="menuToggle"
-            type="button"
-            aria-label={menuOpen ? "Tutup menu" : "Buka menu"}
-            aria-expanded={menuOpen}
-            onClick={onMenuToggle}
-            whileTap={{ scale: 0.9 }}
-            className="hidden items-center gap-[10px] lg:hidden!" // 👈 UBAH DI SINI
-          >
-            {/*<span
+          {isMobile && (
+            <motion.button
+              id="menuToggle"
+              type="button"
+              aria-label={menuOpen ? "Tutup menu" : "Buka menu"}
+              aria-expanded={menuOpen}
+              onClick={onMenuToggle}
+              whileTap={{ scale: 0.9 }}
+              className="items-center gap-[10px] " // 👈 UBAH DI SINI
+            >
+              {/*<span
               className={`hidden sm:inline-block text-right w-[56px] text-[11px] font-semibold tracking-[0.2em] transition-colors uppercase ${
                 menuOpen || isTransparent ? "text-white" : "text-ink"
               }`}
             >
               {menuOpen ? "TUTUP" : "MENU"}
             </span>*/}
-            <span className="w-[26px] h-[16px] relative block overflow-hidden">
-              <span
-                className={`absolute left-0 right-0 h-[2px] block transition-all duration-300 ${
-                  menuOpen ? "top-[7px] rotate-45" : "top-0"
-                } ${menuOpen || isTransparent ? "bg-white" : "bg-ink"}`}
-              />
-              <span
-                className={`absolute left-0 right-0 h-[2px] block transition-all duration-300 ${
-                  menuOpen ? "top-[7px] -rotate-45" : "top-[14px]"
-                } ${menuOpen || isTransparent ? "bg-white" : "bg-ink"}`}
-              />
-            </span>
-          </motion.button>
+              <span className="w-[26px] h-[16px] relative block overflow-hidden">
+                <span
+                  className={`absolute left-0 right-0 h-[2px] block transition-all duration-300 ${
+                    menuOpen ? "top-[7px] rotate-45" : "top-0"
+                  } ${menuOpen || isTransparent ? "bg-white" : "bg-ink"}`}
+                />
+                <span
+                  className={`absolute left-0 right-0 h-[2px] block transition-all duration-300 ${
+                    menuOpen ? "top-[7px] -rotate-45" : "top-[14px]"
+                  } ${menuOpen || isTransparent ? "bg-white" : "bg-ink"}`}
+                />
+              </span>
+            </motion.button>
+          )}
         </div>
       </div>
     </nav>
