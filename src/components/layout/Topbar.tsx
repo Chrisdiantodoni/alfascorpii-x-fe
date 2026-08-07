@@ -182,7 +182,7 @@ export default function Topbar({
             aria-expanded={menuOpen}
             onClick={onMenuToggle}
             whileTap={{ scale: 0.9 }}
-            className="flex items-center gap-[10px] lg:hidden"
+            className="hidden items-center gap-[10px] max-lg:flex" // 👈 UBAH DI SINI
           >
             {/*<span
               className={`hidden sm:inline-block text-right w-[56px] text-[11px] font-semibold tracking-[0.2em] transition-colors uppercase ${
