@@ -1,4 +1,6 @@
 // server.ts (root)
+import "dotenv/config";
+//
 import express from "express";
 import { toNodeHandler } from "srvx/node";
 
