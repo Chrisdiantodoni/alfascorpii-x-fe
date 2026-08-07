@@ -2,17 +2,7 @@
 
 @plugin "@tailwindcss/typography";
 
-/* Memindai seluruh file di dalam folder src */
-@source "./**/*.{ts,tsx,js,jsx,html}";
-
-/* Jika ada file/komponen di luar src (misal folder app/ atau components/ sejajar src): */
-@source "../**/*.{ts,tsx,js,jsx,html}";
-
 @variant dark (&:where(.dark, .dark *));
-
-@utility gap-7 {
-  gap: 1.75rem;
-}
 
 @theme {
   --color-ink: #0a0a0c;

@@ -95,7 +95,7 @@ async function fetchBanners(scopes: BannerScope[]) {
     ),
     orderBy: (b, { asc }) => [asc(b.placement), asc(b.orderPosition)],
   });
-  console.log({ rows });
+  console.log();
 
   return rows;
 }
