@@ -66,7 +66,10 @@ export default function Topbar({
         </Link>
 
         <div className="flex items-center gap-5 md:gap-7">
-          <div className="hidden md:flex items-center gap-7">
+          <div
+            className="hidden lg:flex items-center gap-8"
+            suppressHydrationWarning
+          >
             <Link
               resetScroll={false}
               to="/"
