@@ -10,6 +10,10 @@
 
 @variant dark (&:where(.dark, .dark *));
 
+@utility gap-7 {
+  gap: 1.75rem;
+}
+
 @theme {
   --color-ink: #0a0a0c;
   --color-ink-2: #131417;
