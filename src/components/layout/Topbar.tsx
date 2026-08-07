@@ -65,9 +65,9 @@ export default function Topbar({
           ALFA SCORPII X
         </Link>
 
-        <div className="flex items-center gap-5 md:gap-7">
+        <div className="flex items-center gap-5 md:gap-8">
           <div
-            className="hidden lg:flex items-center gap-7 "
+            className="hidden lg:flex items-center gap-8 "
             suppressHydrationWarning
           >
             <Link
