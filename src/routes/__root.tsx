@@ -55,7 +55,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: SPLASH_SCRIPT }} />
         {children}
         <Toaster position="bottom-right" />
-        {import.meta.env.DEV && (
+        {import.meta.env.NODE_ENV === "development" && (
           <TanStackDevtools
             config={{ position: "bottom-right" }}
             plugins={[

@@ -11,7 +11,13 @@ const config = defineConfig({
   server: {
     allowedHosts: ["alfascorpiix-dev.neodev.web.id"],
   },
-  plugins: [devtools(), tailwindcss(), tanstackStart(), viteReact()],
+  plugins: [
+    // devtools(),
+
+    tailwindcss(),
+    tanstackStart(),
+    viteReact(),
+  ],
 });
 
 export default config;

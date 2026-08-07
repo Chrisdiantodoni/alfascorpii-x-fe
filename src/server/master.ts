@@ -11,6 +11,7 @@ import {
 } from "#/drizzle/schema";
 import type { ContactSettings } from "#/types";
 import { batchFilesWithUrls } from "./files";
+import { safeSerialize } from "#/utils/fn";
 
 const siteSettingSchema = z.object({
   key: z.string(),
@@ -171,24 +172,22 @@ export const getSubCategoryBySlug = createServerFn({ method: "GET" })
           })
         : {};
     const response = {
-      subCategory,
+      subCategory: safeSerialize(subCategory),
       category: subCategory.category
-        ? {
+        ? safeSerialize({
             ...subCategory.category,
             specTemplate: subCategory.category.specTemplate
-              ? JSON.parse(JSON.stringify(subCategory.category.specTemplate))
+              ? safeSerialize(subCategory.category.specTemplate)
               : null,
-          }
+          })
         : null,
       products: subCategory.products.map((prod) => ({
         ...prod,
-        specValues: prod.specValues
-          ? JSON.parse(JSON.stringify(prod.specValues))
-          : null,
+        specValues: safeSerialize(prod.specValues),
         images: filesMap[prod.id] ?? [],
-        thumbnail: filesMap[prod.id] ?? null,
+        thumbnail: filesMap[prod.id]?.[0] ?? null,
       })),
-    };
+    } as any;
 
     return response;
   });
