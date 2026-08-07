@@ -11,11 +11,12 @@ import OverlayNav from "#/components/layout/OverlayNav";
 import Topbar from "#/components/layout/Topbar";
 import WhatsAppFloat from "#/components/layout/WhatsAppFloat";
 import { getBanners } from "#/server/cms";
-import { getLayoutData } from "#/server/master";
+import { getCategories, getLayoutData } from "#/server/master";
 import { useCartStore } from "#/stores/cart";
 import { useWishlistStore } from "#/stores/wishlist";
 import { AnimatePresence, LayoutGroup } from "motion/react";
 import { RouteAnimationContainer } from "#/components/RouteAnimationContainer";
+import type { Category } from "#/types";
 
 export const Route = createFileRoute("/_public")({
   loader: async ({ location }) => {
@@ -68,9 +69,37 @@ function PublicLayout() {
     }
   }, [menuOpen]);
 
+  const navbar = menu.find((find) => find.location === "navbar");
+
+  const categories = navbar?.menuItems
+    .filter((filt) => filt.type === "category")
+    .flatMap((item) => ({
+      ...item.reference,
+    })) as Category[];
+
+  useEffect(() => {
+    // 768px adalah batas breakpoint 'md' pada Tailwind
+    const mediaQuery = window.matchMedia("(min-width: 768px)");
+
+    const handleMediaChange = (e: MediaQueryListEvent) => {
+      // Jika layar menjadi lebih lebar dari 768px (Desktop mode), tutup menu
+      if (e.matches) {
+        setMenuOpen(false);
+      }
+    };
+
+    // Tambahkan event listener untuk memantau perubahan ukuran layar
+    mediaQuery.addEventListener("change", handleMediaChange);
+
+    // Cleanup listener saat komponen di-unmount
+    return () => mediaQuery.removeEventListener("change", handleMediaChange);
+  }, []);
+
   return (
     <>
       <Topbar
+        categories={categories}
+        menu={menu}
         menuOpen={menuOpen}
         transparent={heroTransparent || menuOpen}
         onMenuToggle={() => setMenuOpen((prev) => !prev)}
@@ -80,6 +109,7 @@ function PublicLayout() {
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
         menu={menu}
+        categories={categories}
         contact={contact}
       />
       <main className="px-6 md:px-16  mx-auto">
