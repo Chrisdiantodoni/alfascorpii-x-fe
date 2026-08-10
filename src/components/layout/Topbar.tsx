@@ -88,7 +88,7 @@ export default function Topbar({
                     pathname.startsWith("/store"),
                   )} cursor-pointer`}
                 >
-                  TOKO
+                  STORE
                 </Link>
               }
             >

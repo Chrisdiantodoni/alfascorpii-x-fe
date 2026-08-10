@@ -1,5 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion } from "motion/react";
+import { useState } from "react";
+import { Autoplay, EffectFade, Navigation, Pagination } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+import type { Swiper as SwiperClass } from "swiper";
 import { PageBanner } from "#/components/PageBanner";
 import { BannerCarousel } from "#/components/ui/BannerCarousel";
 import type { Banner } from "#/components/ui/BannerSlide";
@@ -10,8 +13,13 @@ import { SearchBar } from "#/components/ui/SearchBar";
 import { Section } from "#/components/ui/Section";
 import { SectionHeading } from "#/components/ui/SectionHeading";
 import { StaggerItem } from "#/components/ui/StaggerItem";
+import { MaterialIcon } from "#/components/ui/MaterialIcon";
 import { getBanners } from "#/server/cms";
-import { getSubCategories, searchProducts } from "#/server/master";
+import {
+  getAllProducts,
+  getSubCategories,
+  searchProducts,
+} from "#/server/master";
 import { formatRupiah } from "#/utils/fn";
 import { SharedElement } from "#/components/SharedElements";
 import { AnimatedRoute } from "#/components/AnimatedRoute";
@@ -19,16 +27,23 @@ import type { Category, SubCategory } from "#/types";
 import { Image } from "#/components/ui/Image";
 import { Button } from "#/components/ui/Button";
 
+import "swiper/css";
+import "swiper/css/effect-fade";
+import "swiper/css/pagination";
+import { SwiperContainer } from "#/components/ui/SwiperContainer";
+
 export const Route = createFileRoute("/_public/store/")({
   component: Store,
   loader: async ({ location }) => {
-    const [banners, subCategories] = await Promise.all([
+    const [banners, subCategories, products] = await Promise.all([
       getBanners({ data: { pathname: location.pathname } }),
       getSubCategories(),
+      getAllProducts({ data: { is_lineup: true } }),
     ]);
     return {
       banners,
       subCategories,
+      products,
     };
   },
 });
@@ -38,9 +53,10 @@ function SubCategoryBanner({ subCategory }: { subCategory: SubCategory }) {
 
   return (
     <div className="relative w-full overflow-hidden rounded-2xl border border-line/40 bg-ink-2 min-h-[240px] md:min-h-[360px] group">
-      {/* Background Image - conditional render */}
+      {/* Background Image */}
       {thumbnail?.url && (
         <Image
+          layout="fullWidth"
           src={thumbnail.url}
           alt={subCategory.name}
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
@@ -48,7 +64,7 @@ function SubCategoryBanner({ subCategory }: { subCategory: SubCategory }) {
         />
       )}
 
-      {/* Fallback watermark (motif BannerSlide) saat tidak ada thumbnail */}
+      {/* Fallback watermark */}
       {!thumbnail?.url && (
         <div className="absolute inset-y-0 right-0 w-[60%] flex items-center justify-end opacity-[0.05] pr-0 lg:pr-10 pointer-events-none">
           <svg
@@ -69,11 +85,8 @@ function SubCategoryBanner({ subCategory }: { subCategory: SubCategory }) {
         </div>
       )}
 
-      {/* Gradient Overlay - brand ink, konsisten dengan BannerSlide */}
+      {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-r from-ink/90 via-ink/55 to-ink/5" />
-
-      {/* Accent Line - brand biru */}
-      {/*<div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-bright via-blue to-transparent" />*/}
 
       {/* Content */}
       <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-12 lg:px-16">
@@ -107,8 +120,76 @@ function SubCategoryBanner({ subCategory }: { subCategory: SubCategory }) {
   );
 }
 
+// Komponen Carousel Khusus untuk SubCategoryBanner
+function SubCategoryBannerCarousel({ subs }: { subs: SubCategory[] }) {
+  const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
+  const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
+  const [paginationEl, setPaginationEl] = useState<HTMLDivElement | null>(null);
+
+  if (!subs || subs.length === 0) return null;
+
+  if (subs.length === 1) {
+    return <SubCategoryBanner subCategory={subs[0]} />;
+  }
+
+  return (
+    <div className="relative group">
+      <Swiper
+        modules={[Autoplay, EffectFade, Navigation, Pagination]}
+        effect="fade"
+        fadeEffect={{ crossFade: true }}
+        autoHeight
+        autoplay={{ delay: 5000, disableOnInteraction: false }}
+        onBeforeInit={(swiper: SwiperClass) => {
+          if (typeof swiper.params.navigation !== "boolean") {
+            swiper.params.navigation!.prevEl = prevEl;
+            swiper.params.navigation!.nextEl = nextEl;
+          }
+          if (typeof swiper.params.pagination !== "boolean") {
+            swiper.params.pagination!.el = paginationEl;
+          }
+        }}
+        navigation={{ prevEl, nextEl }}
+        pagination={{ el: paginationEl, clickable: true }}
+        loop
+        className="w-full rounded-2xl"
+      >
+        {subs.map((subCategory) => (
+          <SwiperSlide key={subCategory.id}>
+            <SubCategoryBanner subCategory={subCategory} />
+          </SwiperSlide>
+        ))}
+      </Swiper>
+
+      {/* Navigasi Prev/Next */}
+      <button
+        type="button"
+        ref={setPrevEl}
+        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/40 hover:bg-black/70 hover:scale-110 backdrop-blur-sm flex items-center justify-center text-white transition-all duration-200 cursor-pointer"
+        aria-label="Slide sebelumnya"
+      >
+        <MaterialIcon name="arrow_back" className="!text-[22px]" />
+      </button>
+      <button
+        type="button"
+        ref={setNextEl}
+        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/40 hover:bg-black/70 hover:scale-110 backdrop-blur-sm flex items-center justify-center text-white transition-all duration-200 cursor-pointer"
+        aria-label="Slide berikutnya"
+      >
+        <MaterialIcon name="arrow_forward" className="!text-[22px]" />
+      </button>
+
+      {/* Pagination Bullets */}
+      <div
+        ref={setPaginationEl}
+        className="absolute bottom-4 left-0 right-0 z-20 flex justify-center gap-2 [&>.swiper-pagination-bullet]:w-2.5 [&>.swiper-pagination-bullet]:h-2.5 [&>.swiper-pagination-bullet]:bg-white/50 [&>.swiper-pagination-bullet-active]:!bg-white [&>.swiper-pagination-bullet-active]:w-8 [&>.swiper-pagination-bullet]:rounded-full [&>.swiper-pagination-bullet]:transition-all [&>.swiper-pagination-bullet]:duration-300"
+      />
+    </div>
+  );
+}
+
 function Store() {
-  const { banners, subCategories } = Route.useLoaderData();
+  const { banners, subCategories, products } = Route.useLoaderData();
 
   const grouped = new Map<
     string,
@@ -137,10 +218,10 @@ function Store() {
       />
       <section className="min-h-[40vh] flex flex-col justify-center pt-32 pb-12">
         <span className="text-[12px] tracking-[0.25em] text-blue-bright font-semibold mb-6">
-          TOKO RESMI · SEPEDA MOTOR &amp; SPAREPARTS
+          SEPEDA MOTOR &amp; SPAREPARTS
         </span>
         <h1 className="font-head font-black leading-[0.88] tracking-tighter text-[clamp(2.75rem,11vw,6.5rem)]">
-          TOKO ALFA
+          ALFA
           <br />
           SCORPII X
         </h1>
@@ -192,6 +273,33 @@ function Store() {
 
       <BannerCarousel banners={banners.middle as Banner[]} />
 
+      {products.length > 0 && (
+        <Section className="pt-8 border-none pb-4">
+          <SectionHeading as="h2">Line-up Produk</SectionHeading>
+          <SwiperContainer className="mt-8" stagger>
+            {products.map((item) => {
+              const thumb = item.files?.find((f) => f.role === "thumbnail");
+              return (
+                <StaggerItem key={item.id}>
+                  <SharedElement layoutId={`category-card-${item.slug}`}>
+                    <MiniProductCard
+                      slug={item.slug}
+                      badge={item.code}
+                      name={item.name}
+                      imageUrl={thumb?.url}
+                      detail={item.subCategory.name}
+                      price={formatRupiah(Number(item.price))}
+                      href={`/product/${item.slug}`}
+                      productId={item.id}
+                    />
+                  </SharedElement>
+                </StaggerItem>
+              );
+            })}
+          </SwiperContainer>
+        </Section>
+      )}
+
       {!subCategories || subCategories.length === 0 ? (
         <Section>
           <EmptyState
@@ -201,8 +309,8 @@ function Store() {
         </Section>
       ) : (
         [...grouped.values()].map(({ category, subs }) => (
-          <div key={category.id}>
-            <Section className="!pb-0 border-none">
+          <div key={category.id} className="mb-8">
+            <Section className="!pb-6 border-none pt-8">
               <div className="flex justify-between items-end mb-6 gap-6 flex-wrap">
                 <SectionHeading as="h2">{category.name}</SectionHeading>
                 <Link
@@ -218,61 +326,10 @@ function Store() {
                   LIHAT SEMUA {category.name.toUpperCase()} →
                 </Link>
               </div>
-            </Section>
 
-            {subs.map((sc) => {
-              return (
-                <Section key={sc.id} className="py-8">
-                  <SubCategoryBanner subCategory={sc} />
-                  {sc.products && sc.products.length > 0 ? (
-                    <DragScrollContainer
-                      stagger
-                      className="flex gap-4 md:gap-6 pb-6 overflow-x-auto snap-x snap-mandatory hide-scrollbar mt-4"
-                    >
-                      {sc.products.map((p) => {
-                        const isMotor = sc.category?.slug === "sepeda-motor";
-                        const thumb = p.files?.find(
-                          (f) => f.role === "thumbnail",
-                        );
-                        return (
-                          <StaggerItem key={p.id}>
-                            <div className="w-[260px] md:w-[280px] shrink-0 snap-start">
-                              <SharedElement
-                                layoutId={`category-card-${p.slug}`}
-                              >
-                                <MiniProductCard
-                                  key={p.id}
-                                  slug={p.slug}
-                                  badge={
-                                    p.code || sc.name.toUpperCase() || "PRODUK"
-                                  }
-                                  icon={isMotor ? "two_wheeler" : "settings"}
-                                  name={p.name}
-                                  imageUrl={thumb?.url}
-                                  detail={
-                                    isMotor
-                                      ? `${p.stock > 0 ? `${p.stock} unit tersedia` : "Cek ketersediaan"}`
-                                      : p.description || "Genuine Part Original"
-                                  }
-                                  price={formatRupiah(Number(p.price))}
-                                  href={`/product/${p.slug}`}
-                                  productId={p.id}
-                                />
-                              </SharedElement>
-                            </div>
-                          </StaggerItem>
-                        );
-                      })}
-                    </DragScrollContainer>
-                  ) : (
-                    <EmptyState
-                      title={`Tidak ada produk di ${sc.name}`}
-                      description="Belum ada produk yang tersedia di kategori ini."
-                    />
-                  )}
-                </Section>
-              );
-            })}
+              {/* Render Swiper khusus SubCategoryBanner per kategori */}
+              <SubCategoryBannerCarousel subs={subs} />
+            </Section>
           </div>
         ))
       )}

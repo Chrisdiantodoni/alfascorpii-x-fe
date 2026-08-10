@@ -260,3 +260,29 @@ a:focus-visible {
   width: 24px;
   border-radius: 4px;
 }
+
+/* Splash screen — theme-aware overlay (bg-paper/text-ink auto-switch in dark mode) */
+.splash-overlay {
+  z-index: 9999;
+  transition: opacity 0.3s ease;
+}
+
+.splash-content {
+  transition: opacity 0.3s ease;
+}
+
+html[data-splash-seen="1"] .splash-overlay {
+  opacity: 0;
+  pointer-events: none;
+}
+
+html:not([data-splash-seen="1"]) .splash-content {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-overlay,
+  .splash-content {
+    transition: none;
+  }
+}

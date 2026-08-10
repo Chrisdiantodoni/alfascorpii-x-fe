@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { and, asc, eq, ilike, inArray, or } from "drizzle-orm";
+import { and, asc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "#/db";
 import {
@@ -147,14 +147,46 @@ export const getCategories = createServerFn({ method: "GET" }).handler(
 );
 
 export const getSubCategoryBySlug = createServerFn({ method: "GET" })
-  .validator(z.object({ slug: z.string() }))
-  .handler(async ({ data: { slug } }) => {
-    console.log(slug);
+  .validator(
+    z.intersection(
+      z.object({ slug: z.string() }),
+      z.record(z.string(), z.string().optional()),
+    ),
+  )
+  .handler(async ({ data }) => {
+    const { slug, ...filters } = data;
+
     const subCategory = await db.query.subCategories.findFirst({
       where: eq(subCategories.slug, slug),
       with: {
         products: {
-          where: eq(products.isActive, true),
+          where: (products, { and, eq }) => {
+            const conditions = [eq(products.isActive, true)];
+
+            for (const [key, rawValue] of Object.entries(filters)) {
+              if (!rawValue) continue;
+
+              const targetValues = rawValue
+                .split(",")
+                .map((v) => v.trim())
+                .filter(Boolean);
+
+              if (targetValues.length === 0) continue;
+
+              const valueConditions = targetValues.map((val) => {
+                // ▼ Struktur asli specValues pakai `value` (singular), bukan `values` (array)
+                const filterObject = JSON.stringify([
+                  { key: String(key), value: String(val) },
+                ]);
+
+                return sql`${products.specValues} @> ${filterObject}::text::jsonb`;
+              });
+
+              conditions.push(sql`(${sql.join(valueConditions, sql` OR `)})`);
+            }
+
+            return and(...conditions);
+          },
           orderBy: asc(products.name),
         },
         category: true,
@@ -164,13 +196,13 @@ export const getSubCategoryBySlug = createServerFn({ method: "GET" })
     if (!subCategory) return null;
 
     const productIds = subCategory.products.map((p) => p.id);
-
     const filesMap =
       productIds.length > 0
         ? await batchFilesWithUrls({
             data: { type: "product", ids: productIds },
           })
         : {};
+
     const response = {
       subCategory: safeSerialize(subCategory),
       category: subCategory.category
@@ -191,7 +223,6 @@ export const getSubCategoryBySlug = createServerFn({ method: "GET" })
 
     return response;
   });
-
 export const getSubCategories = createServerFn({ method: "GET" }).handler(
   async () => {
     const response = await db.query.subCategories.findMany({
@@ -364,4 +395,53 @@ export const getProductByCategory = createServerFn({ method: "GET" })
     };
 
     return response;
+  });
+
+const productListSchema = z.object({
+  is_lineup: z.boolean().default(false),
+});
+
+export const getAllProducts = createServerFn({ method: "GET" })
+  .validator(productListSchema)
+  .handler(async ({ data }) => {
+    // 2. Query products yang subCategoryId-nya cocok
+    const res = await db.query.products.findMany({
+      where: eq(products.isLineup, data.is_lineup),
+      with: {
+        subCategory: {
+          with: {
+            category: true,
+          },
+        },
+      },
+    });
+
+    const productIds = res.map((p) => p.id);
+
+    const filesMap =
+      productIds.length > 0
+        ? await batchFilesWithUrls({
+            data: { type: "product", ids: productIds },
+          })
+        : {};
+    const response = {
+      products: res.map((item) => ({
+        ...item,
+        files: filesMap[item.id],
+        specValues: JSON.parse(JSON.stringify(item.specValues)),
+        subCategory: {
+          ...item.subCategory,
+          category: {
+            ...item.subCategory.category,
+            specTemplate: item.subCategory.category?.specTemplate
+              ? JSON.parse(
+                  JSON.stringify(item.subCategory.category?.specTemplate),
+                )
+              : null,
+          },
+        },
+      })),
+    };
+
+    return response.products;
   });

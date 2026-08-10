@@ -17,6 +17,8 @@ import { useWishlistStore } from "#/stores/wishlist";
 import { AnimatePresence, LayoutGroup } from "motion/react";
 import { RouteAnimationContainer } from "#/components/RouteAnimationContainer";
 import type { Category } from "#/types";
+import SplashScreenWrapper from "#/components/SplashScreenWrapper";
+import SplashScreen from "#/components/SplashScreen";
 
 export const Route = createFileRoute("/_public")({
   loader: async ({ location }) => {
@@ -116,7 +118,9 @@ function PublicLayout() {
       <main className="px-6 md:px-16  mx-auto">
         <LayoutGroup id="page-layout">
           <RouteAnimationContainer>
-            <Outlet />
+            <SplashScreenWrapper showSplash>
+              <Outlet />
+            </SplashScreenWrapper>
           </RouteAnimationContainer>
         </LayoutGroup>
       </main>

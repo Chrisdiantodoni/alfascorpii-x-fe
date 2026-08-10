@@ -15,6 +15,7 @@ import type { Category, FeaturedProduct, SubCategory } from "#/types";
 import { motion } from "motion/react";
 import { SharedElement } from "#/components/SharedElements";
 import { BannerCarousel } from "#/components/ui/BannerCarousel";
+import z from "zod";
 
 function mapToMiniCard(product: FeaturedProduct) {
   const type = product.subCategory?.name?.toLowerCase() || "";
@@ -53,13 +54,16 @@ function mapToMiniCard(product: FeaturedProduct) {
   };
 }
 
+const subCategorySearchSchema = z.record(z.string(), z.string().optional());
+
 export const Route = createFileRoute("/_public/sub-category/$slug")({
   component: SubCategoryPage,
-  loader: async ({ params }) => {
-    console.log(params.slug, "slug");
+  validateSearch: (search) => subCategorySearchSchema.parse(search),
+  loaderDeps: ({ search }) => ({ search }),
+  loader: async ({ params, deps: { search } }) => {
     const [res, banners] = await Promise.all([
       getSubCategoryBySlug({
-        data: { slug: params.slug },
+        data: { slug: params.slug, ...search },
       }),
       getBanners({ data: { pathname: params.slug } }),
     ]);
@@ -81,8 +85,6 @@ function SubCategoryPage() {
     };
   } = Route.useLoaderData();
 
-  console.log(banners);
-
   if (!res.subCategory) {
     return (
       <Section className="pt-32">
@@ -99,6 +101,7 @@ function SubCategoryPage() {
     .replace(/-/g, " ")
     .replace(/\b\w/g, (char) => char.toUpperCase());
   const products = res.products;
+  console.log(products, "produk");
 
   return (
     <>

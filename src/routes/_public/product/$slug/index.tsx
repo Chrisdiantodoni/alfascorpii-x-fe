@@ -107,6 +107,8 @@ function ProductDetail() {
 
   const backTo = (location.state as { from?: string })?.from || "/store";
 
+  console.log(files);
+
   return (
     <>
       <PageBanner hero={banners.hero} top={banners.top} />
@@ -129,7 +131,7 @@ function ProductDetail() {
           layoutId={`product-card-${data.slug}`}
           transition={{ duration: 0.45, ease: [0.32, 0.72, 0, 1] }}
         >
-          <div className="aspect-square bg-paper-dim overflow-hidden mb-5">
+          <div className="p-2">
             <ProductGallery files={files} productName={data.name} />
           </div>
         </SharedElement>
