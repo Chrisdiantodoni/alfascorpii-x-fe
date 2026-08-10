@@ -132,7 +132,7 @@ export default function OverlayNav({
                 onClick={onClose}
                 className="flex-1"
               >
-                <RowLabel num="02" label="Toko" />
+                <RowLabel num="02" label="Store" />
               </Link>
               {categories.length > 0 && (
                 <button

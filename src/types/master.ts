@@ -25,12 +25,15 @@ export interface SubCategory {
   categoryId: string | null;
   name: string;
   slug: string;
+
   orderIndex: number;
   showInMenu: boolean;
   isActive: boolean;
   createdAt: string | null;
   updatedAt: string | null;
   deletedAt: string | null;
+  category: Category;
+  files: FileData[];
   products?: FeaturedProduct[];
 }
 
