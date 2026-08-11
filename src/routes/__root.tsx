@@ -41,6 +41,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: SPLASH_SEEN_SCRIPT }} />
+        {/* Pindahkan splash script ke head agar dieksekusi sebelum render */}
+        <script dangerouslySetInnerHTML={{ __html: SPLASH_SCRIPT }} />
         {/*<link rel="stylesheet" href={appCss} />*/}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
