@@ -276,7 +276,7 @@ function Store() {
       {products.length > 0 && (
         <Section className="pt-8 border-none pb-4">
           <SectionHeading as="h2">Line-up Produk</SectionHeading>
-          <SwiperContainer className="mt-8" stagger>
+          <SwiperContainer className="mt-8" stagger key="products-swiper">
             {products.map((item) => {
               const thumb = item.files?.find((f) => f.role === "thumbnail");
               return (

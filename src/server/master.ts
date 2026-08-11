@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { and, asc, eq, ilike, inArray, or, sql } from "drizzle-orm";
+import { and, asc, eq, ilike, inArray, isNull, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "#/db";
 import {
@@ -32,10 +32,18 @@ export const getLayoutData = createServerFn({ method: "GET" }).handler(
             with: {
               page: true,
               category: {
+                where: and(
+                  eq(categories.isActive, true),
+                  isNull(categories.deletedAt),
+                ),
                 with: {
                   subCategories: {
                     orderBy: (subs, { asc }) => [asc(subs.orderIndex)],
-                    where: eq(subCategories.showInMenu, true),
+                    where: and(
+                      eq(subCategories.showInMenu, true),
+                      isNull(subCategories.deletedAt),
+                      eq(subCategories.isActive, true),
+                    ),
                     with: {
                       products: {
                         limit: 3,
@@ -110,6 +118,7 @@ export const getCategories = createServerFn({ method: "GET" }).handler(
             products: {
               where: and(
                 eq(products.isLineup, true),
+                isNull(products.deletedAt),
                 eq(products.isActive, true),
               ),
               limit: 2,
@@ -161,7 +170,9 @@ export const getSubCategoryBySlug = createServerFn({ method: "GET" })
       with: {
         products: {
           where: (products, { and, eq }) => {
-            const conditions = [eq(products.isActive, true)];
+            const conditions = [
+              and(eq(products.isActive, true), isNull(products.deletedAt)),
+            ];
 
             for (const [key, rawValue] of Object.entries(filters)) {
               if (!rawValue) continue;
@@ -229,7 +240,7 @@ export const getSubCategories = createServerFn({ method: "GET" }).handler(
       orderBy: asc(subCategories.orderIndex),
       with: {
         products: {
-          where: eq(products.isActive, true),
+          where: and(eq(products.isActive, true), isNull(products.deletedAt)),
           limit: 10,
         },
         category: true,
@@ -329,6 +340,7 @@ export const searchProducts = createServerFn({ method: "GET" })
       .where(
         and(
           eq(products.isActive, true),
+          isNull(products.deletedAt),
           or(ilike(products.name, pattern), ilike(products.code, pattern)),
         ),
       )
@@ -406,7 +418,10 @@ export const getAllProducts = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     // 2. Query products yang subCategoryId-nya cocok
     const res = await db.query.products.findMany({
-      where: eq(products.isLineup, data.is_lineup),
+      where: and(
+        eq(products.isLineup, data.is_lineup),
+        isNull(products.deletedAt),
+      ),
       with: {
         subCategory: {
           with: {

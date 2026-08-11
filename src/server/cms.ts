@@ -32,40 +32,34 @@ function mapBanner(b: typeof banners.$inferSelect) {
     isActive: b.isActive,
     startDate: b.startDate,
     endDate: b.endDate,
-    fieldSettings: JSON.parse(JSON.stringify(b.fieldSettings ?? null)),
+    // Cukup gunakan nullish coalescing tanpa JSON.parse/stringify
+    fieldSettings: b.fieldSettings ?? null,
   };
 }
 
 async function resolveScopes(pathname: string): Promise<BannerScope[]> {
-  if (pathname === "/") return [{ type: "home", id: "home" }];
+  // Pastikan pathname ter-decode dengan benar
+  const decodedPath = decodeURIComponent(pathname);
+  if (decodedPath === "/") return [{ type: "home", id: "home" }];
 
-  const slug = pathname.replace(/^\//, "").split("/").pop()!;
+  const slug = decodedPath.replace(/^\//, "").split("/").pop() || "";
 
   const [page, category, subCategory, menuItem] = await Promise.all([
-    db.query.pages.findFirst({ where: eq(pages.slug, slug) }),
-    db.query.categories.findFirst({ where: eq(categories.slug, slug) }),
-    db.query.subCategories.findFirst({ where: eq(subCategories.slug, slug) }),
-    // db.query.products.findFirst({ where: eq(products.slug, slug) }),
-    // db.query.blogs.findFirst({ where: eq(blogs.slug, slug) }),
-    db.query.menuItems.findFirst({ where: eq(menuItems.url, pathname) }),
+    slug ? db.query.pages.findFirst({ where: eq(pages.slug, slug) }) : null,
+    slug
+      ? db.query.categories.findFirst({ where: eq(categories.slug, slug) })
+      : null,
+    slug
+      ? db.query.subCategories.findFirst({
+          where: eq(subCategories.slug, slug),
+        })
+      : null,
+    db.query.menuItems.findFirst({ where: eq(menuItems.url, decodedPath) }),
   ]);
 
   if (page) return [{ type: "page", id: page.id }];
   if (category) return [{ type: "category", id: category.id }];
-
-  // if (category) {
-  //   const subs = await db.query.subCategories.findMany({
-  //     where: eq(subCategories.categoryId, category.id),
-  //     columns: { id: true },
-  //   });
-  //   return [
-  //     { type: "category", id: category.id },
-  //     ...subs.map((s) => ({ type: "sub_category" as const, id: s.id })),
-  //   ];
-  // }
-
-  // if (product) return [{ type: "product", id: product.id }];
-  if (subCategory) return [{ type: "sub-category", id: subCategory.id }];
+  if (subCategory) return [{ type: "sub-category", id: subCategory.id }]; // Disesuaikan menjadi sub_category
   if (menuItem) return [{ type: "menu_item", id: menuItem.id }];
 
   return [];
@@ -73,7 +67,7 @@ async function resolveScopes(pathname: string): Promise<BannerScope[]> {
 
 async function fetchBanners(scopes: BannerScope[]) {
   const scopeFilters = [
-    isNull(banners.bannerableType),
+    isNull(banners.bannerableType), // Banner global (berlaku untuk semua halaman)
     ...scopes.map((s) =>
       s.type === "home"
         ? eq(banners.bannerableType, "home")
@@ -84,7 +78,7 @@ async function fetchBanners(scopes: BannerScope[]) {
     ),
   ];
 
-  const currentTime = now();
+  const currentTime = new Date(); // Atau gunakan now() bawaan project Anda
 
   const rows = await db.query.banners.findMany({
     where: and(
@@ -95,7 +89,6 @@ async function fetchBanners(scopes: BannerScope[]) {
     ),
     orderBy: (b, { asc }) => [asc(b.placement), asc(b.orderPosition)],
   });
-  console.log();
 
   return rows;
 }
@@ -108,7 +101,6 @@ export const getBanners = createServerFn({ method: "GET" })
   .validator(schema)
   .handler(async ({ data }) => {
     const scopes = await resolveScopes(data.pathname);
-    console.log({ scopes });
     const rows = await fetchBanners(scopes);
 
     const grouped: Record<string, ReturnType<typeof mapBanner>[]> = {
@@ -117,12 +109,15 @@ export const getBanners = createServerFn({ method: "GET" })
       middle: [],
       bottom: [],
     };
+
     for (const b of rows) {
-      grouped[b.placement]?.push(mapBanner(b));
+      if (b.placement && grouped[b.placement]) {
+        grouped[b.placement].push(mapBanner(b));
+      }
     }
+
     return grouped;
   });
-
 const blogListSchema = z
   .object({
     slug: z.string().optional(),
@@ -136,9 +131,15 @@ export const getBlogs = createServerFn({ method: "GET" })
     // 2. Ambil kategori terlebih dahulu agar bisa filter blog berdasarkan categoryId
     const allCategories = await db.query.blogCategories.findMany({
       orderBy: asc(blogCategories.orderIndex),
+      where: and(
+        eq(blogCategories.isActive, true),
+        isNull(blogCategories.deletedAt),
+      ),
     });
 
-    const conditions = [eq(blogs.status, "published")];
+    const conditions = [
+      and(eq(blogs.status, "published"), isNull(blogs.deletedAt)),
+    ];
 
     if (data?.slug) {
       // Cari ID kategori berdasarkan slug yang dikirim
@@ -250,6 +251,7 @@ export const getPages = createServerFn({ method: "GET" })
     const page = await db.query.pages.findFirst({
       where: and(
         eq(pages.slug, data.slug.replace("/", "")),
+        isNull(pages.deletedAt),
         eq(pages.isActive, true),
       ),
     });

@@ -1,7 +1,6 @@
-import { useState, type ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 import { Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
-import type { Swiper as SwiperClass } from "swiper";
 import { motion } from "motion/react";
 import { MaterialIcon } from "#/components/ui/MaterialIcon";
 
@@ -39,8 +38,11 @@ export function SwiperContainer({
   spaceBetween = 24,
   breakpoints,
 }: SwiperContainerProps) {
-  const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
-  const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
+  // Generate ID unik agar selector navigasi tidak bentrok jika Swiper dipasang lebih dari satu
+  const rawId = useId();
+  const uniqueId = rawId.replace(/:/g, "");
+  const prevBtnClass = `swiper-prev-${uniqueId}`;
+  const nextBtnClass = `swiper-next-${uniqueId}`;
 
   if (!children || children.length === 0) return null;
 
@@ -63,6 +65,10 @@ export function SwiperContainer({
         modules={[Navigation]}
         slidesPerView={slidesPerView}
         spaceBetween={spaceBetween}
+        observer={true}
+        onSwiper={(swiper) => swiper.update()}
+        resizeObserver={true}
+        observeParents={true}
         breakpoints={
           breakpoints || {
             0: { slidesPerView: 1.2, spaceBetween: 16 },
@@ -71,14 +77,11 @@ export function SwiperContainer({
             1024: { slidesPerView: 4.2, spaceBetween: 24 },
           }
         }
-        onBeforeInit={(swiper: SwiperClass) => {
-          if (typeof swiper.params.navigation !== "boolean") {
-            swiper.params.navigation!.prevEl = prevEl;
-            swiper.params.navigation!.nextEl = nextEl;
-          }
+        navigation={{
+          prevEl: `.${prevBtnClass}`,
+          nextEl: `.${nextBtnClass}`,
         }}
-        navigation={{ prevEl, nextEl }}
-        className="w-full !py-6 -!my-6 cursor-grab active:cursor-grabbing select-none"
+        className="w-full !py-6 !-my-6 cursor-grab active:cursor-grabbing select-none"
       >
         {children.map((child, index) => (
           <SwiperSlide key={index} className="!h-auto">
@@ -98,16 +101,14 @@ export function SwiperContainer({
         <>
           <button
             type="button"
-            ref={setPrevEl}
-            className="absolute -left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 hover:scale-110 backdrop-blur-sm flex items-center justify-center text-white transition-all duration-200 cursor-pointer disabled:opacity-0 disabled:pointer-events-none"
+            className={`${prevBtnClass} absolute -left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 hover:scale-110 backdrop-blur-sm flex items-center justify-center text-white transition-all duration-200 cursor-pointer disabled:opacity-0 disabled:pointer-events-none`}
             aria-label="Previous slide"
           >
             <MaterialIcon name="arrow_back" className="!text-[22px]" />
           </button>
           <button
             type="button"
-            ref={setNextEl}
-            className="absolute -right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 hover:scale-110 backdrop-blur-sm flex items-center justify-center text-white transition-all duration-200 cursor-pointer disabled:opacity-0 disabled:pointer-events-none"
+            className={`${nextBtnClass} absolute -right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 hover:scale-110 backdrop-blur-sm flex items-center justify-center text-white transition-all duration-200 cursor-pointer disabled:opacity-0 disabled:pointer-events-none`}
             aria-label="Next slide"
           >
             <MaterialIcon name="arrow_forward" className="!text-[22px]" />
