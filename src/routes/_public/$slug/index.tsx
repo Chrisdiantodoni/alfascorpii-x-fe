@@ -4,7 +4,7 @@ import { BannerCarousel } from "#/components/ui/BannerCarousel";
 import { MarkdownPreview } from "#/components/ui/MarkdownPreview";
 import { getBanners, getPages } from "#/server/cms";
 import type { BannerProps, IPage } from "#/types";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import { motion } from "motion/react";
 
 export const Route = createFileRoute("/_public/$slug/")({
@@ -14,6 +14,7 @@ export const Route = createFileRoute("/_public/$slug/")({
       getPages({ data: { slug: location.pathname } }),
       getBanners({ data: { pathname: location.pathname } }),
     ]);
+    if (!pages) throw notFound();
     return { pages, banners };
   },
 });

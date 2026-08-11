@@ -10,6 +10,7 @@ import { Toaster } from "sonner";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
 import { RouteAnimationContainer } from "#/components/RouteAnimationContainer";
+import { PageNotFound } from "#/components/PageNotFound";
 
 interface MyRouterContext {
   queryClient: QueryClient;
@@ -30,7 +31,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     ],
     links: [{ rel: "stylesheet", href: appCss }],
   }),
-
   shellComponent: RootDocument,
 });
 

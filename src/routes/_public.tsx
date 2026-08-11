@@ -19,6 +19,7 @@ import { RouteAnimationContainer } from "#/components/RouteAnimationContainer";
 import type { Category } from "#/types";
 import SplashScreenWrapper from "#/components/SplashScreenWrapper";
 import SplashScreen from "#/components/SplashScreen";
+import { PageNotFound } from "#/components/PageNotFound";
 
 export const Route = createFileRoute("/_public")({
   loader: async ({ location }) => {
@@ -28,6 +29,7 @@ export const Route = createFileRoute("/_public")({
     ]);
     return { menu: res.newMenus, contact: res.contact, banners };
   },
+  notFoundComponent: PageNotFound,
 
   component: PublicLayout,
 });
