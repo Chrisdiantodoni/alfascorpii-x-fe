@@ -6,6 +6,9 @@ import { useSession } from "#/lib/auth-client";
 import { useCartStore } from "#/stores/cart";
 import type { CategoryRef, MenuData, PageRef } from "#/types/menu";
 import type { Category } from "#/types";
+import LogoWhite from "#/../public/LogoWhite.png";
+import LogoDark from "#/../public/LogoDark.png";
+import { Image } from "../ui/Image";
 
 interface TopbarProps {
   onMenuToggle: () => void;
@@ -62,7 +65,14 @@ export default function Topbar({
             pathname === "/",
           )}`}
         >
-          ALFA SCORPII X
+          <Image
+            src={isTransparent ? LogoWhite : LogoDark}
+            alt="Logo Alfa"
+            width={160}
+            height={56}
+            className="h-14 w-auto object-contain"
+            priority
+          />
         </Link>
 
         <div className="flex items-center gap-5 md:gap-7">
