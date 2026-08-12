@@ -1,25 +1,7 @@
-import { useEffect, useState } from "react";
-import { Button } from "./ui/Button";
+import { useTheme } from "#/hooks/useTheme";
 
 export function ThemeToggle() {
-	const [theme, setTheme] = useState<"light" | "dark">("dark");
-
-	// Sync state dengan DOM / localStorage saat komponen di-mount
-	useEffect(() => {
-		const isDark = document.documentElement.classList.contains("dark");
-		setTheme(isDark ? "dark" : "light");
-	}, []);
-
-	const changeTheme = (newTheme: "light" | "dark") => {
-		setTheme(newTheme);
-		localStorage.setItem("theme", newTheme);
-
-		if (newTheme === "dark") {
-			document.documentElement.classList.add("dark");
-		} else {
-			document.documentElement.classList.remove("dark");
-		}
-	};
+	const { theme, setTheme } = useTheme();
 
 	return (
 		<div className="flex items-center gap-5">
@@ -29,7 +11,7 @@ export function ThemeToggle() {
 			<div className="flex border border-white/30 overflow-hidden">
 				<button
 					type="button"
-					onClick={() => changeTheme("light")}
+					onClick={() => setTheme("light")}
 					className={`px-[10px] py-[6px] text-[10px] tracking-[.12em] font-semibold transition-colors ${
 						theme === "light"
 							? "bg-white text-[#0A0A0C]"
@@ -40,7 +22,7 @@ export function ThemeToggle() {
 				</button>
 				<button
 					type="button"
-					onClick={() => changeTheme("dark")}
+					onClick={() => setTheme("dark")}
 					className={`px-[10px] py-[6px] text-[10px] tracking-[.12em] font-semibold transition-colors ${
 						theme === "dark"
 							? "bg-white"

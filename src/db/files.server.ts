@@ -1,7 +1,7 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { db } from "#/db";
 import { files } from "#/drizzle/schema";
-import { storageUrl } from "#/lib/utils";
+import { generatePresignedUrls } from "#/lib/minio";
 
 export type FileableType = "product" | "sub-category" | "blog";
 export type FileItem = typeof files.$inferSelect;
@@ -50,6 +50,17 @@ export async function batchFilesWithUrls(
 	ids: string[],
 ): Promise<Map<string, FileItemWithUrl[]>> {
 	const grouped = await batchFiles(type, ids);
+
+	const allPaths = new Set<string>();
+	for (const items of grouped.values()) {
+		for (const f of items) {
+			if (f.filePath) allPaths.add(f.filePath);
+		}
+	}
+
+	const presignedMap =
+		allPaths.size > 0 ? await generatePresignedUrls([...allPaths]) : {};
+
 	const result = new Map<string, FileItemWithUrl[]>();
 
 	for (const [id, items] of grouped) {
@@ -57,8 +68,7 @@ export async function batchFilesWithUrls(
 			id,
 			items.map((f) => ({
 				...f,
-				// Safe check jika f.filePath bernilai null/undefined
-				url: storageUrl(f.filePath) ?? null,
+				url: f.filePath ? presignedMap[f.filePath] ?? null : null,
 			})),
 		);
 	}

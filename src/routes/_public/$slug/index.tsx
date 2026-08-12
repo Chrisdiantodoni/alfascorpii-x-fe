@@ -26,7 +26,7 @@ function RouteComponent() {
   return (
     <AnimatedRoute variant="slide">
       <PageBanner hero={banners.hero} top={banners.top} />
-      <section className="min-h-[20vh] flex flex-col justify-center pt-24 pb-8 max-w-4xl mx-auto w-full px-4">
+      <section className="min-h-[20vh] flex flex-col justify-center pt-36 pb-8 max-w-4xl mx-auto w-full px-4">
         <span className="text-[12px] tracking-[0.25em] text-blue-bright font-semibold mb-4">
           HALAMAN
         </span>

@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import { MaterialIcon } from "#/components/ui/MaterialIcon";
 import { useSession } from "#/lib/auth-client";
 import { useCartStore } from "#/stores/cart";
+import { useTheme } from "#/hooks/useTheme";
 import type { CategoryRef, MenuData, PageRef } from "#/types/menu";
 import type { Category } from "#/types";
-import LogoWhite from "#/../public/LogoWhite.png";
-import LogoDark from "#/../public/LogoDark.png";
+import LogoWhite from "/LogoWhite.png";
+import LogoDark from "/LogoDark.png";
 import { Image } from "../ui/Image";
 
 interface TopbarProps {
@@ -34,6 +35,7 @@ export default function Topbar({
   const { data: session } = useSession();
   const [hydrated, setHydrated] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => setHydrated(true), []);
 
@@ -184,6 +186,22 @@ export default function Topbar({
               </span>
             </Link>
           )}
+
+          <motion.button
+            type="button"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            whileTap={{ rotate: 360, scale: 0.9 }}
+            whileHover={{ scale: 1.1 }}
+            className={`hidden lg:block rounded-full p-1.5 -m-1.5 hover:bg-amber-400/10 hover:text-amber-400 dark:hover:shadow-[0_0_10px_rgba(251,191,36,0.2)] transition-colors ${
+              isTransparent ? "text-white/80" : "text-ink"
+            }`}
+            aria-label="Toggle tema"
+          >
+            <MaterialIcon
+              name={theme === "dark" ? "light_mode" : "dark_mode"}
+              className="!text-[22px]"
+            />
+          </motion.button>
 
           <motion.button
             id="menuToggle"

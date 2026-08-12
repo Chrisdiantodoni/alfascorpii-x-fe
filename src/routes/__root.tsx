@@ -11,6 +11,7 @@ import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
 import { RouteAnimationContainer } from "#/components/RouteAnimationContainer";
 import { PageNotFound } from "#/components/PageNotFound";
+import { ThemeProvider } from "#/hooks/useTheme";
 
 interface MyRouterContext {
   queryClient: QueryClient;
@@ -58,7 +59,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body className="bg-paper text-ink antialiased overflow-x-hidden font-body selection:bg-blue selection:text-white">
         {/* biome-ignore lint/security/noDangerouslySetInnerHtml: self-contained splash — creates DOM, injects CSS, fades out. React never owns it. */}
         {/*<script dangerouslySetInnerHTML={{ __html: SPLASH_SCRIPT }} />*/}
-        {children}
+        <ThemeProvider>{children}</ThemeProvider>
         <Toaster position="bottom-right" />
         {import.meta.env.NODE_ENV === "development" && (
           <TanStackDevtools
