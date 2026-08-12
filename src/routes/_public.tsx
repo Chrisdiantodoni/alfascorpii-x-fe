@@ -120,9 +120,9 @@ function PublicLayout() {
       <main className="px-6 md:px-16  mx-auto">
         <LayoutGroup id="page-layout">
           <RouteAnimationContainer>
-            <SplashScreenWrapper showSplash>
-              <Outlet />
-            </SplashScreenWrapper>
+            {/*<SplashScreenWrapper showSplash>*/}
+            <Outlet />
+            {/*</SplashScreenWrapper>*/}
           </RouteAnimationContainer>
         </LayoutGroup>
       </main>

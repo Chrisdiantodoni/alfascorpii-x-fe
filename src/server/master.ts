@@ -110,7 +110,7 @@ export const getSiteSettings = createServerFn({ method: "GET" })
 export const getCategories = createServerFn({ method: "GET" }).handler(
   async () => {
     const response = await db.query.categories.findMany({
-      where: eq(categories.isActive, true),
+      where: and(eq(categories.isActive, true), isNull(categories.deletedAt)),
       orderBy: (categories, { asc }) => [asc(categories.orderIndex)],
       with: {
         subCategories: {
@@ -166,7 +166,7 @@ export const getSubCategoryBySlug = createServerFn({ method: "GET" })
     const { slug, ...filters } = data;
 
     const subCategory = await db.query.subCategories.findFirst({
-      where: eq(subCategories.slug, slug),
+      where: and(eq(subCategories.slug, slug), isNull(subCategories.deletedAt)),
       with: {
         products: {
           where: (products, { and, eq }) => {
@@ -237,6 +237,7 @@ export const getSubCategoryBySlug = createServerFn({ method: "GET" })
 export const getSubCategories = createServerFn({ method: "GET" }).handler(
   async () => {
     const response = await db.query.subCategories.findMany({
+      where: isNull(subCategories.deletedAt),
       orderBy: asc(subCategories.orderIndex),
       with: {
         products: {
@@ -293,7 +294,7 @@ export const getProductDetail = createServerFn({ method: "GET" })
   .validator(productDetailSchema)
   .handler(async ({ data }) => {
     const response = await db.query.products.findFirst({
-      where: eq(products.slug, data.slug),
+      where: and(eq(products.slug, data.slug), isNull(products.deletedAt)),
       with: {
         productColors: true,
         subCategory: true,
@@ -368,8 +369,8 @@ export const getProductByCategory = createServerFn({ method: "GET" })
   .validator(productSchema)
   .handler(async ({ data }) => {
     const category = await db.query.categories.findFirst({
-      where: eq(categories.slug, data.slug),
-      with: { subCategories: true },
+      where: and(eq(categories.slug, data.slug), isNull(categories.deletedAt)),
+      with: { subCategories: { where: isNull(subCategories.deletedAt) } },
     });
 
     if (!category || category.subCategories.length === 0) {
@@ -380,7 +381,7 @@ export const getProductByCategory = createServerFn({ method: "GET" })
 
     // 2. Query products yang subCategoryId-nya cocok
     const res = await db.query.products.findMany({
-      where: inArray(products.subCategoryId, subCategoryIds),
+      where: and(inArray(products.subCategoryId, subCategoryIds), isNull(products.deletedAt)),
       with: {
         subCategory: true, // opsional: sertakan data subCategory jika butuh
       },

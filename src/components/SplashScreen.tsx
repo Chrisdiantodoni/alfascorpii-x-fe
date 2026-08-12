@@ -1,4 +1,4 @@
-import { motion, useAnimation, type Easing, type Variants } from "motion/react";
+import { motion, useAnimation, type Easing } from "motion/react";
 import { useEffect, useState, useRef } from "react";
 
 const easingFunctions = {
@@ -19,13 +19,9 @@ interface SplashScreenProps {
     alt: string;
   };
   backgroundColor?: string;
-  logoSizeType?: "auto" | "fixed" | "percentage";
-  logoWidth?: number;
-  logoHeight?: number;
   duration?: number;
   fadeOutDuration?: number;
   autoHide?: boolean;
-  logoEasing?: keyof typeof easingFunctions;
   curtainEasing?: keyof typeof easingFunctions;
   onComplete?: () => void;
   children?: React.ReactNode;
@@ -35,51 +31,25 @@ interface SplashScreenProps {
   textDuration?: number;
 }
 
-function computeLogoSize(
-  viewportWidth: number,
-  viewportHeight: number,
-  logoSizeType: "auto" | "fixed" | "percentage",
-  logoWidth: number,
-  logoHeight: number,
-): { width: number; height: number } {
-  if (logoSizeType === "auto") {
-    const minDimension = Math.min(viewportWidth, viewportHeight);
-    const baseSize = Math.max(150, Math.min(500, minDimension * 0.4));
-    return { width: baseSize, height: baseSize };
-  }
-  if (logoSizeType === "percentage") {
-    return {
-      width: (viewportWidth * logoWidth) / 100,
-      height: (viewportHeight * logoHeight) / 100,
-    };
-  }
-  return { width: logoWidth, height: logoHeight };
-}
-
 export default function SplashScreen({
   logo = {
     src: "/Logo.avif",
     alt: "Logo",
   },
   backgroundColor = "#000000",
-  logoSizeType = "auto",
-  logoWidth = 150,
-  logoHeight = 150,
-  duration = 1.2,
-  fadeOutDuration = 0.8,
+  duration = 0.6,
+  fadeOutDuration = 0.5,
   autoHide = true,
-  logoEasing = "elegantEntry",
   curtainEasing = "elegantExit",
   onComplete,
   children,
   text,
   textColor = "#ffffff",
   textSize = 18,
-  textDuration = 0.6,
+  textDuration = 0.4,
 }: SplashScreenProps) {
-  // Check sessionStorage langsung saat inisialisasi state awal
   const [shouldShow, setShouldShow] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
+    if (typeof window === "undefined") return true;
     return !sessionStorage.getItem("splashScreenSeen");
   });
 
@@ -88,53 +58,15 @@ export default function SplashScreen({
   const curtainControls = useAnimation();
   const isMountedRef = useRef(true);
 
-  // Set flag mount
   useEffect(() => {
     setIsMounted(true);
-    return () => {
-      setIsMounted(false);
-    };
+    return () => setIsMounted(false);
   }, []);
-
-  // Hitung Logo Size
-  const [logoSize, setLogoSize] = useState(() => {
-    if (typeof window === "undefined") return { width: 300, height: 300 };
-    return computeLogoSize(
-      window.innerWidth,
-      window.innerHeight,
-      logoSizeType,
-      logoWidth,
-      logoHeight,
-    );
-  });
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const updateLogoSize = () => {
-      setLogoSize(
-        computeLogoSize(
-          window.innerWidth,
-          window.innerHeight,
-          logoSizeType,
-          logoWidth,
-          logoHeight,
-        ),
-      );
-    };
-
-    window.addEventListener("resize", updateLogoSize);
-    return () => window.removeEventListener("resize", updateLogoSize);
-  }, [logoSizeType, logoWidth, logoHeight]);
 
   const curtainEase: Easing = [
     ...(easingFunctions[curtainEasing] || easingFunctions.elegantExit),
   ];
-  const logoEase: Easing = [
-    ...(easingFunctions[logoEasing] || easingFunctions.elegantEntry),
-  ];
 
-  // Logika Animasi Keluar (Satu useEffect saja)
   useEffect(() => {
     if (!autoHide || !isMounted || !shouldShow) return;
 
@@ -150,7 +82,6 @@ export default function SplashScreen({
 
         if (!isMountedRef.current) return;
 
-        // Jalankan animasi transisi keluar
         await Promise.all([
           contentWrapperControls.start({
             opacity: 0,
@@ -171,7 +102,6 @@ export default function SplashScreen({
 
         if (!isMountedRef.current) return;
 
-        // Simpan flag di SessionStorage dan hilangkan splash
         sessionStorage.setItem("splashScreenSeen", "true");
         setShouldShow(false);
         onComplete?.();
@@ -198,34 +128,82 @@ export default function SplashScreen({
     text,
   ]);
 
-  // Variants
-  const logoVariants: Variants = {
-    hidden: { y: 60, opacity: 0, scale: 0.95 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      scale: 1,
-      transition: { duration, ease: logoEase },
-    },
-  };
-
-  const textVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        duration: textDuration,
-        ease: "easeOut",
-        delay: duration,
-      },
-    },
-  };
-
-  // Jangan render splash jika sudah pernah dilihat atau belum mounted di client
-  if (!isMounted || !shouldShow) {
+  if (typeof window !== "undefined" && !shouldShow) {
     return <>{children}</>;
   }
 
+  // SSR + first client paint: static splash (no Framer Motion) — covers content
+  if (!isMounted) {
+    return (
+      <div style={{ position: "relative", width: "100%", height: "100%" }}>
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            overflow: "hidden",
+            zIndex: 9999,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <div
+              style={{
+                width: "clamp(120px, 30vw, 280px)",
+                aspectRatio: "1",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "10px",
+              }}
+            >
+              <img
+                src={logo.src}
+                alt={logo.alt}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                }}
+              />
+            </div>
+            {text && (
+              <p
+                style={{
+                  margin: 0,
+                  marginTop: "24px",
+                  color: textColor,
+                  fontSize: `${textSize}px`,
+                  fontWeight: 600,
+                  letterSpacing: "0.05em",
+                  textAlign: "center",
+                }}
+              >
+                {text}
+              </p>
+            )}
+          </div>
+        </div>
+        {children}
+      </div>
+    );
+  }
+
+  // Client mounted: animated exit only — logo langsung visible, no entrance animation
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
       <motion.div
@@ -257,17 +235,13 @@ export default function SplashScreen({
             justifyContent: "center",
           }}
         >
-          {/* Logo */}
-          <motion.div
-            variants={logoVariants}
-            initial="hidden"
-            animate="visible"
+          <div
             style={{
+              width: "clamp(120px, 30vw, 280px)",
+              aspectRatio: "1",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              width: `${logoSize.width}px`,
-              height: `${logoSize.height}px`,
               padding: "10px",
             }}
           >
@@ -280,14 +254,10 @@ export default function SplashScreen({
                 objectFit: "contain",
               }}
             />
-          </motion.div>
+          </div>
 
-          {/* Text */}
           {text && (
-            <motion.p
-              variants={textVariants}
-              initial="hidden"
-              animate="visible"
+            <p
               style={{
                 margin: 0,
                 marginTop: "24px",
@@ -299,7 +269,7 @@ export default function SplashScreen({
               }}
             >
               {text}
-            </motion.p>
+            </p>
           )}
         </motion.div>
       </motion.div>

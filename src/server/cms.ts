@@ -13,7 +13,8 @@ import {
   siteSettings,
   subCategories,
 } from "#/drizzle/schema";
-import { now, storageUrl } from "#/lib/utils";
+import { now } from "#/lib/utils";
+import { generatePresignedUrls } from "#/lib/minio";
 import type { BannerScope } from "#/types/menu";
 import { batchFilesWithUrls } from "./files";
 
@@ -22,7 +23,7 @@ function mapBanner(b: typeof banners.$inferSelect) {
     id: b.id,
     title: b.title,
     subtitle: b.subtitle,
-    imageUrl: storageUrl(b.filePath),
+    imageUrl: b.filePath,
     clickUrl: b.clickUrl,
     ctaText: b.ctaText,
     textColor: b.textColor,
@@ -32,7 +33,6 @@ function mapBanner(b: typeof banners.$inferSelect) {
     isActive: b.isActive,
     startDate: b.startDate,
     endDate: b.endDate,
-    // Cukup gunakan nullish coalescing tanpa JSON.parse/stringify
     fieldSettings: b.fieldSettings ?? null,
   };
 }
@@ -45,13 +45,22 @@ async function resolveScopes(pathname: string): Promise<BannerScope[]> {
   const slug = decodedPath.replace(/^\//, "").split("/").pop() || "";
 
   const [page, category, subCategory, menuItem] = await Promise.all([
-    slug ? db.query.pages.findFirst({ where: eq(pages.slug, slug) }) : null,
     slug
-      ? db.query.categories.findFirst({ where: eq(categories.slug, slug) })
+      ? db.query.pages.findFirst({
+          where: and(eq(pages.slug, slug), isNull(pages.deletedAt)),
+        })
+      : null,
+    slug
+      ? db.query.categories.findFirst({
+          where: and(eq(categories.slug, slug), isNull(categories.deletedAt)),
+        })
       : null,
     slug
       ? db.query.subCategories.findFirst({
-          where: eq(subCategories.slug, slug),
+          where: and(
+            eq(subCategories.slug, slug),
+            isNull(subCategories.deletedAt),
+          ),
         })
       : null,
     db.query.menuItems.findFirst({ where: eq(menuItems.url, decodedPath) }),
@@ -83,6 +92,7 @@ async function fetchBanners(scopes: BannerScope[]) {
   const rows = await db.query.banners.findMany({
     where: and(
       eq(banners.isActive, true),
+      isNull(banners.deletedAt),
       or(...scopeFilters),
       or(isNull(banners.startDate), lte(banners.startDate, currentTime)),
       or(isNull(banners.endDate), gte(banners.endDate, currentTime)),
@@ -103,6 +113,10 @@ export const getBanners = createServerFn({ method: "GET" })
     const scopes = await resolveScopes(data.pathname);
     const rows = await fetchBanners(scopes);
 
+    const allPaths = rows.map((b) => b.filePath).filter(Boolean) as string[];
+    const presignedMap =
+      allPaths.length > 0 ? await generatePresignedUrls(allPaths) : {};
+
     const grouped: Record<string, ReturnType<typeof mapBanner>[]> = {
       hero: [],
       top: [],
@@ -112,7 +126,11 @@ export const getBanners = createServerFn({ method: "GET" })
 
     for (const b of rows) {
       if (b.placement && grouped[b.placement]) {
-        grouped[b.placement].push(mapBanner(b));
+        const mapped = mapBanner(b);
+        mapped.imageUrl = b.filePath
+          ? (presignedMap[b.filePath] ?? null)
+          : null;
+        grouped[b.placement].push(mapped);
       }
     }
 
@@ -194,7 +212,8 @@ export const getBlogDetail = createServerFn({ method: "GET" })
     const blogDetails = await db.query.blogs.findFirst({
       where: and(
         eq(blogs.slug, data.slug),
-        eq(blogs.status, "published"), // Memastikan hanya blog terpublikasi yang bisa diakses
+        eq(blogs.status, "published"),
+        isNull(blogs.deletedAt),
       ),
       with: {
         blogCategory: true, // Ambil pula relasi kategorinya jika dibutuhkan di detail page
@@ -213,6 +232,7 @@ export const getBlogDetail = createServerFn({ method: "GET" })
         eq(blogs.status, "published"),
         eq(blogs.blogCategoryId, blogDetails?.blogCategoryId),
         not(eq(blogs.id, blogDetails.id)),
+        isNull(blogs.deletedAt),
       ),
       limit: 5, // Optional: batasi jumlah related blogs
       with: {
