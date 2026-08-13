@@ -5,6 +5,7 @@ import { MaterialIcon } from "#/components/ui/MaterialIcon";
 import { useSession } from "#/lib/auth-client";
 import { useCartStore } from "#/stores/cart";
 import { useTheme } from "#/hooks/useTheme";
+import { useOverflowFlip } from "#/hooks/useOverflowFlip";
 import type { CategoryRef, MenuData, PageRef } from "#/types/menu";
 import type { Category } from "#/types";
 import LogoWhite from "/LogoWhite.png";
@@ -276,6 +277,11 @@ function HoverDropdown({
 
 function CategoryRow({ category }: { category: CategoryRef }) {
   const hasSub = !!category.subCategories?.length;
+  const [subRef, overflow] = useOverflowFlip<HTMLDivElement>([category.id]);
+
+  const subPosition = overflow
+    ? "right-full mr-2 before:-right-2 before:left-auto"
+    : "left-full ml-2 before:-left-2";
 
   return (
     <div className="relative group/cat">
@@ -291,7 +297,10 @@ function CategoryRow({ category }: { category: CategoryRef }) {
       </Link>
 
       {hasSub && (
-        <div className="absolute left-full top-0 ml-2 opacity-0 invisible translate-x-1 group-hover/cat:opacity-100 group-hover/cat:visible group-hover/cat:translate-x-0 transition-all duration-200 z-50 before:absolute before:-left-2 before:top-0 before:w-2 before:h-full">
+        <div
+          ref={subRef}
+          className={`absolute top-0 ${subPosition} opacity-0 invisible translate-x-1 group-hover/cat:opacity-100 group-hover/cat:visible group-hover/cat:translate-x-0 transition-all duration-200 z-50 before:absolute before:top-0 before:w-2 before:h-full`}
+        >
           <div className="bg-white text-ink rounded-xl shadow-xl border border-black/5 py-3 min-w-[220px]">
             {category.subCategories?.map((sc) => (
               <Link
