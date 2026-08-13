@@ -1,4 +1,5 @@
 import { marked } from "marked";
+import DOMPurify from "dompurify";
 import { useMemo } from "react";
 import { cn } from "#/lib/utils";
 
@@ -15,58 +16,51 @@ interface MarkdownPreviewProps {
 export function MarkdownPreview({ content, className }: MarkdownPreviewProps) {
   const html = useMemo(() => {
     if (!content) return "";
-    const raw = marked.parse(content.replace(/\\n/g, "\n")) as string;
 
-    // Inject inline style ke img yang punya width
-    return raw.replace(
-      /<img\s([^>]*?)\bwidth=(["']?)(\d+)\2([^>]*?)>/gi,
-      (match, before, _q, width, after) =>
-        `<img ${before}width="${width}"${after} style="width:${width}px;max-width:100%;height:auto;">`,
-    );
+    // 1. Parse markdown
+    const parsed = marked.parse(content.replace(/\\n/g, "\n")) as string;
+
+    // 2. Olah semua tag <img> (baik yang punya width maupun tidak)
+    const processedImg = parsed.replace(/<img\b[^>]*>/gi, (imgTag) => {
+      // Cek apakah ada atribut width (misal: width="200" atau width='200')
+      const widthMatch = imgTag.match(/\bwidth=(["']?)(\d+)\1/i);
+      const widthValue = widthMatch ? widthMatch[2] : null;
+
+      // Tentukan style width berdasarkan kondisi
+      const styleWidth = widthValue ? `${widthValue}px` : "100%";
+
+      // Jika imgTag sudah punya atribut style, gabungkan style-nya
+      if (/style=/i.test(imgTag)) {
+        return imgTag.replace(
+          /style=(["'])(.*?)\1/i,
+          `style="$2; width:${styleWidth}; max-width:100%; height:auto;"`,
+        );
+      }
+
+      // Jika belum punya style, selipkan atribut style di akhir tag
+      return imgTag.replace(
+        ">",
+        ` style="width:${styleWidth}; max-width:100%; height:auto;">`,
+      );
+    });
+
+    // 3. Sanitasi HTML dengan DOMPurify (mengizinkan atribut style & data-align)
+    return DOMPurify.sanitize(processedImg, {
+      ADD_ATTR: ["target", "data-align", "style"],
+    });
   }, [content]);
 
   return (
-    <>
-      <style>{`
-				.md-preview [data-align="center"] { text-align: center; }
-				.md-preview [data-align="center"] figure { display: inline-block; }
-				.md-preview figure[data-align="left"] {
-					float: left;
-					margin-right: 1rem;
-					margin-bottom: 0.5rem;
-				}
-				.md-preview figure[data-align="right"] {
-					float: right;
-					margin-left: 1rem;
-					margin-bottom: 0.5rem;
-				}
-
-				/* ========================================================= */
-				/* FIX KUNCI: Paksa browser membaca atribut width & height   */
-				/* ========================================================= */
-
-				/* 1. Jika tag <img> memiliki atribut width */
-				// .md-preview img[width] {
-				// 	width: attr(width px) !important; /* Untuk browser modern */
-				// 	max-width: 100%;
-				// 	height: auto;
-				// }
-
-				// /* 2. Overrule paksaan 'width: 100%' dari Tailwind .prose */
-				// .md-preview img[width],
-				// .md-preview img[height] {
-				// 	display: inline-block !important;
-				// 	width: unset; /* Lepas paksaan width 100% */
-				// 	max-width: 100%;
-				// }
-			`}</style>
-      <div
-        className={cn(
-          "prose prose-sm dark:prose-invert max-w-none md-preview",
-          className,
-        )}
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
-    </>
+    <div
+      className={cn(
+        "prose prose-sm dark:prose-invert max-w-none md-preview",
+        "[&_[data-align='center']]:text-center",
+        "[&_[data-align='center']_figure]:inline-block",
+        "[&_figure[data-align='left']]:float-left [&_figure[data-align='left']]:mr-4 [&_figure[data-align='left']]:mb-2",
+        "[&_figure[data-align='right']]:float-right [&_figure[data-align='right']]:ml-4 [&_figure[data-align='right']]:mb-2",
+        className,
+      )}
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
   );
 }

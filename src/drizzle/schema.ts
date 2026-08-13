@@ -304,6 +304,27 @@ export const menuItems = pgTable("menu_items", {
 		}).onDelete("set null"),
 ]);
 
+export const subCategories = pgTable("sub_categories", {
+	id: char({ length: 26 }).primaryKey().notNull(),
+	name: varchar({ length: 255 }).notNull(),
+	slug: varchar({ length: 255 }).notNull(),
+	categoryId: char("category_id", { length: 26 }),
+	orderIndex: integer("order_index").default(0).notNull(),
+	isActive: boolean("is_active").default(true).notNull(),
+	deletedAt: timestamp("deleted_at", { mode: 'string' }),
+	createdAt: timestamp("created_at", { mode: 'string' }),
+	updatedAt: timestamp("updated_at", { mode: 'string' }),
+	showInMenu: boolean("show_in_menu").default(true).notNull(),
+	description: varchar({ length: 255 }),
+}, (table) => [
+	foreignKey({
+			columns: [table.categoryId],
+			foreignColumns: [categories.id],
+			name: "sub_categories_category_id_foreign"
+		}).onDelete("set null"),
+	unique("sub_categories_slug_unique").on(table.slug),
+]);
+
 export const productColors = pgTable("product_colors", {
 	id: char({ length: 26 }).primaryKey().notNull(),
 	productId: char("product_id", { length: 26 }).notNull(),
@@ -367,27 +388,6 @@ export const products = pgTable("products", {
 			name: "products_sub_category_id_foreign"
 		}).onDelete("cascade"),
 	unique("products_slug_unique").on(table.slug),
-]);
-
-export const subCategories = pgTable("sub_categories", {
-	id: char({ length: 26 }).primaryKey().notNull(),
-	name: varchar({ length: 255 }).notNull(),
-	slug: varchar({ length: 255 }).notNull(),
-	categoryId: char("category_id", { length: 26 }),
-	orderIndex: integer("order_index").default(0).notNull(),
-	isActive: boolean("is_active").default(true).notNull(),
-	deletedAt: timestamp("deleted_at", { mode: 'string' }),
-	createdAt: timestamp("created_at", { mode: 'string' }),
-	updatedAt: timestamp("updated_at", { mode: 'string' }),
-	showInMenu: boolean("show_in_menu").default(true).notNull(),
-	description: varchar({ length: 255 }),
-}, (table) => [
-	foreignKey({
-			columns: [table.categoryId],
-			foreignColumns: [categories.id],
-			name: "sub_categories_category_id_foreign"
-		}).onDelete("set null"),
-	unique("sub_categories_slug_unique").on(table.slug),
 ]);
 
 export const roleHasPermissions = pgTable("role_has_permissions", {

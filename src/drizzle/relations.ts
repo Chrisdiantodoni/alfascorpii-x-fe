@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm/relations";
-import { users, blogs, blogCategories, menus, menuItems, products, productColors, subCategories, categories, permissions, roleHasPermissions, roles, modelHasPermissions, modelHasRoles, relatedProducts } from "./schema";
+import { users, blogs, blogCategories, menus, menuItems, categories, subCategories, products, productColors, permissions, roleHasPermissions, roles, modelHasPermissions, modelHasRoles, relatedProducts } from "./schema";
 
 export const blogsRelations = relations(blogs, ({one}) => ({
 	user: one(users, {
@@ -39,6 +39,18 @@ export const menusRelations = relations(menus, ({many}) => ({
 	menuItems: many(menuItems),
 }));
 
+export const subCategoriesRelations = relations(subCategories, ({one, many}) => ({
+	category: one(categories, {
+		fields: [subCategories.categoryId],
+		references: [categories.id]
+	}),
+	products: many(products),
+}));
+
+export const categoriesRelations = relations(categories, ({many}) => ({
+	subCategories: many(subCategories),
+}));
+
 export const productColorsRelations = relations(productColors, ({one}) => ({
 	product: one(products, {
 		fields: [productColors.productId],
@@ -58,18 +70,6 @@ export const productsRelations = relations(products, ({one, many}) => ({
 	relatedProducts_relatedProductId: many(relatedProducts, {
 		relationName: "relatedProducts_relatedProductId_products_id"
 	}),
-}));
-
-export const subCategoriesRelations = relations(subCategories, ({one, many}) => ({
-	products: many(products),
-	category: one(categories, {
-		fields: [subCategories.categoryId],
-		references: [categories.id]
-	}),
-}));
-
-export const categoriesRelations = relations(categories, ({many}) => ({
-	subCategories: many(subCategories),
 }));
 
 export const roleHasPermissionsRelations = relations(roleHasPermissions, ({one}) => ({
