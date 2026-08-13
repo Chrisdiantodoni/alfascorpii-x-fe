@@ -16,6 +16,7 @@ interface TopbarProps {
   onCartToggle: () => void;
   menuOpen: boolean;
   transparent?: boolean;
+  scrolled?: boolean;
   menu: MenuData[];
   categories: Category[];
 }
@@ -28,6 +29,7 @@ export default function Topbar({
   onCartToggle,
   menuOpen,
   transparent,
+  scrolled,
   menu,
   categories,
 }: TopbarProps) {
@@ -51,10 +53,14 @@ export default function Topbar({
     [];
   const dynamicItems = headerItems.filter((item) => item.isActive);
 
+  console.log(isTransparent);
+
   return (
     <nav
       id="topbar"
-      className={`fixed top-0 inset-x-0 z-50 px-6 md:px-16 py-6 border-b transition-all duration-300  ${
+      className={`fixed top-0 inset-x-0 z-50 px-6 md:px-16 py-6 border-b transition-all duration-300 ${
+        scrolled ? "scrolled" : ""
+      } ${
         isTransparent ? "nav-transparent" : "bg-white border-black/5"
       }`}
     >

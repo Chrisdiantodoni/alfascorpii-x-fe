@@ -44,17 +44,20 @@ function PublicLayout() {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [heroTransparent, setHeroTransparent] = useState(hasHeroBanner);
+  const [scrolled, setScrolled] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+
+  const isScrolled = hydrated ? scrolled : true;
 
   useEffect(() => {
     useWishlistStore.getState().load();
   }, []);
 
   useEffect(() => {
-    const topbar = document.getElementById("topbar");
+    setHydrated(true);
 
     const handler = () => {
-      const scrolled = window.scrollY > 24;
-      if (topbar) topbar.classList.toggle("scrolled", scrolled);
+      setScrolled(window.scrollY > 24);
       setHeroTransparent(hasHeroBanner && window.scrollY < 80);
     };
 
@@ -98,7 +101,7 @@ function PublicLayout() {
     // Cleanup listener saat komponen di-unmount
     return () => mediaQuery.removeEventListener("change", handleMediaChange);
   }, []);
-  console.log(menu, categories);
+  console.log(menu, categories, heroTransparent);
 
   return (
     <>
@@ -106,7 +109,8 @@ function PublicLayout() {
         categories={categories}
         menu={menu}
         menuOpen={menuOpen}
-        transparent={heroTransparent || menuOpen}
+        transparent={hydrated ? heroTransparent || menuOpen : false}
+        scrolled={isScrolled}
         onMenuToggle={() => setMenuOpen((prev) => !prev)}
         onCartToggle={useCartStore((s) => s.toggleCart)}
       />
