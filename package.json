@@ -46,11 +46,8 @@
     "@unpic/react": "^1.0.2",
     "better-auth": "^1.6.23",
     "cheerio": "^1.2.0",
-<<<<<<< HEAD
     "clsx": "^2.1.1",
-=======
     "dompurify": "^3.4.13",
->>>>>>> 2fa371820bee3d1112a3d626504e105b27bab7ce
     "drizzle-orm": "^0.45.2",
     "express": "^5.2.1",
     "lucide-react": "^0.545.0",
