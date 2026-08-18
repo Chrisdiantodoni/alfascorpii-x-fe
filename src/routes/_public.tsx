@@ -97,7 +97,6 @@ function PublicLayout() {
     // Cleanup listener saat komponen di-unmount
     return () => mediaQuery.removeEventListener("change", handleMediaChange);
   }, []);
-  console.log(menu, categories, heroTransparent);
 
   return (
     <>

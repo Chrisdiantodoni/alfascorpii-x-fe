@@ -39,7 +39,10 @@ function Home() {
 
   return (
     <>
-      <PageBanner hero={banners.hero as Banner[]} top={banners.top as Banner[]} />
+      <PageBanner
+        hero={banners.hero as Banner[]}
+        top={banners.top as Banner[]}
+      />
       <UspStrip />
       <MessageGallery />
       <SplitSection categories={categories} />
@@ -77,7 +80,7 @@ function Home() {
         className="-mx-6 md:-mx-16"
       />
       <InquiryForm />
-      <Faq faqs={faqs} />
+      {faqs && <Faq faqs={faqs} />}
     </>
   );
 }
