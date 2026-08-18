@@ -6,10 +6,15 @@ import { useSession } from "#/lib/auth-client";
 import { useCartStore } from "#/stores/cart";
 import { useTheme } from "#/hooks/useTheme";
 import { useOverflowFlip } from "#/hooks/useOverflowFlip";
-import type { CategoryRef, MenuData, PageRef } from "#/types/menu";
+import type {
+  CategoryRef,
+  ContactSettings,
+  MenuData,
+  PageRef,
+} from "#/types/menu";
 import type { Category } from "#/types";
-import LogoWhite from "/LogoWhite.png";
-import LogoDark from "/LogoDark.png";
+import LogoW from "/LogoWhite.png";
+import LogoD from "/LogoDark.png";
 import { Image } from "../ui/Image";
 
 interface TopbarProps {
@@ -20,6 +25,7 @@ interface TopbarProps {
   scrolled?: boolean;
   menu: MenuData[];
   categories: Category[];
+  contact: ContactSettings;
 }
 
 const navLinkClasses =
@@ -33,6 +39,7 @@ export default function Topbar({
   scrolled,
   menu,
   categories,
+  contact,
 }: TopbarProps) {
   const totalItems = useCartStore((s) => s.totalItems());
   const { data: session } = useSession();
@@ -54,16 +61,15 @@ export default function Topbar({
     [];
   const dynamicItems = headerItems.filter((item) => item.isActive);
 
-  console.log(isTransparent);
+  const LogoWhite = contact.logo ?? LogoW;
+  const LogoDark = contact.logo_dark ?? LogoD;
 
   return (
     <nav
       id="topbar"
       className={`fixed top-0 inset-x-0 z-50 px-6 md:px-16 py-6 border-b transition-all duration-300 ${
         scrolled ? "scrolled" : ""
-      } ${
-        isTransparent ? "nav-transparent" : "bg-white border-black/5"
-      }`}
+      } ${isTransparent ? "nav-transparent" : "bg-white border-black/5"}`}
     >
       <div className="max-w-[1920px] mx-auto flex items-center justify-between">
         <Link

@@ -8,82 +8,93 @@ import "swiper/css/effect-fade";
 import "swiper/css/pagination";
 
 interface BannerCarouselProps {
-  banners: Banner[];
-  height?: string;
-  autoRotate?: number;
-  className?: string;
+	banners: Banner[];
+	height?: string;
+	heightClass?: string;
+	autoRotate?: number;
+	className?: string;
 }
 
 export function BannerCarousel({
-  banners,
-  height,
-  autoRotate = 0,
-  className = "",
+	banners,
+	height,
+	heightClass,
+	autoRotate = 0,
+	className = "",
 }: BannerCarouselProps) {
-  // Ganti useRef dengan useState / Callback Ref
-  const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
-  const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
-  const [paginationEl, setPaginationEl] = useState<HTMLDivElement | null>(null);
+	// Ganti useRef dengan useState / Callback Ref
+	const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
+	const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
+	const [paginationEl, setPaginationEl] = useState<HTMLDivElement | null>(null);
 
-  if (banners.length === 0) return null;
+	if (banners.length === 0) return null;
 
-  if (banners.length === 1) {
-    return (
-      <BannerSlide banner={banners[0]} height={height} className={className} />
-    );
-  }
+	if (banners.length === 1) {
+		return (
+			<BannerSlide
+				banner={banners[0]}
+				height={height}
+				heightClass={heightClass}
+				className={className}
+			/>
+		);
+	}
 
-  return (
-    <section className={`relative ${className}`}>
-      <Swiper
-        modules={[Autoplay, EffectFade, Navigation, Pagination]}
-        effect="fade"
-        fadeEffect={{ crossFade: true }}
-        autoHeight={!height}
-        autoplay={
-          autoRotate > 0
-            ? { delay: autoRotate, disableOnInteraction: false }
-            : false
-        }
-        navigation={{
-          prevEl,
-          nextEl,
-        }}
-        pagination={{
-          el: paginationEl,
-          clickable: true,
-        }}
-        loop
-        className="w-full banner-swiper"
-      >
-        {banners.map((banner) => (
-          <SwiperSlide key={banner.id}>
-            <BannerSlide banner={banner} height={height} />
-          </SwiperSlide>
-        ))}
-      </Swiper>
+	return (
+		<section className={`relative ${className}`}>
+			<Swiper
+				modules={[Autoplay, EffectFade, Navigation, Pagination]}
+				effect="fade"
+				fadeEffect={{ crossFade: true }}
+				autoHeight={!height && !heightClass}
+				autoplay={
+					autoRotate > 0
+						? { delay: autoRotate, disableOnInteraction: false }
+						: false
+				}
+				navigation={{
+					prevEl,
+					nextEl,
+				}}
+				pagination={{
+					el: paginationEl,
+					clickable: true,
+				}}
+				loop
+				className="w-full banner-swiper"
+			>
+				{banners.map((banner) => (
+					<SwiperSlide key={banner.id}>
+						<BannerSlide
+							banner={banner}
+							height={height}
+							heightClass={heightClass}
+						/>
+					</SwiperSlide>
+				))}
+			</Swiper>
 
-      {/* Sambungkan elemen ke state via callback ref */}
-      <button
-        type="button"
-        ref={setPrevEl}
-        className="banner-prev absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 hover:scale-110 backdrop-blur-sm flex items-center justify-center text-white transition-all duration-200 cursor-pointer"
-        aria-label="Slide sebelumnya"
-      >
-        <MaterialIcon name="arrow_back" className="!text-[22px]" />
-      </button>
-      <button
-        type="button"
-        ref={setNextEl}
-        className="banner-next absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 hover:scale-110 backdrop-blur-sm flex items-center justify-center text-white transition-all duration-200 cursor-pointer"
-        aria-label="Slide berikutnya"
-      >
-        <MaterialIcon name="arrow_forward" className="!text-[22px]" />
-      </button>
+			{/* Sambungkan elemen ke state via callback ref */}
+			<button
+				type="button"
+				ref={setPrevEl}
+				className="banner-prev absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 hover:scale-110 backdrop-blur-sm flex items-center justify-center text-white transition-all duration-200 cursor-pointer"
+				aria-label="Slide sebelumnya"
+			>
+				<MaterialIcon name="arrow_back" className="!text-[22px]" />
+			</button>
+			<button
+				type="button"
+				ref={setNextEl}
+				className="banner-next absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 hover:scale-110 backdrop-blur-sm flex items-center justify-center text-white transition-all duration-200 cursor-pointer"
+				aria-label="Slide berikutnya"
+			>
+				<MaterialIcon name="arrow_forward" className="!text-[22px]" />
+			</button>
 
-      <div ref={setPaginationEl} className="banner-pagination z-20 relative" />
-    </section>
-  );
+			<div ref={setPaginationEl} className="banner-pagination z-20 relative" />
+		</section>
+	);
 }
 
 /* ====================================================================

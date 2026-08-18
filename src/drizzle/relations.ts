@@ -1,5 +1,18 @@
 import { relations } from "drizzle-orm/relations";
-import { users, blogs, blogCategories, menus, menuItems, categories, subCategories, products, productColors, permissions, roleHasPermissions, roles, modelHasPermissions, modelHasRoles, relatedProducts } from "./schema";
+import { authUser, authAccount, users, blogs, blogCategories, authSession, wishlists, products, categories, subCategories, menus, menuItems, productColors, permissions, roleHasPermissions, roles, modelHasPermissions, modelHasRoles, relatedProducts } from "./schema";
+
+export const authAccountRelations = relations(authAccount, ({one}) => ({
+	authUser: one(authUser, {
+		fields: [authAccount.userId],
+		references: [authUser.id]
+	}),
+}));
+
+export const authUserRelations = relations(authUser, ({many}) => ({
+	authAccounts: many(authAccount),
+	authSessions: many(authSession),
+	wishlists: many(wishlists),
+}));
 
 export const blogsRelations = relations(blogs, ({one}) => ({
 	user: one(users, {
@@ -18,6 +31,51 @@ export const usersRelations = relations(users, ({many}) => ({
 
 export const blogCategoriesRelations = relations(blogCategories, ({many}) => ({
 	blogs: many(blogs),
+}));
+
+export const authSessionRelations = relations(authSession, ({one}) => ({
+	authUser: one(authUser, {
+		fields: [authSession.userId],
+		references: [authUser.id]
+	}),
+}));
+
+export const wishlistsRelations = relations(wishlists, ({one}) => ({
+	authUser: one(authUser, {
+		fields: [wishlists.userId],
+		references: [authUser.id]
+	}),
+	product: one(products, {
+		fields: [wishlists.productId],
+		references: [products.id]
+	}),
+}));
+
+export const productsRelations = relations(products, ({one, many}) => ({
+	wishlists: many(wishlists),
+	subCategory: one(subCategories, {
+		fields: [products.subCategoryId],
+		references: [subCategories.id]
+	}),
+	productColors: many(productColors),
+	relatedProducts_productId: many(relatedProducts, {
+		relationName: "relatedProducts_productId_products_id"
+	}),
+	relatedProducts_relatedProductId: many(relatedProducts, {
+		relationName: "relatedProducts_relatedProductId_products_id"
+	}),
+}));
+
+export const subCategoriesRelations = relations(subCategories, ({one, many}) => ({
+	category: one(categories, {
+		fields: [subCategories.categoryId],
+		references: [categories.id]
+	}),
+	products: many(products),
+}));
+
+export const categoriesRelations = relations(categories, ({many}) => ({
+	subCategories: many(subCategories),
 }));
 
 export const menuItemsRelations = relations(menuItems, ({one, many}) => ({
@@ -39,36 +97,10 @@ export const menusRelations = relations(menus, ({many}) => ({
 	menuItems: many(menuItems),
 }));
 
-export const subCategoriesRelations = relations(subCategories, ({one, many}) => ({
-	category: one(categories, {
-		fields: [subCategories.categoryId],
-		references: [categories.id]
-	}),
-	products: many(products),
-}));
-
-export const categoriesRelations = relations(categories, ({many}) => ({
-	subCategories: many(subCategories),
-}));
-
 export const productColorsRelations = relations(productColors, ({one}) => ({
 	product: one(products, {
 		fields: [productColors.productId],
 		references: [products.id]
-	}),
-}));
-
-export const productsRelations = relations(products, ({one, many}) => ({
-	productColors: many(productColors),
-	subCategory: one(subCategories, {
-		fields: [products.subCategoryId],
-		references: [subCategories.id]
-	}),
-	relatedProducts_productId: many(relatedProducts, {
-		relationName: "relatedProducts_productId_products_id"
-	}),
-	relatedProducts_relatedProductId: many(relatedProducts, {
-		relationName: "relatedProducts_relatedProductId_products_id"
 	}),
 }));
 

@@ -8,13 +8,13 @@ import { formatRupiah } from "#/utils/fn";
 import { MaterialIcon } from "#/components/ui/MaterialIcon";
 import { PageBanner } from "#/components/PageBanner";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { getBanners } from "#/server/cms";
 import CategorySidebar from "#/components/ui/CategorySidebar";
 import { TextInput } from "#/components/ui/TextInput";
 import type { Category, FeaturedProduct, SubCategory } from "#/types";
 import { motion } from "motion/react";
 import { SharedElement } from "#/components/SharedElements";
 import { BannerCarousel } from "#/components/ui/BannerCarousel";
+import { bannerQueryOptions } from "#/queries/cms";
 import z from "zod";
 
 function mapToMiniCard(product: FeaturedProduct) {
@@ -60,30 +60,28 @@ export const Route = createFileRoute("/_public/sub-category/$slug")({
   component: SubCategoryPage,
   validateSearch: (search) => subCategorySearchSchema.parse(search),
   loaderDeps: ({ search }) => ({ search }),
-  loader: async ({ params, deps: { search } }) => {
-    const [res, banners] = await Promise.all([
+  loader: async ({ params, deps: { search }, context }) => {
+    const [res] = await Promise.all([
       getSubCategoryBySlug({
         data: { slug: params.slug, ...search },
       }),
-      getBanners({ data: { pathname: params.slug } }),
+      context.queryClient.ensureQueryData(bannerQueryOptions(params.slug)),
     ]);
 
-    return { res, banners };
+    return { res };
   },
 });
 
 function SubCategoryPage() {
   const { slug } = Route.useParams();
-  const {
-    res,
-    banners,
-  }: {
+  const { res }: {
     res: {
       subCategory: SubCategory;
       category: Category;
       products: FeaturedProduct[];
     };
   } = Route.useLoaderData();
+  const { data: banners } = useSuspenseQuery(bannerQueryOptions(slug));
 
   if (!res.subCategory) {
     return (
@@ -101,13 +99,15 @@ function SubCategoryPage() {
     .replace(/-/g, " ")
     .replace(/\b\w/g, (char) => char.toUpperCase());
   const products = res.products;
-  console.log(products, "produk");
+  const hasSidebar =
+    Array.isArray(res?.category?.specTemplate) &&
+    res.category.specTemplate.length > 0;
 
   return (
     <>
       <PageBanner hero={banners.hero} top={banners.top} />
       <section
-        className={`${banners.hero.length > 0 || banners.top.length > 0 ? "pt-18 " : "pt-32 lg:pt-24"} pb-8`}
+        className={`${banners.hero.length > 0 || banners.top.length > 0 ? "pt-18 " : "pt-32 lg:pt-28"} pb-8`}
       >
         <Link
           resetScroll={false}
@@ -122,13 +122,14 @@ function SubCategoryPage() {
       <BannerCarousel banners={banners.middle} className="-mx-6 md:-mx-16" />
 
       <Section className="pt-8">
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-6">
-          {Array.isArray(res?.category?.specTemplate) &&
-            res.category.specTemplate.length > 0 && (
-              <CategorySidebar specTemplate={res.category.specTemplate} />
-            )}
+        <div
+          className={`grid grid-cols-1 gap-10 ${hasSidebar ? "lg:grid-cols-6" : ""}`}
+        >
+          {hasSidebar && (
+            <CategorySidebar specTemplate={res.category.specTemplate} />
+          )}
 
-          <div className="lg:col-span-5">
+          <div className={hasSidebar ? "lg:col-span-5" : ""}>
             <SectionHeading className="mb-4">{title}</SectionHeading>
             <p className="mb-10 max-w-2xl text-ash">
               {res.category?.description}

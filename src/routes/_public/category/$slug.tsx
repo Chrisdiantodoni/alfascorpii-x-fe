@@ -1,5 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import z from "zod";
 import { motion } from "motion/react";
 import { PageBanner } from "#/components/PageBanner";
 import { BannerCarousel } from "#/components/ui/BannerCarousel";
@@ -10,8 +11,8 @@ import { MiniProductCard } from "#/components/ui/MiniProductCard";
 import { Section } from "#/components/ui/Section";
 import { SectionHeading } from "#/components/ui/SectionHeading";
 import { cms } from "#/data/cms";
-import { getBanners } from "#/server/cms";
 import { getProductByCategory } from "#/server/master";
+import { bannerQueryOptions } from "#/queries/cms";
 import type { Category, FeaturedProduct } from "#/types";
 import { formatRupiah } from "#/utils/fn";
 import { TextInput } from "#/components/ui/TextInput";
@@ -53,41 +54,46 @@ function mapToMiniCard(product: FeaturedProduct) {
   };
 }
 
+const searchSchema = z.record(z.string(), z.string().optional());
+
 export const Route = createFileRoute("/_public/category/$slug")({
   component: CategoryPage,
-  loader: async ({ params }) => {
-    const [res, banners] = await Promise.all([
+  validateSearch: (search) => searchSchema.parse(search),
+  loaderDeps: ({ search }) => ({ search }),
+  loader: async ({ params, deps: { search }, context }) => {
+    const [res] = await Promise.all([
       getProductByCategory({
-        data: { slug: params.slug },
+        data: { slug: params.slug, ...search },
       }),
-      getBanners({ data: { pathname: params.slug } }),
+      context.queryClient.ensureQueryData(bannerQueryOptions(params.slug)),
     ]);
-    return { res: res || [], banners };
+    return { res: res || [] };
   },
 });
 
 function CategoryPage() {
   const { slug } = Route.useParams();
-  const {
-    res,
-    banners,
-  }: {
+  const { res }: {
     res: {
       categories: Category;
       products: FeaturedProduct[];
     };
   } = Route.useLoaderData();
+  const { data: banners } = useSuspenseQuery(bannerQueryOptions(slug));
 
   const title = slug
     .replace(/-/g, " ")
     .replace(/\b\w/g, (char) => char.toUpperCase());
   const products = res.products;
+  const hasSidebar =
+    Array.isArray(res?.categories?.specTemplate) &&
+    res.categories.specTemplate.length > 0;
 
   return (
     <>
       <PageBanner hero={banners.hero} top={banners.top} />
       <section
-        className={`${banners.hero.length > 0 || banners.top.length > 0 ? "pt-18 " : "pt-32 lg:pt-24"} pb-8`}
+        className={`${banners.hero.length > 0 || banners.top.length > 0 ? "pt-18 " : "pt-32 lg:pt-28"} pb-8`}
       >
         <Link
           resetScroll={false}
@@ -102,13 +108,14 @@ function CategoryPage() {
       <BannerCarousel banners={banners.middle} className="-mx-6 md:-mx-16" />
 
       <Section className="pt-8">
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-6">
-          {Array.isArray(res?.categories?.specTemplate) &&
-            res.categories.specTemplate.length > 0 && (
-              <CategorySidebar specTemplate={res.categories.specTemplate} />
-            )}
+        <div
+          className={`grid grid-cols-1 gap-10 ${hasSidebar ? "lg:grid-cols-6" : ""}`}
+        >
+          {hasSidebar && (
+            <CategorySidebar specTemplate={res.categories.specTemplate} />
+          )}
 
-          <div className="lg:col-span-5">
+          <div className={hasSidebar ? "lg:col-span-5" : ""}>
             <SectionHeading className="mb-4">{title}</SectionHeading>
             <p className="mb-10 max-w-2xl text-ash">
               {res.categories?.description}

@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, integer, timestamp, index, char, text, bigserial, smallint, unique, jsonb, foreignKey, boolean, json, check, uuid, numeric, primaryKey } from "drizzle-orm/pg-core"
+import { pgTable, serial, varchar, integer, unique, char, timestamp, index, text, bigserial, smallint, foreignKey, jsonb, boolean, check, json, numeric, uuid, primaryKey } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 
@@ -8,6 +8,22 @@ export const migrations = pgTable("migrations", {
 	migration: varchar({ length: 255 }).notNull(),
 	batch: integer().notNull(),
 });
+
+export const users = pgTable("users", {
+	id: char({ length: 26 }).primaryKey().notNull(),
+	name: varchar({ length: 255 }).notNull(),
+	username: varchar({ length: 255 }).notNull(),
+	email: varchar({ length: 255 }).notNull(),
+	emailVerifiedAt: timestamp("email_verified_at", { mode: 'string' }),
+	password: varchar({ length: 255 }).notNull(),
+	rememberToken: varchar("remember_token", { length: 100 }),
+	createdAt: timestamp("created_at", { mode: 'string' }),
+	updatedAt: timestamp("updated_at", { mode: 'string' }),
+	passwordResetAt: timestamp("password_reset_at", { mode: 'string' }),
+}, (table) => [
+	unique("users_username_unique").on(table.username),
+	unique("users_email_unique").on(table.email),
+]);
 
 export const passwordResetTokens = pgTable("password_reset_tokens", {
 	email: varchar({ length: 255 }).primaryKey().notNull(),
@@ -64,6 +80,29 @@ export const jobBatches = pgTable("job_batches", {
 	finishedAt: integer("finished_at"),
 });
 
+export const authAccount = pgTable("auth_account", {
+	id: text().primaryKey().notNull(),
+	accountId: text("account_id").notNull(),
+	providerId: text("provider_id").notNull(),
+	userId: text("user_id").notNull(),
+	accessToken: text("access_token"),
+	refreshToken: text("refresh_token"),
+	idToken: text("id_token"),
+	accessTokenExpiresAt: timestamp("access_token_expires_at", { mode: 'string' }),
+	refreshTokenExpiresAt: timestamp("refresh_token_expires_at", { mode: 'string' }),
+	scope: text(),
+	password: text(),
+	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).notNull(),
+}, (table) => [
+	index("account_userId_idx").using("btree", table.userId.asc().nullsLast().op("text_ops")),
+	foreignKey({
+			columns: [table.userId],
+			foreignColumns: [authUser.id],
+			name: "auth_account_user_id_auth_user_id_fk"
+		}).onDelete("cascade"),
+]);
+
 export const failedJobs = pgTable("failed_jobs", {
 	id: bigserial({ mode: "bigint" }).primaryKey().notNull(),
 	uuid: varchar({ length: 255 }).notNull(),
@@ -84,22 +123,6 @@ export const siteSettings = pgTable("site_settings", {
 	updatedAt: timestamp("updated_at", { mode: 'string' }),
 }, (table) => [
 	unique("site_settings_key_unique").on(table.key),
-]);
-
-export const users = pgTable("users", {
-	id: char({ length: 26 }).primaryKey().notNull(),
-	name: varchar({ length: 255 }).notNull(),
-	username: varchar({ length: 255 }).notNull(),
-	email: varchar({ length: 255 }).notNull(),
-	emailVerifiedAt: timestamp("email_verified_at", { mode: 'string' }),
-	password: varchar({ length: 255 }).notNull(),
-	rememberToken: varchar("remember_token", { length: 100 }),
-	createdAt: timestamp("created_at", { mode: 'string' }),
-	updatedAt: timestamp("updated_at", { mode: 'string' }),
-	passwordResetAt: timestamp("password_reset_at", { mode: 'string' }),
-}, (table) => [
-	unique("users_username_unique").on(table.username),
-	unique("users_email_unique").on(table.email),
 ]);
 
 export const blogs = pgTable("blogs", {
@@ -142,6 +165,17 @@ export const blogCategories = pgTable("blog_categories", {
 	unique("blog_categories_slug_unique").on(table.slug),
 ]);
 
+export const authVerification = pgTable("auth_verification", {
+	id: text().primaryKey().notNull(),
+	identifier: text().notNull(),
+	value: text().notNull(),
+	expiresAt: timestamp("expires_at", { mode: 'string' }).notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().notNull(),
+}, (table) => [
+	index("verification_identifier_idx").using("btree", table.identifier.asc().nullsLast().op("text_ops")),
+]);
+
 export const files = pgTable("files", {
 	id: char({ length: 26 }).primaryKey().notNull(),
 	filePath: varchar("file_path", { length: 255 }).notNull(),
@@ -169,6 +203,25 @@ export const areas = pgTable("areas", {
 	unique("areas_name_unique").on(table.name),
 ]);
 
+export const authSession = pgTable("auth_session", {
+	id: text().primaryKey().notNull(),
+	expiresAt: timestamp("expires_at", { mode: 'string' }).notNull(),
+	token: text().notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).notNull(),
+	ipAddress: text("ip_address"),
+	userAgent: text("user_agent"),
+	userId: text("user_id").notNull(),
+}, (table) => [
+	index("session_userId_idx").using("btree", table.userId.asc().nullsLast().op("text_ops")),
+	foreignKey({
+			columns: [table.userId],
+			foreignColumns: [authUser.id],
+			name: "auth_session_user_id_auth_user_id_fk"
+		}).onDelete("cascade"),
+	unique("auth_session_token_unique").on(table.token),
+]);
+
 export const pages = pgTable("pages", {
 	id: char({ length: 26 }).primaryKey().notNull(),
 	title: varchar({ length: 255 }).notNull(),
@@ -184,28 +237,37 @@ export const pages = pgTable("pages", {
 	unique("pages_slug_unique").on(table.slug),
 ]);
 
-export const banners = pgTable("banners", {
-	id: char({ length: 26 }).primaryKey().notNull(),
-	title: varchar({ length: 255 }),
-	subtitle: varchar({ length: 255 }),
-	filePath: varchar("file_path", { length: 255 }),
-	clickUrl: varchar("click_url", { length: 255 }),
-	ctaText: varchar("cta_text", { length: 255 }),
-	textColor: varchar("text_color", { length: 255 }).default('light').notNull(),
-	overlay: boolean().default(true).notNull(),
-	placement: varchar({ length: 255 }).notNull(),
-	orderPosition: integer("order_position").default(0).notNull(),
-	isActive: boolean("is_active").default(true).notNull(),
-	startDate: timestamp("start_date", { mode: 'string' }),
-	endDate: timestamp("end_date", { mode: 'string' }),
-	bannerableType: varchar("bannerable_type", { length: 255 }),
-	bannerableId: char("bannerable_id", { length: 26 }),
-	deletedAt: timestamp("deleted_at", { mode: 'string' }),
-	createdAt: timestamp("created_at", { mode: 'string' }),
-	updatedAt: timestamp("updated_at", { mode: 'string' }),
-	fieldSettings: json("field_settings"),
+export const authUser = pgTable("auth_user", {
+	id: text().primaryKey().notNull(),
+	name: text().notNull(),
+	email: text().notNull(),
+	emailVerified: boolean("email_verified").default(false).notNull(),
+	image: text(),
+	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().notNull(),
+	whatsapp: text(),
 }, (table) => [
-	index().using("btree", table.bannerableType.asc().nullsLast().op("text_ops"), table.bannerableId.asc().nullsLast().op("text_ops")),
+	unique("auth_user_email_unique").on(table.email),
+]);
+
+export const wishlists = pgTable("wishlists", {
+	id: text().primaryKey().notNull(),
+	userId: text("user_id").notNull(),
+	productId: text("product_id").notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
+}, (table) => [
+	index("wishlists_user_idx").using("btree", table.userId.asc().nullsLast().op("text_ops")),
+	foreignKey({
+			columns: [table.userId],
+			foreignColumns: [authUser.id],
+			name: "wishlists_user_id_auth_user_id_fk"
+		}).onDelete("cascade"),
+	foreignKey({
+			columns: [table.productId],
+			foreignColumns: [products.id],
+			name: "wishlists_product_id_products_id_fk"
+		}).onDelete("cascade"),
+	unique("wishlists_user_product_unique").on(table.userId, table.productId),
 ]);
 
 export const seoMetadata = pgTable("seo_metadata", {
@@ -237,6 +299,30 @@ export const inquiries = pgTable("inquiries", {
 	check("inquiries_status_check", sql`(status)::text = ANY ((ARRAY['new'::character varying, 'followed_up'::character varying, 'closed'::character varying])::text[])`),
 ]);
 
+export const banners = pgTable("banners", {
+	id: char({ length: 26 }).primaryKey().notNull(),
+	title: varchar({ length: 255 }),
+	subtitle: varchar({ length: 255 }),
+	filePath: varchar("file_path", { length: 255 }),
+	clickUrl: varchar("click_url", { length: 255 }),
+	ctaText: varchar("cta_text", { length: 255 }),
+	textColor: varchar("text_color", { length: 255 }).default('light').notNull(),
+	overlay: boolean().default(true).notNull(),
+	placement: varchar({ length: 255 }).notNull(),
+	orderPosition: integer("order_position").default(0).notNull(),
+	isActive: boolean("is_active").default(true).notNull(),
+	startDate: timestamp("start_date", { mode: 'string' }),
+	endDate: timestamp("end_date", { mode: 'string' }),
+	bannerableType: varchar("bannerable_type", { length: 255 }),
+	bannerableId: char("bannerable_id", { length: 26 }),
+	deletedAt: timestamp("deleted_at", { mode: 'string' }),
+	createdAt: timestamp("created_at", { mode: 'string' }),
+	updatedAt: timestamp("updated_at", { mode: 'string' }),
+	fieldSettings: json("field_settings"),
+}, (table) => [
+	index().using("btree", table.bannerableType.asc().nullsLast().op("text_ops"), table.bannerableId.asc().nullsLast().op("text_ops")),
+]);
+
 export const categories = pgTable("categories", {
 	id: char({ length: 26 }).primaryKey().notNull(),
 	name: varchar({ length: 255 }).notNull(),
@@ -253,6 +339,27 @@ export const categories = pgTable("categories", {
 	unique("categories_slug_unique").on(table.slug),
 ]);
 
+export const subCategories = pgTable("sub_categories", {
+	id: char({ length: 26 }).primaryKey().notNull(),
+	name: varchar({ length: 255 }).notNull(),
+	slug: varchar({ length: 255 }).notNull(),
+	categoryId: char("category_id", { length: 26 }),
+	orderIndex: integer("order_index").default(0).notNull(),
+	isActive: boolean("is_active").default(true).notNull(),
+	deletedAt: timestamp("deleted_at", { mode: 'string' }),
+	createdAt: timestamp("created_at", { mode: 'string' }),
+	updatedAt: timestamp("updated_at", { mode: 'string' }),
+	showInMenu: boolean("show_in_menu").default(true).notNull(),
+	description: varchar({ length: 255 }),
+}, (table) => [
+	foreignKey({
+			columns: [table.categoryId],
+			foreignColumns: [categories.id],
+			name: "sub_categories_category_id_foreign"
+		}).onDelete("set null"),
+	unique("sub_categories_slug_unique").on(table.slug),
+]);
+
 export const personalAccessTokens = pgTable("personal_access_tokens", {
 	id: bigserial({ mode: "bigint" }).primaryKey().notNull(),
 	tokenableType: varchar("tokenable_type", { length: 255 }).notNull(),
@@ -266,7 +373,7 @@ export const personalAccessTokens = pgTable("personal_access_tokens", {
 	updatedAt: timestamp("updated_at", { mode: 'string' }),
 }, (table) => [
 	index().using("btree", table.expiresAt.asc().nullsLast().op("timestamp_ops")),
-	index().using("btree", table.tokenableType.asc().nullsLast().op("bpchar_ops"), table.tokenableId.asc().nullsLast().op("bpchar_ops")),
+	index().using("btree", table.tokenableType.asc().nullsLast().op("text_ops"), table.tokenableId.asc().nullsLast().op("text_ops")),
 	unique("personal_access_tokens_token_unique").on(table.token),
 ]);
 
@@ -304,25 +411,32 @@ export const menuItems = pgTable("menu_items", {
 		}).onDelete("set null"),
 ]);
 
-export const subCategories = pgTable("sub_categories", {
+export const products = pgTable("products", {
 	id: char({ length: 26 }).primaryKey().notNull(),
 	name: varchar({ length: 255 }).notNull(),
 	slug: varchar({ length: 255 }).notNull(),
-	categoryId: char("category_id", { length: 26 }),
-	orderIndex: integer("order_index").default(0).notNull(),
+	code: varchar({ length: 255 }),
+	description: text(),
+	subCategoryId: char("sub_category_id", { length: 26 }).notNull(),
+	price: numeric({ precision: 12, scale:  2 }).default('0').notNull(),
+	weight: numeric({ precision: 9, scale:  2 }),
+	length: numeric({ precision: 9, scale:  2 }),
+	width: numeric({ precision: 9, scale:  2 }),
+	height: numeric({ precision: 9, scale:  2 }),
+	stock: integer().default(0).notNull(),
 	isActive: boolean("is_active").default(true).notNull(),
+	specValues: jsonb("spec_values"),
 	deletedAt: timestamp("deleted_at", { mode: 'string' }),
 	createdAt: timestamp("created_at", { mode: 'string' }),
 	updatedAt: timestamp("updated_at", { mode: 'string' }),
-	showInMenu: boolean("show_in_menu").default(true).notNull(),
-	description: varchar({ length: 255 }),
+	isLineup: boolean("is_lineup").default(false).notNull(),
 }, (table) => [
 	foreignKey({
-			columns: [table.categoryId],
-			foreignColumns: [categories.id],
-			name: "sub_categories_category_id_foreign"
-		}).onDelete("set null"),
-	unique("sub_categories_slug_unique").on(table.slug),
+			columns: [table.subCategoryId],
+			foreignColumns: [subCategories.id],
+			name: "products_sub_category_id_foreign"
+		}).onDelete("cascade"),
+	unique("products_slug_unique").on(table.slug),
 ]);
 
 export const productColors = pgTable("product_colors", {
@@ -360,34 +474,6 @@ export const permissions = pgTable("permissions", {
 	groupName: varchar("group_name", { length: 255 }),
 }, (table) => [
 	unique("permissions_name_guard_name_unique").on(table.name, table.guardName),
-]);
-
-export const products = pgTable("products", {
-	id: char({ length: 26 }).primaryKey().notNull(),
-	name: varchar({ length: 255 }).notNull(),
-	slug: varchar({ length: 255 }).notNull(),
-	code: varchar({ length: 255 }),
-	description: text(),
-	subCategoryId: char("sub_category_id", { length: 26 }).notNull(),
-	price: numeric({ precision: 12, scale:  2 }).default('0').notNull(),
-	weight: numeric({ precision: 9, scale:  2 }),
-	length: numeric({ precision: 9, scale:  2 }),
-	width: numeric({ precision: 9, scale:  2 }),
-	height: numeric({ precision: 9, scale:  2 }),
-	stock: integer().default(0).notNull(),
-	isActive: boolean("is_active").default(true).notNull(),
-	specValues: jsonb("spec_values"),
-	deletedAt: timestamp("deleted_at", { mode: 'string' }),
-	createdAt: timestamp("created_at", { mode: 'string' }),
-	updatedAt: timestamp("updated_at", { mode: 'string' }),
-	isLineup: boolean("is_lineup").default(false).notNull(),
-}, (table) => [
-	foreignKey({
-			columns: [table.subCategoryId],
-			foreignColumns: [subCategories.id],
-			name: "products_sub_category_id_foreign"
-		}).onDelete("cascade"),
-	unique("products_slug_unique").on(table.slug),
 ]);
 
 export const roleHasPermissions = pgTable("role_has_permissions", {

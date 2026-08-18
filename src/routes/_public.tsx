@@ -10,8 +10,7 @@ import Footer from "#/components/layout/Footer";
 import OverlayNav from "#/components/layout/OverlayNav";
 import Topbar from "#/components/layout/Topbar";
 import WhatsAppFloat from "#/components/layout/WhatsAppFloat";
-import { getBanners } from "#/server/cms";
-import { getCategories, getLayoutData } from "#/server/master";
+import { getLayoutData } from "#/server/master";
 import { useCartStore } from "#/stores/cart";
 import { useWishlistStore } from "#/stores/wishlist";
 import { AnimatePresence, LayoutGroup } from "motion/react";
@@ -22,12 +21,9 @@ import SplashScreen from "#/components/SplashScreen";
 import { PageNotFound } from "#/components/PageNotFound";
 
 export const Route = createFileRoute("/_public")({
-  loader: async ({ location }) => {
-    const [res, banners] = await Promise.all([
-      getLayoutData(),
-      getBanners({ data: { pathname: location.pathname } }),
-    ]);
-    return { menu: res.newMenus, contact: res.contact, banners };
+  loader: async () => {
+    const res = await getLayoutData();
+    return { menu: res.newMenus, contact: res.contact };
   },
   notFoundComponent: PageNotFound,
 
@@ -35,7 +31,7 @@ export const Route = createFileRoute("/_public")({
 });
 
 function PublicLayout() {
-  const { menu, contact, banners } = Route.useLoaderData();
+  const { menu, contact } = Route.useLoaderData();
   const router = useRouter();
   const pathname = useRouterState({
     select: (s) => s.location.pathname,
@@ -113,6 +109,7 @@ function PublicLayout() {
         scrolled={isScrolled}
         onMenuToggle={() => setMenuOpen((prev) => !prev)}
         onCartToggle={useCartStore((s) => s.toggleCart)}
+        contact={contact}
       />
       <OverlayNav
         open={menuOpen}

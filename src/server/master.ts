@@ -1,5 +1,15 @@
 import { createServerFn } from "@tanstack/react-start";
-import { and, asc, eq, ilike, inArray, isNull, or, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  eq,
+  ilike,
+  inArray,
+  isNull,
+  or,
+  sql,
+  type SQL,
+} from "drizzle-orm";
 import { z } from "zod";
 import { db } from "#/db";
 import {
@@ -12,6 +22,7 @@ import {
 import type { ContactSettings } from "#/types";
 import { batchFilesWithUrls } from "./files";
 import { safeSerialize } from "#/utils/fn";
+import { generatePresignedUrl } from "#/lib/minio";
 
 const siteSettingSchema = z.object({
   key: z.string(),
@@ -19,8 +30,9 @@ const siteSettingSchema = z.object({
 
 export const getLayoutData = createServerFn({ method: "GET" }).handler(
   async () => {
+    // 1. Jalankan query database secara paralel tanpa 'await' di dalam array
     const [allMenus, contactSettings] = await Promise.all([
-      await db.query.menus.findMany({
+      db.query.menus.findMany({
         orderBy: (menus, { asc }) => [asc(menus.id)],
         with: {
           menuItems: {
@@ -59,11 +71,12 @@ export const getLayoutData = createServerFn({ method: "GET" }).handler(
         },
       }),
 
-      await db.query.siteSettings.findFirst({
+      db.query.siteSettings.findFirst({
         where: eq(siteSettings.key, "contact"),
       }),
     ]);
 
+    // 2. Mapping menus & items
     const newMenus = allMenus.map((menu) => ({
       ...menu,
       menuItems: menu.menuItems.map((item) => {
@@ -76,7 +89,7 @@ export const getLayoutData = createServerFn({ method: "GET" }).handler(
               specTemplate: _,
               subCategories,
               ...catWithoutSpec
-            } = category;
+            } = category as typeof category & { specTemplate?: unknown };
             return { ...catWithoutSpec, subCategories };
           }
           return null;
@@ -86,9 +99,20 @@ export const getLayoutData = createServerFn({ method: "GET" }).handler(
       }),
     }));
 
+    // 3. Safe contact values & parallel presigned URL resolution
+    const contactVal = contactSettings?.value as ContactSettings;
+    const [logoUrl, logoDarkUrl] = await Promise.all([
+      contactVal.logo ? generatePresignedUrl(contactVal.logo) : null,
+      contactVal.logo_dark ? generatePresignedUrl(contactVal.logo_dark) : null,
+    ]);
+
     return {
       newMenus,
-      contact: (contactSettings?.value as ContactSettings) ?? null,
+      contact: {
+        ...contactVal,
+        logo: logoUrl,
+        logo_dark: logoDarkUrl,
+      },
     };
   },
 );
@@ -165,39 +189,63 @@ export const getSubCategoryBySlug = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const { slug, ...filters } = data;
 
+    const base = await db.query.subCategories.findFirst({
+      where: and(eq(subCategories.slug, slug), isNull(subCategories.deletedAt)),
+      columns: { id: true },
+      with: { category: { columns: { specTemplate: true } } },
+    });
+
+    if (!base) return null;
+
+    const specTemplate = (base.category?.specTemplate ?? []) as Array<{
+      key: string;
+      type?: string;
+    }>;
+    const textKeys = new Set(
+      specTemplate.filter((t) => t.type === "text").map((t) => t.key),
+    );
+
+    const filterConditions: SQL[] = [];
+
+    for (const [key, rawValue] of Object.entries(filters)) {
+      if (!rawValue) continue;
+
+      if (textKeys.has(key)) {
+        const pattern = `%${rawValue.trim()}%`;
+        filterConditions.push(sql`EXISTS (
+          SELECT 1 FROM jsonb_array_elements(${products.specValues}) AS elem
+          WHERE elem->>'key' = ${key} AND elem->>'value' ILIKE ${pattern}
+        )`);
+      } else {
+        const targetValues = rawValue
+          .split(",")
+          .map((v) => v.trim())
+          .filter(Boolean);
+
+        if (targetValues.length === 0) continue;
+
+        const valueConditions = targetValues.map((val) => {
+          const filterObject = JSON.stringify([
+            { key: String(key), value: String(val) },
+          ]);
+
+          return sql`${products.specValues} @> ${filterObject}::text::jsonb`;
+        });
+
+        filterConditions.push(sql`(${sql.join(valueConditions, sql` OR `)})`);
+      }
+    }
+
     const subCategory = await db.query.subCategories.findFirst({
       where: and(eq(subCategories.slug, slug), isNull(subCategories.deletedAt)),
       with: {
         products: {
-          where: (products, { and, eq }) => {
-            const conditions = [
-              and(eq(products.isActive, true), isNull(products.deletedAt)),
-            ];
-
-            for (const [key, rawValue] of Object.entries(filters)) {
-              if (!rawValue) continue;
-
-              const targetValues = rawValue
-                .split(",")
-                .map((v) => v.trim())
-                .filter(Boolean);
-
-              if (targetValues.length === 0) continue;
-
-              const valueConditions = targetValues.map((val) => {
-                // ▼ Struktur asli specValues pakai `value` (singular), bukan `values` (array)
-                const filterObject = JSON.stringify([
-                  { key: String(key), value: String(val) },
-                ]);
-
-                return sql`${products.specValues} @> ${filterObject}::text::jsonb`;
-              });
-
-              conditions.push(sql`(${sql.join(valueConditions, sql` OR `)})`);
-            }
-
-            return and(...conditions);
-          },
+          where: (products, { and, eq }) =>
+            and(
+              eq(products.isActive, true),
+              isNull(products.deletedAt),
+              ...filterConditions,
+            ),
           orderBy: asc(products.name),
         },
         category: true,
@@ -361,15 +409,18 @@ export const searchProducts = createServerFn({ method: "GET" })
     }));
   });
 
-const productSchema = z.object({
-  slug: z.string().min(1, "Slug wajib diisi"),
-});
-
 export const getProductByCategory = createServerFn({ method: "GET" })
-  .validator(productSchema)
+  .validator(
+    z.intersection(
+      z.object({ slug: z.string().min(1) }),
+      z.record(z.string(), z.string().optional()),
+    ),
+  )
   .handler(async ({ data }) => {
+    const { slug, ...filters } = data;
+
     const category = await db.query.categories.findFirst({
-      where: and(eq(categories.slug, data.slug), isNull(categories.deletedAt)),
+      where: and(eq(categories.slug, slug), isNull(categories.deletedAt)),
       with: { subCategories: { where: isNull(subCategories.deletedAt) } },
     });
 
@@ -379,11 +430,54 @@ export const getProductByCategory = createServerFn({ method: "GET" })
 
     const subCategoryIds = category.subCategories.map((s) => s.id);
 
-    // 2. Query products yang subCategoryId-nya cocok
+    const specTemplate = (category.specTemplate ?? []) as Array<{
+      key: string;
+      type?: string;
+    }>;
+    const textKeys = new Set(
+      specTemplate.filter((t) => t.type === "text").map((t) => t.key),
+    );
+
+    const filterConditions: SQL[] = [];
+
+    for (const [key, rawValue] of Object.entries(filters)) {
+      if (!rawValue) continue;
+
+      if (textKeys.has(key)) {
+        const pattern = `%${rawValue.trim()}%`;
+        filterConditions.push(sql`EXISTS (
+          SELECT 1 FROM jsonb_array_elements(${products.specValues}) AS elem
+          WHERE elem->>'key' = ${key} AND elem->>'value' ILIKE ${pattern}
+        )`);
+      } else {
+        const targetValues = rawValue
+          .split(",")
+          .map((v) => v.trim())
+          .filter(Boolean);
+
+        if (targetValues.length === 0) continue;
+
+        const valueConditions = targetValues.map((val) => {
+          const filterObject = JSON.stringify([
+            { key: String(key), value: String(val) },
+          ]);
+
+          return sql`${products.specValues} @> ${filterObject}::text::jsonb`;
+        });
+
+        filterConditions.push(sql`(${sql.join(valueConditions, sql` OR `)})`);
+      }
+    }
+
     const res = await db.query.products.findMany({
-      where: and(inArray(products.subCategoryId, subCategoryIds), isNull(products.deletedAt)),
+      where: and(
+        eq(products.isActive, true),
+        isNull(products.deletedAt),
+        inArray(products.subCategoryId, subCategoryIds),
+        ...filterConditions,
+      ),
       with: {
-        subCategory: true, // opsional: sertakan data subCategory jika butuh
+        subCategory: true,
       },
     });
 
@@ -395,6 +489,7 @@ export const getProductByCategory = createServerFn({ method: "GET" })
             data: { type: "product", ids: productIds },
           })
         : {};
+
     const response = {
       products: res.map((item) => ({
         ...item,
