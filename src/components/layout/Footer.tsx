@@ -26,6 +26,7 @@ export default function Footer({
 }) {
   const items = menu.find((m) => m.location === "footer")?.menuItems ?? [];
   const activeItems = items.filter((item) => item.isActive);
+  console.log(contact);
 
   return (
     <footer className="bg-[#0A0A0C] text-white pt-24 pb-10 px-6 md:px-16">

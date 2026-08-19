@@ -2,20 +2,22 @@ import { MaterialIcon } from "#/components/ui/MaterialIcon";
 import { Section } from "#/components/ui/Section";
 import { SectionLabel } from "#/components/ui/SectionLabel";
 import { cms } from "#/data/cms";
+import type { VideoProps } from "#/types";
 
-export default function VideoSection() {
-  const v = cms.video;
+export default function VideoSection({ video }: { video: VideoProps }) {
   return (
     <Section animate>
-      <SectionLabel>TONTON ALFA SCORPII</SectionLabel>
-      <h2
-        className="font-head font-bold text-2xl sm:text-3xl md:text-5xl tracking-tighter mb-10 max-w-2xl"
-        dangerouslySetInnerHTML={{ __html: v.title }}
-      />
+      <SectionLabel>
+        {video?.title ?? "Kenalan Lebih Dekat dengan Showroom Kami"}
+      </SectionLabel>
+      <h2 className="font-head font-bold text-2xl sm:text-3xl md:text-5xl tracking-tighter mb-10 max-w-2xl">
+        {video.subtitle ?? "TONTON ALFA SCORPII"}
+      </h2>
       <div className="relative w-full aspect-video bg-[#0A0A0C] overflow-hidden group cursor-pointer">
-        {v.embedUrl ? (
+        {video.embed_url ? (
           <iframe
-            src={v.embedUrl}
+            title="Video"
+            src={video.embed_url}
             className="absolute inset-0 w-full h-full border-0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
@@ -40,14 +42,18 @@ export default function VideoSection() {
                 <MaterialIcon name="play_arrow" className="!text-[34px]" />
               </div>
               <p className="text-white/50 text-[11px] tracking-widest text-center max-w-xs px-6">
-                {v.placeholderNote}
+                {
+                  "Video belum ditambahkan — isi embedUrl untuk menampilkan video."
+                }
               </p>
             </div>
           </>
         )}
       </div>
-      {v.caption && (
-        <p className="text-[13px] text-ash mt-4 max-w-lg">{v.caption}</p>
+      {video.description && (
+        <p className="text-[13px] text-ash mt-4 max-w-lg">
+          {video.description}
+        </p>
       )}
     </Section>
   );

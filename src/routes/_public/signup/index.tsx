@@ -25,7 +25,12 @@ function Signup() {
 
   // State untuk mengontrol Modal Privacy Policy
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
-
+  const privacyPolicyContent: string =
+    typeof res?.settings === "string"
+      ? res.settings
+      : typeof res?.settings?.["privacy-policy"] === "string"
+        ? (res.settings["privacy-policy"] as string)
+        : "";
   const [status, setStatus] = useState<{
     ok: boolean;
     text: string | null;
@@ -105,20 +110,28 @@ function Signup() {
           placeholder="Minimal 8 karakter"
           minLength={8}
         />
-        <label className="flex items-start gap-2 text-[12px] text-ash">
-          <input type="checkbox" required className="accent-blue mt-0.5" />
-          <span>
-            Saya menyetujui Syarat &amp; Ketentuan serta{" "}
-            <button
-              type="button"
-              onClick={() => setIsPrivacyModalOpen(true)}
-              className="text-blue underline font-semibold hover:text-blue-bright transition-colors"
-            >
-              Kebijakan Privasi
-            </button>
-            .
-          </span>
-        </label>
+        {privacyPolicyContent && (
+          <label className="flex items-start gap-2 text-[12px] text-ash cursor-pointer select-none">
+            <input
+              type="checkbox"
+              name="agree"
+              value="yes"
+              required
+              className="accent-blue mt-0.5"
+            />
+            <span>
+              Saya menyetujui Syarat &amp; Ketentuan serta{" "}
+              <button
+                type="button"
+                onClick={() => setIsPrivacyModalOpen(true)}
+                className="text-blue underline font-semibold hover:text-blue-bright transition-colors inline"
+              >
+                Kebijakan Privasi
+              </button>
+              .
+            </span>
+          </label>
+        )}
         <Button type="submit" disabled={loading}>
           {loading ? "MEMPROSES..." : "DAFTAR AKUN"}
         </Button>

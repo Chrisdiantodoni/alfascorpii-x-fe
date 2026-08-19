@@ -1,7 +1,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Suspense } from "react";
-import Faq from "#/components/sections/Faq";
+import Faq, { type FaqProps } from "#/components/sections/Faq";
 import FeaturedCarousel from "#/components/sections/FeaturedCarousel";
 import InquiryForm from "#/components/sections/InquiryForm";
 import MessageGallery from "#/components/sections/MessageGallery";
@@ -17,25 +17,26 @@ import { getBanners } from "#/server/cms";
 import { getCategories, getSiteSettings } from "#/server/master";
 import { getSocialFeeds } from "#/server/socials";
 import { BannerCarousel } from "#/components/ui/BannerCarousel";
+import type { VideoProps } from "#/types";
 
 export const Route = createFileRoute("/_public/")({
   component: Home,
   loader: async ({ location }) => {
     const [banners, { settings }, { categories }] = await Promise.all([
       getBanners({ data: { pathname: location.pathname } }),
-      getSiteSettings({ data: { key: "faqs" } }),
+      getSiteSettings({ data: { key: ["faqs", "video"] } }),
       getCategories(),
     ]);
     return {
       banners,
-      faqs: settings,
+      settings,
       categories,
     };
   },
 });
 
 function Home() {
-  const { banners, faqs, categories } = Route.useLoaderData();
+  const { banners, settings, categories } = Route.useLoaderData();
 
   return (
     <>
@@ -74,13 +75,15 @@ function Home() {
       <Suspense fallback={<SkeletonGrid cols={3} itemHeight={320} />}>
         <SocialsSection />
       </Suspense>
-      <VideoSection />
+      <VideoSection video={settings.video as unknown as VideoProps} />
       <BannerCarousel
         banners={banners.bottom as Banner[]}
         className="-mx-6 md:-mx-16"
       />
       <InquiryForm />
-      {faqs && <Faq faqs={faqs} />}
+      {Array.isArray(settings?.faqs) && (
+        <Faq faqs={settings.faqs as unknown as FaqProps[]} />
+      )}
     </>
   );
 }

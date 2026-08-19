@@ -30,10 +30,10 @@ function MagneticLink({ platform, url }: { platform: string; url: string }) {
       rel="noopener noreferrer"
       animate={{ x: position.x, y: position.y }}
       transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
-      className="relative px-4 py-2 text-[12px] tracking-widest text-white/60 hover:text-white transition-colors group"
+      className="relative px-4 py-2 text-[12px] tracking-widest text-white bg-ink-2 rounded-full transition-colors group"
     >
-      <span className="relative z-10 flex items-center gap-1.5">
-        <span className="inline-block w-1.5 h-1.5 rounded-full bg-white/20 group-hover:bg-blue-bright group-hover:scale-125 transition-all duration-300" />
+      <span className="uppercase relative z-10 flex items-center gap-1.5">
+        <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-bright transition-all duration-300" />
         {platform}
       </span>
       <span className="absolute inset-0 rounded-lg bg-white/5 scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300" />
@@ -142,12 +142,19 @@ export default function OverlayNav({
                     e.stopPropagation();
                     setExpandedId((prev) => (prev === "toko" ? null : "toko"));
                   }}
-                  className={`text-[26px] font-light transition-transform duration-250 w-12 h-12 flex items-center justify-end md:group-hover:rotate-45 md:group-hover:text-blue-bright ${
-                    expandedId === "toko" ? "rotate-45 text-blue-bright" : ""
-                  }`}
+                  className="w-12 h-12 flex items-center justify-end group/btn cursor-pointer"
                   aria-label="Toggle dropdown"
                 >
-                  +
+                  {/* Bungkus '+' dengan span ber-transform */}
+                  <span
+                    className={`text-[26px] font-light leading-none inline-flex items-center justify-center transition-all duration-300 transform origin-center md:group-hover:rotate-45 md:group-hover:text-blue-bright ${
+                      expandedId === "toko"
+                        ? "rotate-45 text-blue-bright"
+                        : "text-white/80"
+                    }`}
+                  >
+                    +
+                  </span>
                 </button>
               )}
             </div>
@@ -158,7 +165,7 @@ export default function OverlayNav({
                 }`}
               >
                 {/* Diperbarui agar layout & isinya (termasuk list produk) persis seperti kategori dinamis di bawahnya */}
-                <div className="pb-6 pl-0 md:pl-16 flex flex-col gap-8">
+                <div className="pb-6 pl-8 md:pl-16 flex flex-col gap-8">
                   {categories.map((cat) => (
                     <div key={cat.id}>
                       <Link

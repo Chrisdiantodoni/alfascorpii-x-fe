@@ -4,10 +4,11 @@ import type { auth } from "./auth";
 
 export const authClient = createAuthClient({
   /** The base URL of the server (optional if you're using the same domain) */
-  baseURL: import.meta.env.VITE_BETTER_AUTH_URL || "http://localhost:3000",
+  baseURL:
+    import.meta.env.VITE_BETTER_AUTH_URL ||
+    process.env.BETTER_AUTH_URL ||
+    "http://localhost:3000",
   plugins: [inferAdditionalFields<typeof auth>()],
 });
-
-console.log(import.meta.env.VITE_BETTER_AUTH_URL, "better auth");
 
 export const { signUp, signIn, signOut, useSession } = authClient;
