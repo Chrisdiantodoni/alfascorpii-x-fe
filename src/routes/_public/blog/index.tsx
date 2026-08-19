@@ -163,10 +163,10 @@ function Blog() {
         top={banners.top as Banner[]}
       />
       <PageHeader
-        subtitle={page.settings.subtitle ?? "EDITORIAL &amp; INSIGHT"}
-        title={page.settings.title ?? "BLOG"}
+        subtitle={page?.blog_page?.subtitle ?? "EDITORIAL INSIGHT"}
+        title={page?.blog_page?.title ?? "BLOG"}
         description={
-          page.settings.description ??
+          page?.blog_page?.description ??
           "Tips perawatan, teknologi terbaru, dan info promo langsung dari tim Alfa Scorpii X."
         }
       />

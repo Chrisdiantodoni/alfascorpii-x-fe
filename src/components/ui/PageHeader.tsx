@@ -21,7 +21,7 @@ export default function PageHeader({
 
   return (
     <section
-      className={`relative flex flex-col justify-center overflow-hidden py-12 md:pt-32 ${
+      className={`relative flex flex-col justify-center overflow-hidden py-12 pt-32 ${
         isCenter ? "items-center text-center" : "items-start text-left"
       } ${className}`}
     >
