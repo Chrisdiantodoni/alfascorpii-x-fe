@@ -14,9 +14,10 @@ import { Section } from "#/components/ui/Section";
 import { SectionHeading } from "#/components/ui/SectionHeading";
 import { StaggerItem } from "#/components/ui/StaggerItem";
 import { MaterialIcon } from "#/components/ui/MaterialIcon";
-import { getBanners } from "#/server/cms";
+import { getBanners, getPages } from "#/server/cms";
 import {
   getAllProducts,
+  getSiteSettings,
   getSubCategories,
   searchProducts,
 } from "#/server/master";
@@ -31,19 +32,22 @@ import "swiper/css";
 import "swiper/css/effect-fade";
 import "swiper/css/pagination";
 import { SwiperContainer } from "#/components/ui/SwiperContainer";
+import PageHeader from "#/components/ui/PageHeader";
 
 export const Route = createFileRoute("/_public/store/")({
   component: Store,
   loader: async ({ location }) => {
-    const [banners, subCategories, products] = await Promise.all([
+    const [banners, subCategories, products, page] = await Promise.all([
       getBanners({ data: { pathname: location.pathname } }),
       getSubCategories(),
       getAllProducts({ data: { is_lineup: true } }),
+      getSiteSettings({ data: { key: "store_page" } }),
     ]);
     return {
       banners,
       subCategories,
       products,
+      page,
     };
   },
 });
@@ -189,7 +193,9 @@ function SubCategoryBannerCarousel({ subs }: { subs: SubCategory[] }) {
 }
 
 function Store() {
-  const { banners, subCategories, products } = Route.useLoaderData();
+  const { banners, subCategories, products, page } = Route.useLoaderData();
+
+  console.log(page);
 
   const grouped = new Map<
     string,
@@ -216,7 +222,16 @@ function Store() {
         hero={banners.hero as Banner[]}
         top={banners.top as Banner[]}
       />
-      <section className="min-h-[40vh] flex flex-col justify-center pt-32 pb-12">
+      <PageHeader
+        subtitle={page.settings.subtitle ?? "Store Alfa Scorpii X"}
+        title={page.settings.title ?? "Spareparts & Sepeda Motor"}
+        badgeAccent={false}
+        description={
+          page.settings.description ??
+          "Semua yang Anda butuhkan dalam satu tempat — motor Yamaha resmi dan sparepart original."
+        }
+      />
+      {/*<section className="min-h-[40vh] flex flex-col justify-center pt-32 pb-12">
         <span className="text-[12px] tracking-[0.25em] text-blue-bright font-semibold mb-6">
           SEPEDA MOTOR &amp; SPAREPARTS
         </span>
@@ -229,7 +244,7 @@ function Store() {
           Semua yang Anda butuhkan dalam satu tempat — motor Yamaha resmi dan
           sparepart original, lengkap dengan diskon 10%.
         </p>
-      </section>
+      </section>*/}
 
       <Section className="!pt-0 !pb-8 border-none">
         <SearchBar

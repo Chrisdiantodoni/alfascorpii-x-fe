@@ -22,7 +22,7 @@ export interface FileData {
 
 export interface SubCategory {
   id: string;
-  categoryId: string | null;
+  categoryId: string;
   name: string;
   slug: string;
 

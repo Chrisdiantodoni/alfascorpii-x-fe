@@ -73,7 +73,9 @@ export const Route = createFileRoute("/_public/category/$slug")({
 
 function CategoryPage() {
   const { slug } = Route.useParams();
-  const { res }: {
+  const {
+    res,
+  }: {
     res: {
       categories: Category;
       products: FeaturedProduct[];
@@ -88,6 +90,8 @@ function CategoryPage() {
   const hasSidebar =
     Array.isArray(res?.categories?.specTemplate) &&
     res.categories.specTemplate.length > 0;
+
+  console.log(res.categories.specTemplate);
 
   return (
     <>

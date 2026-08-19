@@ -295,3 +295,15 @@ html:not([data-splash-seen="1"]) .splash-content {
     transition: none;
   }
 }
+
+/* Number filters — hide native up/down arrows, numeric input only */
+.no-spinner::-webkit-outer-spin-button,
+.no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.no-spinner {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}

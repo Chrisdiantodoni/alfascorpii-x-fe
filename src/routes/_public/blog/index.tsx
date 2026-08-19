@@ -12,6 +12,8 @@ import { StaggerItem } from "#/components/ui/StaggerItem";
 import { StaggerList } from "#/components/ui/StaggerList";
 import { getBanners, getBlogs } from "#/server/cms";
 import { motion } from "motion/react";
+import PageHeader from "#/components/ui/PageHeader";
+import { bannerQueryOptions, blogSettingsQueryOptions } from "#/queries/cms";
 
 const pageSize = 6;
 
@@ -29,15 +31,16 @@ export const Route = createFileRoute("/_public/blog/")({
   loaderDeps: ({ search }) => ({
     slug: search.slug,
   }),
-  loader: async ({ deps }) => {
-    const [banners, res] = await Promise.all([
-      getBanners({ data: { pathname: "/blog" } }),
+  loader: async ({ deps, context }) => {
+    const [res] = await Promise.all([
+      // getBanners({ data: { pathname: "/blog" } }),
       getBlogs({ data: { slug: deps.slug } }),
+      context.queryClient.ensureQueryData(bannerQueryOptions("/blog")),
+      context.queryClient.ensureQueryData(blogSettingsQueryOptions()),
     ]);
 
     return {
       res,
-      banners,
     };
   },
 });
@@ -97,7 +100,9 @@ function AnimatedTabsLocal({
 }
 
 function Blog() {
-  const { res, banners } = Route.useLoaderData();
+  const { res } = Route.useLoaderData();
+  const { data: banners } = useSuspenseQuery(bannerQueryOptions("/blog"));
+  const { data: page } = useSuspenseQuery(blogSettingsQueryOptions());
 
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
@@ -157,8 +162,15 @@ function Blog() {
         hero={banners.hero as Banner[]}
         top={banners.top as Banner[]}
       />
-
-      <section className="min-h-[40vh] flex flex-col justify-center pt-24 pb-8">
+      <PageHeader
+        subtitle={page.settings.subtitle ?? "EDITORIAL &amp; INSIGHT"}
+        title={page.settings.title ?? "BLOG"}
+        description={
+          page.settings.description ??
+          "Tips perawatan, teknologi terbaru, dan info promo langsung dari tim Alfa Scorpii X."
+        }
+      />
+      {/*<section className="min-h-[40vh] flex flex-col justify-center pt-24 pb-8">
         <span className="text-[12px] tracking-[0.25em] text-blue-bright font-semibold mb-4">
           EDITORIAL &amp; INSIGHT
         </span>
@@ -169,7 +181,7 @@ function Blog() {
           Tips perawatan, teknologi terbaru, dan info promo langsung dari tim
           Alfa Scorpii X.
         </p>
-      </section>
+      </section>*/}
 
       <BannerCarousel
         banners={banners.middle as Banner[]}
