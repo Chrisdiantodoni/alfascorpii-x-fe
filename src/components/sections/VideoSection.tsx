@@ -11,7 +11,7 @@ export default function VideoSection({ video }: { video: VideoProps }) {
         {video?.title ?? "Kenalan Lebih Dekat dengan Showroom Kami"}
       </SectionLabel>
       <h2 className="font-head font-bold text-2xl sm:text-3xl md:text-5xl tracking-tighter mb-10 max-w-2xl">
-        {video.subtitle ?? "TONTON ALFA SCORPII"}
+        {video?.subtitle ?? "TONTON ALFA SCORPII"}
       </h2>
       <div className="relative w-full aspect-video bg-[#0A0A0C] overflow-hidden group cursor-pointer">
         {video.embed_url ? (
