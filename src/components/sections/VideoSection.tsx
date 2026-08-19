@@ -14,10 +14,10 @@ export default function VideoSection({ video }: { video: VideoProps }) {
         {video?.subtitle ?? "TONTON ALFA SCORPII"}
       </h2>
       <div className="relative w-full aspect-video bg-[#0A0A0C] overflow-hidden group cursor-pointer">
-        {video.embed_url ? (
+        {video?.embed_url ? (
           <iframe
             title="Video"
-            src={video.embed_url}
+            src={video?.embed_url}
             className="absolute inset-0 w-full h-full border-0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
@@ -50,9 +50,9 @@ export default function VideoSection({ video }: { video: VideoProps }) {
           </>
         )}
       </div>
-      {video.description && (
+      {video?.description && (
         <p className="text-[13px] text-ash mt-4 max-w-lg">
-          {video.description}
+          {video?.description}
         </p>
       )}
     </Section>
