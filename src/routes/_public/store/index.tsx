@@ -47,7 +47,7 @@ export const Route = createFileRoute("/_public/store/")({
       banners,
       subCategories,
       products,
-      page: page?.store_page,
+      page: page.settings,
     };
   },
 });
@@ -222,11 +222,11 @@ function Store() {
         top={banners.top as Banner[]}
       />
       <PageHeader
-        subtitle={page?.subtitle ?? "Store Alfa Scorpii X"}
-        title={page?.title ?? "Spareparts & Sepeda Motor"}
+        subtitle={page?.store_page?.subtitle ?? "Store Alfa Scorpii X"}
+        title={page?.store_page?.title ?? "Spareparts & Sepeda Motor"}
         badgeAccent={false}
         description={
-          page?.description ??
+          page?.store_page?.description ??
           "Semua yang Anda butuhkan dalam satu tempat — motor Yamaha resmi dan sparepart original."
         }
       />

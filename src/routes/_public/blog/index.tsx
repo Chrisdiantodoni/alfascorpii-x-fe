@@ -102,7 +102,13 @@ function AnimatedTabsLocal({
 function Blog() {
   const { res } = Route.useLoaderData();
   const { data: banners } = useSuspenseQuery(bannerQueryOptions("/blog"));
-  const { data: page } = useSuspenseQuery(blogSettingsQueryOptions());
+  const {
+    data: {
+      settings: { blog_page: page },
+    },
+  } = useSuspenseQuery(blogSettingsQueryOptions());
+
+  console.log({ page });
 
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
@@ -163,10 +169,10 @@ function Blog() {
         top={banners.top as Banner[]}
       />
       <PageHeader
-        subtitle={page?.blog_page?.subtitle ?? "EDITORIAL INSIGHT"}
-        title={page?.blog_page?.title ?? "BLOG"}
+        subtitle={page?.subtitle ?? "EDITORIAL INSIGHT"}
+        title={page?.title ?? "BLOG"}
         description={
-          page?.blog_page?.description ??
+          page?.description ??
           "Tips perawatan, teknologi terbaru, dan info promo langsung dari tim Alfa Scorpii X."
         }
       />
