@@ -14,6 +14,7 @@ import { getBanners, getBlogs } from "#/server/cms";
 import { motion } from "motion/react";
 import PageHeader from "#/components/ui/PageHeader";
 import { bannerQueryOptions, blogSettingsQueryOptions } from "#/queries/cms";
+import { AnimatedRoute } from "#/components/AnimatedRoute";
 
 const pageSize = 6;
 
@@ -163,20 +164,21 @@ function Blog() {
   ];
 
   return (
-    <Suspense fallback={<SkeletonGrid cols={3} itemHeight={320} />}>
-      <PageBanner
-        hero={banners.hero as Banner[]}
-        top={banners.top as Banner[]}
-      />
-      <PageHeader
-        subtitle={page?.subtitle ?? "EDITORIAL INSIGHT"}
-        title={page?.title ?? "BLOG"}
-        description={
-          page?.description ??
-          "Tips perawatan, teknologi terbaru, dan info promo langsung dari tim Alfa Scorpii X."
-        }
-      />
-      {/*<section className="min-h-[40vh] flex flex-col justify-center pt-24 pb-8">
+    <AnimatedRoute variant="slide">
+      <Suspense fallback={<SkeletonGrid cols={3} itemHeight={320} />}>
+        <PageBanner
+          hero={banners.hero as Banner[]}
+          top={banners.top as Banner[]}
+        />
+        <PageHeader
+          subtitle={page?.subtitle ?? "EDITORIAL INSIGHT"}
+          title={page?.title ?? "BLOG"}
+          description={
+            page?.description ??
+            "Tips perawatan, teknologi terbaru, dan info promo langsung dari tim Alfa Scorpii X."
+          }
+        />
+        {/*<section className="min-h-[40vh] flex flex-col justify-center pt-24 pb-8">
         <span className="text-[12px] tracking-[0.25em] text-blue-bright font-semibold mb-4">
           EDITORIAL &amp; INSIGHT
         </span>
@@ -189,14 +191,14 @@ function Blog() {
         </p>
       </section>*/}
 
-      <BannerCarousel
-        banners={banners.middle as Banner[]}
-        className="-mx-6 md:-mx-16"
-      />
+        <BannerCarousel
+          banners={banners.middle as Banner[]}
+          className="-mx-6 md:-mx-16"
+        />
 
-      {/* Filter Buttons Section */}
-      <section className="py-8 border-t border-line flex flex-wrap gap-3">
-        {/*<button
+        {/* Filter Buttons Section */}
+        <section className="py-8 border-t border-line flex flex-wrap gap-3">
+          {/*<button
           type="button"
           onClick={() => handleFilterChange()}
           className={`px-5 py-2 text-[12px] font-semibold tracking-widest transition-colors ${
@@ -222,46 +224,47 @@ function Blog() {
             {cat.name.toUpperCase()}
           </button>
         ))}*/}
-        <AnimatedTabsLocal
-          items={tabItems}
-          currentValue={currentSlug} // Gunakan currentSlug, bukan currentCategory
-          onChange={handleFilterChange}
+          <AnimatedTabsLocal
+            items={tabItems}
+            currentValue={currentSlug} // Gunakan currentSlug, bukan currentCategory
+            onChange={handleFilterChange}
+          />
+        </section>
+
+        {/* Posts Grid */}
+        {posts.length > 0 ? (
+          <StaggerList
+            key={currentSlug}
+            className="py-12 grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-14"
+          >
+            {posts.slice(0, shown).map((post) => (
+              <StaggerItem key={post.id}>
+                <BlogCard post={post} />
+              </StaggerItem>
+            ))}
+          </StaggerList>
+        ) : null}
+
+        {/* Sentinel Infinite Scroll / Status Info */}
+        <div ref={sentinelRef} className="flex justify-center py-10">
+          {posts.length === 0 ? (
+            <span className="text-[12px] tracking-[.08em] text-[#9CA3AF]">
+              Belum ada artikel di kategori ini.
+            </span>
+          ) : shown >= posts.length ? (
+            <span className="text-[12px] tracking-[.08em] text-[#9CA3AF]">
+              SEMUA ARTIKEL SUDAH DITAMPILKAN
+            </span>
+          ) : (
+            <div className="w-5 h-5 border-2 border-line border-t-blue-bright rounded-full animate-spin" />
+          )}
+        </div>
+
+        <BannerCarousel
+          banners={banners.bottom as Banner[]}
+          className="-mx-6 md:-mx-16"
         />
-      </section>
-
-      {/* Posts Grid */}
-      {posts.length > 0 ? (
-        <StaggerList
-          key={currentSlug}
-          className="py-12 grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-14"
-        >
-          {posts.slice(0, shown).map((post) => (
-            <StaggerItem key={post.id}>
-              <BlogCard post={post} />
-            </StaggerItem>
-          ))}
-        </StaggerList>
-      ) : null}
-
-      {/* Sentinel Infinite Scroll / Status Info */}
-      <div ref={sentinelRef} className="flex justify-center py-10">
-        {posts.length === 0 ? (
-          <span className="text-[12px] tracking-[.08em] text-[#9CA3AF]">
-            Belum ada artikel di kategori ini.
-          </span>
-        ) : shown >= posts.length ? (
-          <span className="text-[12px] tracking-[.08em] text-[#9CA3AF]">
-            SEMUA ARTIKEL SUDAH DITAMPILKAN
-          </span>
-        ) : (
-          <div className="w-5 h-5 border-2 border-line border-t-blue-bright rounded-full animate-spin" />
-        )}
-      </div>
-
-      <BannerCarousel
-        banners={banners.bottom as Banner[]}
-        className="-mx-6 md:-mx-16"
-      />
-    </Suspense>
+      </Suspense>
+    </AnimatedRoute>
   );
 }
