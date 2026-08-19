@@ -133,7 +133,7 @@ export const getSiteSettings = createServerFn({ method: "GET" })
       where: inArray(siteSettings.key, key),
     });
 
-    const settingsMap = records.reduce<Record<string, JsonValue>>(
+    const settingsMap = records?.reduce<Record<string, JsonValue>>(
       (acc, item) => {
         let value: JsonValue = item.value as JsonValue;
 
