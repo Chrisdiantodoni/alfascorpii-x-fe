@@ -22,6 +22,7 @@ import {
   searchProducts,
 } from "#/server/master";
 import { formatRupiah } from "#/utils/fn";
+import { SharedElement } from "#/components/SharedElements";
 import { AnimatedRoute } from "#/components/AnimatedRoute";
 import type { Category, SubCategory } from "#/types";
 import { Image } from "#/components/ui/Image";
@@ -294,16 +295,18 @@ function Store() {
               const thumb = item.files?.find((f) => f.role === "thumbnail");
               return (
                 <StaggerItem key={item.id}>
-                  <MiniProductCard
-                    slug={item.slug}
-                    badge={item.subCategory?.name?.toUpperCase()}
-                    name={item.name}
-                    imageUrl={thumb?.url}
-                    detail={item.subCategory.name}
-                    price={formatRupiah(Number(item.price))}
-                    href={`/product/${item.slug}`}
-                    productId={item.id}
-                  />
+                  <SharedElement layoutId={`category-card-${item.slug}`}>
+                    <MiniProductCard
+                      slug={item.slug}
+                      badge={item.code}
+                      name={item.name}
+                      imageUrl={thumb?.url}
+                      detail={item.subCategory.name}
+                      price={formatRupiah(Number(item.price))}
+                      href={`/product/${item.slug}`}
+                      productId={item.id}
+                    />
+                  </SharedElement>
                 </StaggerItem>
               );
             })}

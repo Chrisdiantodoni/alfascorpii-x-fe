@@ -164,9 +164,16 @@ function SubCategoryPage() {
                 {products.map((p) => {
                   const props = mapToMiniCard(p as unknown as FeaturedProduct);
                   return (
-                    <div key={p.id}>
+                    <SharedElement
+                      key={p.id}
+                      layoutId={`category-card-${p.slug}`}
+                      transition={{
+                        duration: 0.45,
+                        ease: [0.32, 0.72, 0, 1],
+                      }}
+                    >
                       <MiniProductCard {...props} />
-                    </div>
+                    </SharedElement>
                   );
                 })}
               </div>

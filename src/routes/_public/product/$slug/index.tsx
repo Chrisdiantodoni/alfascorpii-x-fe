@@ -175,6 +175,11 @@ function ProductDetail() {
         <Link
           resetScroll={false}
           to={backTo}
+          state={(prev) => ({
+            ...prev,
+            from: backTo,
+            returnFromProduct: true,
+          })}
           className="inline-flex items-center gap-2 text-[11px] tracking-widest text-ash hover:text-blue transition-colors"
         >
           <MaterialIcon name="arrow_back" className="!text-[16px]" />
