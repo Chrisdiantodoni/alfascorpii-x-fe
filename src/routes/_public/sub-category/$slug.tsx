@@ -17,6 +17,7 @@ import { bannerQueryOptions } from "#/queries/cms";
 import { getSubCategoryBySlug } from "#/server/master";
 import type { Category, FeaturedProduct, SubCategory } from "#/types";
 import { formatRupiah } from "#/utils/fn";
+import { AnimatedRoute } from "#/components/AnimatedRoute";
 
 function mapToMiniCard(product: FeaturedProduct) {
   const type = product.subCategory?.name?.toLowerCase() || "";
@@ -121,7 +122,7 @@ function SubCategoryPage() {
   };
 
   return (
-    <>
+    <AnimatedRoute variant="slide">
       <PageBanner hero={banners.hero} top={banners.top} />
       <section
         className={`${banners.hero.length > 0 || banners.top.length > 0 ? "pt-18 " : "pt-32 lg:pt-28"} pb-8`}
@@ -190,6 +191,6 @@ function SubCategoryPage() {
         </div>
       </Section>
       <BannerCarousel banners={banners.bottom} className="-mx-6 md:-mx-16" />
-    </>
+    </AnimatedRoute>
   );
 }
