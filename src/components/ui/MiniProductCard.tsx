@@ -37,7 +37,7 @@ export function MiniProductCard({
   // - Aktif jika href menuju ke product DANKELUAR dari status disableLayoutId
   const shouldAnimate = isTargetingProduct && !disableLayoutId;
   return (
-    <div className="group relative border border-line bg-paper hover:border-ink hover:shadow-md transition-all duration-300 ease-out flex flex-col h-full overflow-hidden focus-within:ring-2 focus-within:ring-blue focus-within:ring-offset-1 rounded-sm">
+    <div className="group relative border border-line bg-paper hover:border-blue hover:shadow-md transition-all duration-300 ease-out flex flex-col h-full overflow-hidden focus-within:ring-2 focus-within:ring-blue focus-within:ring-offset-1 rounded-sm">
       {/* Full-card overlay link ke detail produk */}
       <Link
         resetScroll={false}
@@ -54,7 +54,7 @@ export function MiniProductCard({
         {/* Container Gambar Produk */}
         <div className="aspect-[4/3] bg-paper-dim/50 relative overflow-hidden flex items-center justify-center">
           {badge && (
-            <span className="absolute top-3 left-3 z-20 max-w-[70%] truncate text-[10px] font-semibold tracking-wider px-2 py-0.5 bg-paper-dim/80 text-ash uppercase select-none">
+            <span className="absolute top-3 left-3 z-20 max-w-[70%] truncate text-[10px] font-bold tracking-widest px-2.5 py-1 bg-ink/80 text-paper rounded-[2px] uppercase backdrop-blur-md border border-white/10 shadow-sm select-none">
               {badge}
             </span>
           )}
@@ -73,12 +73,12 @@ export function MiniProductCard({
                   alt={name}
                   width={400}
                   height={300}
-                  className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 ease-out"
+                  className="w-full h-full object-contain"
                 />
               ) : icon ? (
                 <MaterialIcon
                   name={icon}
-                  className="!text-[60px] text-blue/30 group-hover:text-blue/70 group-hover:scale-110 transition-all duration-500 select-none"
+                  className="!text-[60px] text-blue/30 select-none"
                 />
               ) : null}
             </div>
