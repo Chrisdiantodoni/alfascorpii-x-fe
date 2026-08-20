@@ -286,3 +286,11 @@ export const getPages = createServerFn({ method: "GET" })
       // bersihkan agar serializable dan bebas error TypeScript:
     };
   });
+
+const markdownImagesSchema = z.object({
+  paths: z.array(z.string()).max(50),
+});
+
+export const getMarkdownPresignedUrls = createServerFn({ method: "POST" })
+  .validator(markdownImagesSchema)
+  .handler(async ({ data }) => generatePresignedUrls(data.paths));
