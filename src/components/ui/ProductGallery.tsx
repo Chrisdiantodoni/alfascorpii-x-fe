@@ -128,7 +128,7 @@ export function ProductGallery({ files, productName }: ProductGalleryProps) {
                   alt={`${productName} ${i + 1}`}
                   width={800}
                   height={800}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
               </div>
             </SwiperSlide>

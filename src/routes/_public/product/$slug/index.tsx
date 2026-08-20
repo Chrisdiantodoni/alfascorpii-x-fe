@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useLocation } from "@tanstack/react-router";
 import { Check } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import type { ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { PageBanner } from "#/components/PageBanner";
 import { SharedElement } from "#/components/SharedElements";
 import { ProductDetailSkeleton } from "#/components/skeleton/ProductDetailSkeleton";
@@ -15,6 +16,8 @@ import { getBanners } from "#/server/cms";
 import { getProductDetail } from "#/server/master";
 import { type CartColor, lineId, useCartStore } from "#/stores/cart";
 import { formatRupiah } from "#/utils/fn";
+import type { BannerProps } from "#/types";
+import type { Banner } from "#/components/ui/BannerSlide";
 
 export const Route = createFileRoute("/_public/product/$slug/")({
   component: ProductDetail,
@@ -68,6 +71,29 @@ function ProductDetail() {
     };
   }, []);
 
+  interface SpecRow {
+    key: string;
+    label?: string;
+    value: string | number;
+    group?: string;
+  }
+
+  const specRows = Array.isArray(data.specValues)
+    ? (data.specValues as SpecRow[])
+    : null;
+
+  const specGroups = useMemo(() => {
+    if (!specRows || specRows.length === 0) return null;
+    const map = new Map<string, SpecRow[]>();
+    for (const spec of specRows) {
+      const group = spec.group || "Lainnya";
+      const list = map.get(group) ?? [];
+      list.push(spec);
+      map.set(group, list);
+    }
+    return [...map.entries()];
+  }, [specRows]);
+
   const handleAddToCart = () => {
     if (justAdded || !("id" in data)) return;
     addItem({
@@ -106,11 +132,39 @@ function ProductDetail() {
 
   const backTo = (location.state as { from?: string })?.from || "/store";
 
+  const mapToBanners = (
+    items: Array<{ url: string | null; role: string }>,
+    targetRole: string,
+  ): Banner[] => {
+    return items
+      .filter(
+        (f): f is { url: string; role: string } =>
+          f.role === targetRole && Boolean(f.url),
+      )
+      .map((f, index) => ({
+        id: `${targetRole}-${index}`,
+        title: null,
+        subtitle: null,
+        imageUrl: f.url,
+        clickUrl: null,
+        ctaText: null,
+        textColor: "light",
+        overlay: false,
+        placement: targetRole,
+        orderPosition: index,
+        isActive: true,
+        startDate: null,
+        endDate: null,
+        fieldSettings: null,
+      }));
+  };
+
+  // 2. Gunakan di dalam komponen ProductDetail
   const banners = {
-    hero: files.filter((find) => find.role === "top_banner"),
-    top: [],
-    middle: files.filter((find) => find.role === "middle_baner"),
-    bottom: files.filter((find) => find.role === "bottom_banner"),
+    hero: mapToBanners(files, "top_banners"),
+    top: [] as Banner[],
+    middle: mapToBanners(files, "middle_banners"), // Typo 'middle_baners' diperbaiki
+    bottom: mapToBanners(files, "bottom_banners"),
   };
 
   return (
@@ -271,36 +325,32 @@ function ProductDetail() {
             </Button>
           )}
           {data.specValues &&
-            (Array.isArray(data.specValues)
-              ? (
-                  data.specValues as Array<{
-                    key: string;
-                    label: string;
-                    value: string;
-                  }>
-                ).length > 0
-              : typeof data.specValues === "object" &&
-                Object.keys(data.specValues).length > 0) && (
+            ((specGroups && specGroups.length > 0) ||
+              (typeof data.specValues === "object" &&
+                !Array.isArray(data.specValues) &&
+                Object.keys(data.specValues).length > 0)) && (
               <div className="mt-12">
                 <span className="block text-[11px] tracking-widest text-ash mb-3">
                   SPESIFIKASI
                 </span>
-                <div className="space-y-2">
-                  {Array.isArray(data.specValues)
-                    ? (
-                        data.specValues as Array<{
-                          key: string;
-                          label: string;
-                          value: string;
-                        }>
-                      ).map((spec) => (
-                        <div
-                          key={spec.key}
-                          className="flex justify-between py-2 border-b border-line text-sm"
-                        >
-                          <span className="text-ash">{spec.label}</span>
-                          <span className="font-semibold">{spec.value}</span>
-                        </div>
+                <div className="space-y-6">
+                  {specGroups
+                    ? specGroups.map(([group, items]) => (
+                        <SpecGroup key={group} title={group}>
+                          {items.map((spec) => (
+                            <div
+                              key={spec.key}
+                              className="flex justify-between py-2 border-b border-line text-sm"
+                            >
+                              <span className="text-ash">
+                                {spec.label || spec.key}
+                              </span>
+                              <span className="font-semibold">
+                                {String(spec.value)}
+                              </span>
+                            </div>
+                          ))}
+                        </SpecGroup>
                       ))
                     : Object.entries(
                         data.specValues as Record<string, unknown>,
@@ -320,5 +370,36 @@ function ProductDetail() {
       </section>
       <BannerCarousel banners={banners.bottom} className="-mx-6 md:-mx-16" />
     </>
+  );
+}
+
+interface SpecGroupProps {
+  title: string;
+  children: ReactNode;
+}
+
+function SpecGroup({ title, children }: SpecGroupProps) {
+  const [open, setOpen] = useState(true);
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="mb-2 flex w-full items-center justify-between md:pointer-events-none md:cursor-default"
+      >
+        <span className="block font-bold uppercase tracking-wider text-[11px] text-ink">
+          {title}
+        </span>
+        <MaterialIcon
+          name={open ? "expand_less" : "expand_more"}
+          className="!text-[16px] text-ash md:hidden"
+        />
+      </button>
+      <div className={open ? "block" : "hidden md:block"}>
+        <div className="space-y-2">{children}</div>
+      </div>
+    </div>
   );
 }
