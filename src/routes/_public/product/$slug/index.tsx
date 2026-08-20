@@ -171,7 +171,7 @@ function ProductDetail() {
     <div className={banners.hero ? "pt-[6.75rem]" : ""}>
       <PageBanner hero={banners.hero} top={banners.top} />
 
-      <section className="pt-32 pb-8">
+      <section className={banners.hero ? "pt-8 pb-8" : "pt-32 pb-8"}>
         <Link
           resetScroll={false}
           to={backTo}
