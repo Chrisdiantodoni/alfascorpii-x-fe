@@ -5,7 +5,8 @@ type BaseProps = {
   error?: string;
   optional?: boolean;
   fontSize?: number;
-  required?: boolean; // <-- Tambahkan prop required
+  required?: boolean;
+  className?: string; // Menambahkan dukungan className luar
 };
 
 export type TextInputProps = Omit<
@@ -27,8 +28,9 @@ type TextAreaProps = Omit<
   };
 
 type Props = TextInputProps | TextAreaProps;
+
 const inputCls =
-  "appearance-none border-0 border-b border-line bg-transparent outline-none px-[2px] py-[10px] text-[15px] text-ink focus:border-b-blue-bright transition-colors placeholder:text-[#9CA3AF]";
+  "w-full appearance-none border-0 border-b border-line bg-transparent outline-none px-[2px] py-[10px] text-[15px] text-ink focus:border-b-blue-bright transition-colors placeholder:text-[#9CA3AF]";
 
 export const TextInput = forwardRef<
   HTMLInputElement | HTMLTextAreaElement,
@@ -43,19 +45,20 @@ export const TextInput = forwardRef<
     multiline,
     id: idProp,
     name,
+    className = "",
     ...rest
   } = props;
   const id = idProp ?? name;
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className={`flex flex-col gap-2 ${className}`}>
       <label
         htmlFor={id}
-        className={`text-[${fontSize}px] tracking-widest text-ash flex items-center gap-1`}
+        style={{ fontSize: `${fontSize}px` }}
+        className="tracking-widest text-ash flex items-center gap-1"
       >
         <span>{label}</span>
 
-        {/* Tanda Asterisk (*) untuk Required */}
         {required && (
           <span
             className="text-red-700 font-bold text-[12px] leading-none"
@@ -65,7 +68,6 @@ export const TextInput = forwardRef<
           </span>
         )}
 
-        {/* Label Opsional */}
         {optional && (
           <span className="text-ash/60 text-[10px] lowercase">(opsional)</span>
         )}

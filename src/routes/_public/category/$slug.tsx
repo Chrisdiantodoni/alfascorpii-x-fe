@@ -19,164 +19,165 @@ import type { Category, FeaturedProduct } from "#/types";
 import { formatRupiah } from "#/utils/fn";
 
 function mapToMiniCard(product: FeaturedProduct) {
-	const type = product.subCategory?.name?.toLowerCase() || "";
-	const year = product?.specValues?.find((s) => s.key === "year");
+  const type = product.subCategory?.name?.toLowerCase() || "";
+  const year = product?.specValues?.find((s) => s.key === "year");
 
-	// Fix: Gunakan product.subCategory?.name secara langsung
-	const badge =
-		type === "motor"
-			? product.subCategory?.name?.toUpperCase() || "MOTOR"
-			: type === "legacy"
-				? "KLASIK"
-				: product.code || "SPAREPART";
+  // Fix: Gunakan product.subCategory?.name secara langsung
+  const badge =
+    type === "motor"
+      ? product.subCategory?.name?.toUpperCase() || "MOTOR"
+      : type === "legacy"
+        ? "KLASIK"
+        : product.code || "SPAREPART";
 
-	const icon = "two-wheel";
-	const imageUrl = product?.images.find(
-		(find) => find.role === "thumbnail",
-	)?.url;
+  const icon = "two-wheel";
+  const imageUrl = product?.images.find(
+    (find) => find.role === "thumbnail",
+  )?.url;
 
-	const detail =
-		type === "motor"
-			? `${product.stock > 0 ? `${product.stock} unit tersedia` : "Cek ketersediaan"}${year ? ` · ${year.value}` : ""}`
-			: "";
+  const detail =
+    type === "motor"
+      ? `${product.stock > 0 ? `${product.stock} unit tersedia` : "Cek ketersediaan"}${year ? ` · ${year.value}` : ""}`
+      : "";
 
-	const price = formatRupiah(Number(product.price));
+  const price = formatRupiah(Number(product.price));
 
-	return {
-		badge,
-		icon,
-		imageUrl,
-		name: product.name,
-		slug: product.slug,
-		detail,
-		price,
-		href: `/product/${product.slug}`,
-		productId: product.id,
-	};
+  return {
+    badge,
+    icon,
+    imageUrl,
+    name: product.name,
+    slug: product.slug,
+    detail,
+    price,
+    href: `/product/${product.slug}`,
+    productId: product.id,
+  };
 }
 
 const searchSchema = z.record(z.string(), z.string().optional());
 
 export const Route = createFileRoute("/_public/category/$slug")({
-	component: CategoryPage,
-	validateSearch: (search) => searchSchema.parse(search),
-	loaderDeps: ({ search }) => ({ search }),
-	loader: async ({ params, deps: { search }, context }) => {
-		const [res] = await Promise.all([
-			getProductByCategory({
-				data: { slug: params.slug, ...search },
-			}),
-			context.queryClient.ensureQueryData(bannerQueryOptions(params.slug)),
-		]);
-		return { res: res || [] };
-	},
+  component: CategoryPage,
+  validateSearch: (search) => searchSchema.parse(search),
+  loaderDeps: ({ search }) => ({ search }),
+  loader: async ({ params, deps: { search }, context }) => {
+    const [res] = await Promise.all([
+      getProductByCategory({
+        data: { slug: params.slug, ...search },
+      }),
+      context.queryClient.ensureQueryData(bannerQueryOptions(params.slug)),
+    ]);
+    return { res: res || [] };
+  },
 });
 
 function CategoryPage() {
-	const { slug } = Route.useParams();
-	const navigate = useNavigate();
-	const search = Route.useSearch() as Record<string, string | undefined>;
-	const {
-		res,
-	}: {
-		res: {
-			categories: Category;
-			products: FeaturedProduct[];
-		};
-	} = Route.useLoaderData();
-	const { data: banners } = useSuspenseQuery(bannerQueryOptions(slug));
+  const { slug } = Route.useParams();
+  const navigate = useNavigate();
+  const search = Route.useSearch() as Record<string, string | undefined>;
+  const {
+    res,
+  }: {
+    res: {
+      categories: Category;
+      products: FeaturedProduct[];
+    };
+  } = Route.useLoaderData();
+  const { data: banners } = useSuspenseQuery(bannerQueryOptions(slug));
 
-	const title = slug
-		.replace(/-/g, " ")
-		.replace(/\b\w/g, (char) => char.toUpperCase());
-	const products = res.products;
-	const hasSidebar =
-		Array.isArray(res?.categories?.specTemplate) &&
-		res.categories.specTemplate.length > 0;
-	const isSparepart = res?.categories?.name
-		?.toLowerCase()
-		.includes("sparepart");
-	const sort = search.sort;
+  const title = slug
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+  const products = res.products;
+  const hasSidebar =
+    Array.isArray(res?.categories?.specTemplate) &&
+    res.categories.specTemplate.length > 0;
+  const isSparepart = res?.categories?.name
+    ?.toLowerCase()
+    .includes("sparepart");
+  const sort = search.sort;
 
-	const handleSortChange = (value: string) => {
-		navigate({
-			search: (prev: Record<string, unknown>) => ({
-				...prev,
-				sort: value === "recommended" ? undefined : value,
-			}),
-			replace: true,
-		});
-	};
+  const handleSortChange = (value: string) => {
+    navigate({
+      search: (prev: Record<string, unknown>) => ({
+        ...prev,
+        sort: value === "recommended" ? undefined : value,
+      }),
+      replace: true,
+    });
+  };
 
-	return (
-		<>
-			<PageBanner hero={banners.hero} top={banners.top} />
-			<section
-				className={`${banners.hero.length > 0 || banners.top.length > 0 ? "pt-18 " : "pt-32 lg:pt-28"} pb-8`}
-			>
-				<Link
-					resetScroll={false}
-					to="/store"
-					className="hover:text-blue inline-flex items-center gap-2 text-[11px] tracking-widest text-ash transition-colors"
-				>
-					<MaterialIcon name="arrow_back" className="!text-[16px]" />
-					KEMBALI
-				</Link>
-			</section>
-			<BannerCarousel banners={banners.middle} className="-mx-6 md:-mx-16" />
+  return (
+    <>
+      <PageBanner hero={banners.hero} top={banners.top} />
+      <section
+        className={`${banners.hero.length > 0 || banners.top.length > 0 ? "pt-18 " : "pt-32 lg:pt-28"} pb-8`}
+      >
+        <Link
+          resetScroll={false}
+          to="/store"
+          className="hover:text-blue inline-flex items-center gap-2 text-[11px] tracking-widest text-ash transition-colors"
+        >
+          <MaterialIcon name="arrow_back" className="!text-[16px]" />
+          KEMBALI
+        </Link>
+      </section>
+      <BannerCarousel banners={banners.middle} className="-mx-6 md:-mx-16" />
 
-			<Section className="pt-8">
-				<div
-					className={`grid grid-cols-1 gap-10 ${hasSidebar ? "lg:grid-cols-6" : ""}`}
-				>
-					{hasSidebar && (
-						<CategorySidebar specTemplate={res.categories.specTemplate} />
-					)}
+      <Section className="pt-8">
+        <div
+          className={`grid grid-cols-1 gap-10 ${hasSidebar ? "lg:grid-cols-6" : ""}`}
+        >
+          {hasSidebar && (
+            <CategorySidebar specTemplate={res.categories.specTemplate} />
+          )}
 
-					<div className={hasSidebar ? "lg:col-span-5" : ""}>
-						<SectionHeading className="mb-4">{title}</SectionHeading>
-						<p className="mb-10 max-w-2xl text-ash">
-							{res.categories?.description}
-						</p>
-						<div className="w-full pb-8  flex flex-wrap items-end justify-between gap-4">
-							<TextInput
-								fontSize={14}
-								placeholder={`Nmax, Gear Ultima, Filano`}
-								label={`Cari ${title}`}
-							/>
-							{isSparepart && (
-								<SortSelect value={sort} onChange={handleSortChange} />
-							)}
-						</div>
+          <div className={hasSidebar ? "lg:col-span-5" : ""}>
+            <SectionHeading className="mb-4">{title}</SectionHeading>
+            <p className="mb-10 max-w-2xl text-ash">
+              {res.categories?.description}
+            </p>
+            <div className="w-full pb-8  flex flex-wrap items-end justify-between gap-4">
+              <TextInput
+                fontSize={14}
+                className="flex-1 min-w-[240px]"
+                placeholder={`Nmax, Gear Ultima, Filano`}
+                label={`Cari ${title}`}
+              />
+              {isSparepart && (
+                <SortSelect value={sort} onChange={handleSortChange} />
+              )}
+            </div>
 
-						{products.length > 0 ? (
-							<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-								{products.map((p) => {
-									const props = mapToMiniCard(p as unknown as FeaturedProduct);
-									return (
-										<motion.div
-											key={p.id}
-											layoutId={`category-card-${p.slug}`}
-											transition={{
-												duration: 0.45,
-												ease: [0.32, 0.72, 0, 1],
-											}}
-										>
-											<MiniProductCard {...props} />
-										</motion.div>
-									);
-								})}
-							</div>
-						) : (
-							<EmptyState
-								title={`Tidak ada produk di ${title}`}
-								description="Belum ada produk yang tersedia di kategori ini."
-							/>
-						)}
-					</div>
-				</div>
-			</Section>
-			<BannerCarousel banners={banners.bottom} className="-mx-6 md:-mx-16" />
-		</>
-	);
+            {products.length > 0 ? (
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
+                {products.map((p) => {
+                  const props = mapToMiniCard(p as unknown as FeaturedProduct);
+                  return (
+                    <motion.div
+                      key={p.id}
+                      layoutId={`category-card-${p.slug}`}
+                      transition={{
+                        duration: 0.45,
+                        ease: [0.32, 0.72, 0, 1],
+                      }}
+                    >
+                      <MiniProductCard {...props} />
+                    </motion.div>
+                  );
+                })}
+              </div>
+            ) : (
+              <EmptyState
+                title={`Tidak ada produk di ${title}`}
+                description="Belum ada produk yang tersedia di kategori ini."
+              />
+            )}
+          </div>
+        </div>
+      </Section>
+      <BannerCarousel banners={banners.bottom} className="-mx-6 md:-mx-16" />
+    </>
+  );
 }
