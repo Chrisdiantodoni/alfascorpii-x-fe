@@ -168,7 +168,7 @@ function ProductDetail() {
   };
 
   return (
-    <>
+    <div className={banners.hero ? "pt-32" : ""}>
       <PageBanner hero={banners.hero} top={banners.top} />
 
       <section className="pt-32 pb-8">
@@ -369,7 +369,7 @@ function ProductDetail() {
         </div>
       </section>
       <BannerCarousel banners={banners.bottom} className="-mx-6 md:-mx-16" />
-    </>
+    </div>
   );
 }
 

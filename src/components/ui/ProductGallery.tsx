@@ -78,7 +78,7 @@ export function ProductGallery({ files, productName }: ProductGalleryProps) {
             alt={productName}
             width={800}
             height={800}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
           />
           <button
             type="button"
