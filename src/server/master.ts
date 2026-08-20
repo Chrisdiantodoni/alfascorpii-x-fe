@@ -436,18 +436,24 @@ export const getProductDetail = createServerFn({ method: "GET" })
 			data: { type: "product", ids: [response.id] },
 		});
 
-		const rel = await db.query.relatedProducts.findMany({
-			where: eq(relatedProducts.productId, response.id),
-			with: {
-				product_relatedProductId: {
-					with: { subCategory: true },
-				},
-			},
-		});
+		const relatedIds = await db
+			.select({ relatedProductId: relatedProducts.relatedProductId })
+			.from(relatedProducts)
+			.where(eq(relatedProducts.productId, response.id));
 
-		const relatedProductsList = rel
-			.map((r) => r.product_relatedProductId)
-			.filter((p) => Boolean(p?.isActive && !p.deletedAt));
+		const ids = relatedIds.map((r) => r.relatedProductId);
+
+		const relatedProductsList =
+			ids.length > 0
+				? await db.query.products.findMany({
+						where: and(
+							inArray(products.id, ids),
+							eq(products.isActive, true),
+							isNull(products.deletedAt),
+						),
+						with: { subCategory: true },
+					})
+				: [];
 
 		const relatedFilesMap =
 			relatedProductsList.length > 0
