@@ -72,7 +72,7 @@ export function MiniProductCard({
                   src={imageUrl}
                   alt={name}
                   width={400}
-                  height={300}
+                  height={400}
                   className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
                 />
               ) : icon ? (
