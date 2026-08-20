@@ -48,17 +48,22 @@ export default function SparepartsTeaser() {
 			</a>
 
 			<DragScrollContainer className="mt-16 auto-cols-[280px] gap-6">
-				{products.map((p) => (
-					<MiniProductCard
-						key={p.id}
-						badge={p.code || "SPAREPART"}
-						icon="settings"
-						name={p.name}
-						slug={p.slug}
-						detail={rupiah(p.price)}
-						href={`/product/${p.slug}`}
-					/>
-				))}
+				{products.map((p) => {
+					const subName = partsCat?.subCategories.find(
+						(s) => s.id === p.subCategoryId,
+					)?.name;
+					return (
+						<MiniProductCard
+							key={p.id}
+							badge={subName?.toUpperCase() || p.code?.toUpperCase() || "SPAREPART"}
+							icon="settings"
+							name={p.name}
+							slug={p.slug}
+							detail={rupiah(p.price)}
+							href={`/product/${p.slug}`}
+						/>
+					);
+				})}
 			</DragScrollContainer>
 		</motion.section>
 	);

@@ -298,7 +298,7 @@ function Store() {
                   <SharedElement layoutId={`category-card-${item.slug}`}>
                     <MiniProductCard
                       slug={item.slug}
-                      badge={item.code}
+                      badge={item.subCategory?.name?.toUpperCase()}
                       name={item.name}
                       imageUrl={thumb?.url}
                       detail={item.subCategory.name}

@@ -23,13 +23,10 @@ function mapToMiniCard(product: FeaturedProduct) {
   const type = product.subCategory?.name?.toLowerCase() || "";
   const year = product?.specValues?.find((s) => s.key === "year");
 
-  // Fix: Gunakan product.subCategory?.name secara langsung
   const badge =
-    type === "motor"
-      ? product.subCategory?.name?.toUpperCase() || "MOTOR"
-      : type === "legacy"
-        ? "KLASIK"
-        : product.code || "SPAREPART";
+    product.subCategory?.name?.toUpperCase() ||
+    product.code?.toUpperCase() ||
+    "PRODUK";
 
   const icon = "two-wheel";
   const imageUrl = product?.images.find(

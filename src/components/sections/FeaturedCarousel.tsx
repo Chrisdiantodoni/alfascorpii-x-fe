@@ -71,7 +71,7 @@ export default function FeaturedCarousel({
       <SwiperContainer className="mt-8" stagger>
         {products.map(({ product, subCategoryName }) =>
           cardMode === "sparepart"
-            ? renderSparepartCard(product)
+            ? renderSparepartCard(product, subCategoryName)
             : renderMotorCard(product, subCategoryName),
         )}
       </SwiperContainer>
@@ -115,12 +115,15 @@ function getYear(product: FeaturedProduct): string | undefined {
   return typeof yearVal === "string" ? yearVal : undefined;
 }
 
-function renderSparepartCard(product: FeaturedProduct) {
+function renderSparepartCard(
+  product: FeaturedProduct,
+  subCategoryName: string,
+) {
   const imageUrl = product.images.find((find) => find.role === "thumbnail");
   return (
     <MiniProductCard
       key={product.id}
-      badge={product.code || "SPAREPART"}
+      badge={subCategoryName.toUpperCase()}
       icon="settings"
       name={product.name}
       slug={product.slug}
