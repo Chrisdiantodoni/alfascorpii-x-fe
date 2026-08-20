@@ -140,6 +140,14 @@ html.dark .hover\:bg-ink > * {
     backdrop-filter 0.3s;
 }
 
+#topbar:not(.nav-transparent) {
+  border-bottom-color: rgba(226, 228, 233, 0.5);
+}
+
+html.dark #topbar:not(.nav-transparent) {
+  border-bottom-color: rgba(38, 40, 46, 0.5);
+}
+
 #topbar.scrolled {
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(16px);
