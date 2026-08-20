@@ -445,14 +445,26 @@ export const getProductDetail = createServerFn({ method: "GET" })
 
 		const relatedProductsList =
 			ids.length > 0
-				? await db.query.products.findMany({
-						where: and(
-							inArray(products.id, ids),
-							eq(products.isActive, true),
-							isNull(products.deletedAt),
-						),
-						with: { subCategory: true },
-					})
+				? await db
+						.select({
+							id: products.id,
+							name: products.name,
+							slug: products.slug,
+							code: products.code,
+							price: products.price,
+							stock: products.stock,
+							description: products.description,
+							subCategoryName: subCategories.name,
+						})
+						.from(products)
+						.leftJoin(subCategories, eq(products.subCategoryId, subCategories.id))
+						.where(
+							and(
+								inArray(products.id, ids),
+								eq(products.isActive, true),
+								isNull(products.deletedAt),
+							),
+						)
 				: [];
 
 		const relatedFilesMap =
@@ -472,7 +484,8 @@ export const getProductDetail = createServerFn({ method: "GET" })
 			code: p.code,
 			price: p.price,
 			stock: p.stock,
-			subCategory: p.subCategory ? { name: p.subCategory.name } : null,
+			description: p.description,
+			subCategory: p.subCategoryName ? { name: p.subCategoryName } : null,
 			images: relatedFilesMap[p.id] ?? [],
 		}));
 
