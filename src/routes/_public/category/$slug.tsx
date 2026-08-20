@@ -1,6 +1,5 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { motion } from "motion/react";
 import z from "zod";
 import { PageBanner } from "#/components/PageBanner";
 import { BannerCarousel } from "#/components/ui/BannerCarousel";
@@ -153,16 +152,9 @@ function CategoryPage() {
                 {products.map((p) => {
                   const props = mapToMiniCard(p as unknown as FeaturedProduct);
                   return (
-                    <motion.div
-                      key={p.id}
-                      layoutId={`category-card-${p.slug}`}
-                      transition={{
-                        duration: 0.45,
-                        ease: [0.32, 0.72, 0, 1],
-                      }}
-                    >
+                    <div key={p.id}>
                       <MiniProductCard {...props} />
-                    </motion.div>
+                    </div>
                   );
                 })}
               </div>

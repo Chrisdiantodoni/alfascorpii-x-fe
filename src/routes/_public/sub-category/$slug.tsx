@@ -3,7 +3,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import z from "zod";
 import { PageBanner } from "#/components/PageBanner";
-import { SharedElement } from "#/components/SharedElements";
 import { BannerCarousel } from "#/components/ui/BannerCarousel";
 import CategorySidebar from "#/components/ui/CategorySidebar";
 import { EmptyState } from "#/components/ui/EmptyState";
@@ -165,16 +164,9 @@ function SubCategoryPage() {
                 {products.map((p) => {
                   const props = mapToMiniCard(p as unknown as FeaturedProduct);
                   return (
-                    <SharedElement
-                      key={p.id}
-                      layoutId={`category-card-${p.slug}`}
-                      transition={{
-                        duration: 0.45,
-                        ease: [0.32, 0.72, 0, 1],
-                      }}
-                    >
+                    <div key={p.id}>
                       <MiniProductCard {...props} />
-                    </SharedElement>
+                    </div>
                   );
                 })}
               </div>
