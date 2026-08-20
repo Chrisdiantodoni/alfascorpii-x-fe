@@ -108,7 +108,7 @@ function ProductDetail() {
 
   const banners = {
     hero: files.filter((find) => find.role === "top_banner"),
-    top: null,
+    top: [],
     middle: files.filter((find) => find.role === "middle_baner"),
     bottom: files.filter((find) => find.role === "bottom_banner"),
   };
