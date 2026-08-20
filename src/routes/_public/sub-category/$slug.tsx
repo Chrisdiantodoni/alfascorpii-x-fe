@@ -17,6 +17,7 @@ import { getSubCategoryBySlug } from "#/server/master";
 import type { Category, FeaturedProduct, SubCategory } from "#/types";
 import { formatRupiah } from "#/utils/fn";
 import { AnimatedRoute } from "#/components/AnimatedRoute";
+import { SharedElement } from "#/components/SharedElements";
 
 function mapToMiniCard(product: FeaturedProduct) {
   const type = product.subCategory?.name?.toLowerCase() || "";

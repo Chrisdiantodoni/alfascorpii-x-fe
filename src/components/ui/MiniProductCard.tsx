@@ -33,13 +33,9 @@ export function MiniProductCard({
   // 1. Cek apakah link tujuan card ini ke product
   const isTargetingProduct = href.startsWith("/product/");
 
-  const isReturning =
-    (location.state as { returnFromProduct?: boolean } | null)
-      ?.returnFromProduct ?? false;
-
   // 2. Tentukan apakah layoutId harus aktif:
   // - Aktif jika href menuju ke product DANKELUAR dari status disableLayoutId
-  const shouldAnimate = isTargetingProduct && !disableLayoutId && !isReturning;
+  const shouldAnimate = isTargetingProduct && !disableLayoutId;
   return (
     <div className="relative border border-line bg-paper hover:border-blue hover:shadow-md transition-all duration-300 ease-out flex flex-col h-full overflow-hidden focus-within:ring-2 focus-within:ring-blue focus-within:ring-offset-1 rounded-sm">
       {/* Full-card overlay link ke detail produk */}
