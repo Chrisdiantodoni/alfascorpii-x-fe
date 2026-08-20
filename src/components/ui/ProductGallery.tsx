@@ -27,11 +27,8 @@ function prepareImages(files: ProductGalleryProps["files"]): GalleryImage[] {
 
   const thumbnails = valid.filter((f) => f.role === "thumbnail");
   const gallery = valid.filter((f) => f.role === "gallery");
-  const others = valid.filter(
-    (f) => f.role !== "thumbnail" && f.role !== "gallery",
-  );
 
-  return [...thumbnails, ...gallery, ...others].map((f, index) => ({
+  return [...thumbnails, ...gallery].map((f, index) => ({
     id: f.id || `${f.url}-${index}`,
     url: f.url,
   }));
