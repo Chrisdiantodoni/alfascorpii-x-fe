@@ -37,7 +37,7 @@ export function MiniProductCard({
   // - Aktif jika href menuju ke product DANKELUAR dari status disableLayoutId
   const shouldAnimate = isTargetingProduct && !disableLayoutId;
   return (
-    <div className="group relative border border-line bg-paper hover:border-blue hover:shadow-md transition-all duration-300 ease-out flex flex-col h-full overflow-hidden focus-within:ring-2 focus-within:ring-blue focus-within:ring-offset-1 rounded-sm">
+    <div className="relative border border-line bg-paper hover:border-blue hover:shadow-md transition-all duration-300 ease-out flex flex-col h-full overflow-hidden focus-within:ring-2 focus-within:ring-blue focus-within:ring-offset-1 rounded-sm">
       {/* Full-card overlay link ke detail produk */}
       <Link
         resetScroll={false}
@@ -66,19 +66,19 @@ export function MiniProductCard({
           <SharedElement
             layoutId={shouldAnimate ? `product-card-${slug}` : undefined}
           >
-            <div className="aspect-square bg-paper-dim overflow-hidden">
+            <div className="group aspect-square bg-paper-dim overflow-hidden">
               {imageUrl ? (
                 <Image
                   src={imageUrl}
                   alt={name}
                   width={400}
                   height={300}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
                 />
               ) : icon ? (
                 <MaterialIcon
                   name={icon}
-                  className="!text-[60px] text-blue/30 select-none"
+                  className="!text-[60px] text-blue/30 group-hover:text-blue/70 group-hover:scale-110 transition-all duration-500 select-none"
                 />
               ) : null}
             </div>
