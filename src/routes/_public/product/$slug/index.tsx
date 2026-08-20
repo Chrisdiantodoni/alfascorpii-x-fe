@@ -168,7 +168,7 @@ function ProductDetail() {
   };
 
   return (
-    <div className={banners.hero ? "pt-32" : ""}>
+    <div className={banners.hero ? "pt-24" : ""}>
       <PageBanner hero={banners.hero} top={banners.top} />
 
       <section className="pt-32 pb-8">
