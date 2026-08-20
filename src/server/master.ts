@@ -14,11 +14,12 @@ import {
 import { z } from "zod";
 import { db } from "#/db";
 import {
-	categories,
-	menuItems,
-	products,
-	siteSettings,
-	subCategories,
+  categories,
+  menuItems,
+  products,
+  relatedProducts,
+  siteSettings,
+  subCategories,
 } from "#/drizzle/schema";
 import { generatePresignedUrl } from "#/lib/minio";
 import type { ContactSettings } from "#/types";
@@ -435,12 +436,47 @@ export const getProductDetail = createServerFn({ method: "GET" })
 			data: { type: "product", ids: [response.id] },
 		});
 
+		const rel = await db.query.relatedProducts.findMany({
+			where: eq(relatedProducts.productId, response.id),
+			with: {
+				product_relatedProductId: {
+					with: { subCategory: true },
+				},
+			},
+		});
+
+		const relatedProductsList = rel
+			.map((r) => r.product_relatedProductId)
+			.filter((p) => Boolean(p?.isActive && !p.deletedAt));
+
+		const relatedFilesMap =
+			relatedProductsList.length > 0
+				? await batchFilesWithUrls({
+						data: {
+							type: "product",
+							ids: relatedProductsList.map((p) => p.id),
+						},
+					})
+				: {};
+
+		const related = relatedProductsList.map((p) => ({
+			id: p.id,
+			name: p.name,
+			slug: p.slug,
+			code: p.code,
+			price: p.price,
+			stock: p.stock,
+			subCategory: p.subCategory ? { name: p.subCategory.name } : null,
+			images: relatedFilesMap[p.id] ?? [],
+		}));
+
 		return {
 			...response,
 			specValues: response.specValues
 				? JSON.parse(JSON.stringify(response.specValues))
 				: null,
 			files: filesMap[response.id] ?? [],
+			related,
 		};
 	});
 

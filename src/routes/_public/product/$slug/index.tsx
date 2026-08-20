@@ -6,18 +6,21 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { PageBanner } from "#/components/PageBanner";
 import { SharedElement } from "#/components/SharedElements";
 import { ProductDetailSkeleton } from "#/components/skeleton/ProductDetailSkeleton";
+import type { Banner } from "#/components/ui/BannerSlide";
 import { BannerCarousel } from "#/components/ui/BannerCarousel";
 import { Button } from "#/components/ui/Button";
+import { MarkdownPreview } from "#/components/ui/MarkdownPreview";
 import { MaterialIcon } from "#/components/ui/MaterialIcon";
+import { MiniProductCard } from "#/components/ui/MiniProductCard";
 import { ProductGallery } from "#/components/ui/ProductGallery";
 import { ShareButton } from "#/components/ui/ShareButton";
+import { SwiperContainer } from "#/components/ui/SwiperContainer";
 import { WishlistButton } from "#/components/ui/WishlistButton";
 import { getBanners } from "#/server/cms";
 import { getProductDetail } from "#/server/master";
 import { type CartColor, lineId, useCartStore } from "#/stores/cart";
 import { formatRupiah } from "#/utils/fn";
 import type { BannerProps } from "#/types";
-import type { Banner } from "#/components/ui/BannerSlide";
 
 export const Route = createFileRoute("/_public/product/$slug/")({
   component: ProductDetail,
@@ -211,9 +214,10 @@ function ProductDetail() {
             <p className="text-[12px] text-ash mb-6">{data.code}</p>
           )}
           <p className="font-head font-bold text-2xl mb-6">{price}</p>
-          <p className="text-ash leading-relaxed mb-8 max-w-lg">
-            {data.description}
-          </p>
+          <MarkdownPreview
+            content={data.description || ""}
+            className="mb-8 max-w-lg leading-relaxed text-ash"
+          />
 
           {colors.length > 0 && (
             <div className="mb-8">
@@ -368,6 +372,53 @@ function ProductDetail() {
             )}
         </div>
       </section>
+      {Array.isArray(data.related) && data.related.length > 0 && (
+        <section className="py-24 border-t border-line scroll-mt-24">
+          <div className="flex flex-wrap items-end justify-between gap-6 mb-10">
+            <div>
+              <span className="block text-[12px] tracking-widest text-ash mb-4">
+                YANG JUGA MUNGKIN KAMU SUKAI
+              </span>
+              <h2 className="font-head font-black text-3xl md:text-5xl tracking-tight">
+                Produk Terkait
+              </h2>
+            </div>
+            <Link
+              resetScroll={false}
+              to="/store"
+              className="inline-block text-[12px] font-semibold tracking-widest border-b border-ink pb-1 hover:text-blue transition-colors"
+            >
+              LIHAT SEMUA →
+            </Link>
+          </div>
+          <SwiperContainer stagger>
+            {data.related.map((prod) => {
+              const thumb = prod.images?.find(
+                (f) => f.role === "thumbnail",
+              );
+              return (
+                <MiniProductCard
+                  key={prod.id}
+                  badge={prod.subCategory?.name?.toUpperCase()}
+                  name={prod.name}
+                  slug={prod.slug}
+                  imageUrl={thumb?.url}
+                  detail={
+                    prod.description?.trim()
+                      ? prod.description
+                      : prod.stock > 0
+                        ? `${prod.stock} unit tersedia`
+                        : "Cek ketersediaan"
+                  }
+                  price={formatRupiah(Number(prod.price))}
+                  href={`/product/${prod.slug}`}
+                  productId={prod.id}
+                />
+              );
+            })}
+          </SwiperContainer>
+        </section>
+      )}
       <BannerCarousel banners={banners.bottom} className="-mx-6 md:-mx-16" />
     </div>
   );
