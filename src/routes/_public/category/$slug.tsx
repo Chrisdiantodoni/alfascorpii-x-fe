@@ -8,10 +8,10 @@ import CategorySidebar from "#/components/ui/CategorySidebar";
 import { EmptyState } from "#/components/ui/EmptyState";
 import { MaterialIcon } from "#/components/ui/MaterialIcon";
 import { MiniProductCard } from "#/components/ui/MiniProductCard";
+import { ProductSearchInput } from "#/components/ui/ProductSearchInput";
 import { Section } from "#/components/ui/Section";
 import { SectionHeading } from "#/components/ui/SectionHeading";
 import { SortSelect } from "#/components/ui/SortSelect";
-import { TextInput } from "#/components/ui/TextInput";
 import { cms } from "#/data/cms";
 import { bannerQueryOptions } from "#/queries/cms";
 import { getProductByCategory } from "#/server/master";
@@ -137,10 +137,9 @@ function CategoryPage() {
               {res.categories?.description}
             </p>
             <div className="w-full pb-8  flex flex-wrap items-end justify-between gap-4">
-              <TextInput
-                fontSize={14}
+              <ProductSearchInput
                 className="flex-1 min-w-[240px]"
-                placeholder={`Nmax, Gear Ultima, Filano`}
+                placeholder="Nmax, Gear Ultima, Filano"
                 label={`Cari ${title}`}
               />
               {isSparepart && (

@@ -291,7 +291,14 @@ export const getSubCategoryBySlug = createServerFn({ method: "GET" })
     ),
   )
   .handler(async ({ data }) => {
-    const { slug, sort, ...filters } = data;
+    const { slug, sort, q, ...filters } = data;
+
+    const searchCondition = q?.trim()
+      ? or(
+          ilike(products.name, `%${q.trim()}%`),
+          ilike(products.code, `%${q.trim()}%`),
+        )
+      : undefined;
 
     const base = await db.query.subCategories.findFirst({
       where: and(eq(subCategories.slug, slug), isNull(subCategories.deletedAt)),
@@ -317,6 +324,7 @@ export const getSubCategoryBySlug = createServerFn({ method: "GET" })
             and(
               eq(products.isActive, true),
               isNull(products.deletedAt),
+              ...(searchCondition ? [searchCondition] : []),
               ...filterConditions,
             ),
           orderBy,
@@ -547,7 +555,14 @@ export const getProductByCategory = createServerFn({ method: "GET" })
     ),
   )
   .handler(async ({ data }) => {
-    const { slug, sort, ...filters } = data;
+    const { slug, sort, q, ...filters } = data;
+
+    const searchCondition = q?.trim()
+      ? or(
+          ilike(products.name, `%${q.trim()}%`),
+          ilike(products.code, `%${q.trim()}%`),
+        )
+      : undefined;
 
     const category = await db.query.categories.findFirst({
       where: and(eq(categories.slug, slug), isNull(categories.deletedAt)),
@@ -573,6 +588,7 @@ export const getProductByCategory = createServerFn({ method: "GET" })
         eq(products.isActive, true),
         isNull(products.deletedAt),
         inArray(products.subCategoryId, subCategoryIds),
+        ...(searchCondition ? [searchCondition] : []),
         ...filterConditions,
       ),
       orderBy,
