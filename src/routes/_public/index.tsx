@@ -80,10 +80,10 @@ function Home() {
         banners={banners.bottom as Banner[]}
         className="-mx-6 md:-mx-16"
       />
-      <InquiryForm />
       {Array.isArray(settings?.faqs) && (
         <Faq faqs={settings.faqs as unknown as FaqProps[]} />
       )}
+      <InquiryForm />
     </>
   );
 }
