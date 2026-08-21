@@ -56,7 +56,7 @@ export default function Topbar({
     active ? "text-blue-bright" : isTransparent ? "text-white/80" : "text-ink";
 
   const headerItems =
-    menu.find((m) => m.location === "header")?.menuItems ??
+    menu?.find((m) => m.location === "header")?.menuItems ??
     menu[0]?.menuItems ??
     [];
   const dynamicItems = headerItems.filter((item) => item.isActive);

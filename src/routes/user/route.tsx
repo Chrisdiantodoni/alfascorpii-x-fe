@@ -87,8 +87,9 @@ function UserLayout() {
     <UserSessionContext.Provider value={session}>
       <div className="min-h-screen bg-gradient-to-b from-paper to-paper-dim/30 flex flex-col">
         {/* Header */}
-        <header className="border-b border-line/60 bg-white/80 backdrop-blur-sm sticky top-0 z-40 mb-24">
+        {/*<header className="border-b border-line/60 bg-white/80 backdrop-blur-sm sticky top-0 z-40 mb-24">
           <Topbar
+            me
             menuOpen={menuOpen}
             transparent={menuOpen}
             onMenuToggle={() => setMenuOpen((prev) => !prev)}
@@ -100,7 +101,7 @@ function UserLayout() {
             menu={menu}
             contact={contact}
           />
-        </header>
+        </header>*/}
 
         {/* Mobile Navigation Trigger */}
         <div className="md:hidden border-b border-line/40 bg-white/50 backdrop-blur-sm px-6 py-3 flex items-center justify-between sticky top-[57px] z-30">
